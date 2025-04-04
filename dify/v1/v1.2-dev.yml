@@ -1,0 +1,1647 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: 250401_Woody
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables:
+  - description: ''
+    id: 2dfeb785-9b24-42f0-9c8c-c041a7756c55
+    name: conversation_uid
+    selector:
+    - conversation
+    - conversation_uid
+    value: ''
+    value_type: string
+  environment_variables:
+  - description: ''
+    id: 6060580f-cbbd-4f6d-8158-deaf07342542
+    name: MITLAB_BACKEND
+    selector:
+    - env
+    - MITLAB_BACKEND
+    value: http://140.118.162.94:30000/api/v1.0/
+    value_type: string
+  - description: ''
+    id: df6b16f3-b5d7-4738-a409-8f58fd95c46d
+    name: N8N_ACTIVE_BASE_URL
+    selector:
+    - env
+    - N8N_ACTIVE_BASE_URL
+    value: http://140.118.162.92:5678/webhook/
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions: []
+      allowed_file_types:
+      - video
+      - audio
+      - image
+      - document
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: true
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 1
+    opening_statement: 你好，我是ITRI SMO虛擬助理
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1742446926046-false-1742442730885-target
+      selected: false
+      source: '1742446926046'
+      sourceHandle: 'false'
+      target: '1742442730885'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742448090528-source-1742448389805-target
+      selected: false
+      source: '1742448090528'
+      sourceHandle: source
+      target: '1742448389805'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1742448389805-false-1742442828989-target
+      selected: false
+      source: '1742448389805'
+      sourceHandle: 'false'
+      target: '1742442828989'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742445883218-source-1742446926046-target
+      selected: false
+      source: '1742445883218'
+      sourceHandle: source
+      target: '1742446926046'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742447067053-source-1742447332580-target
+      selected: false
+      source: '1742447067053'
+      sourceHandle: source
+      target: '1742447332580'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: knowledge-retrieval
+      id: 1742447332580-true-1742442861275-target
+      selected: false
+      source: '1742447332580'
+      sourceHandle: 'true'
+      target: '1742442861275'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: parameter-extractor
+      id: 1742472808495-source-1742472982494-target
+      selected: false
+      source: '1742472808495'
+      sourceHandle: source
+      target: '1742472982494'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1742446926046-f84ddd9c-2ec2-4c9a-982f-dbf050004c96-1743501210955-target
+      selected: false
+      source: '1742446926046'
+      sourceHandle: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+      target: '1743501210955'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: llm
+      id: 1743511206372-source-1742445883218-target
+      selected: false
+      source: '1743511206372'
+      sourceHandle: source
+      target: '1742445883218'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 1743509989605-source-1742448090528-target
+      selected: false
+      source: '1743509989605'
+      sourceHandle: source
+      target: '1742448090528'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1742448389805-true-17435117558650-target
+      selected: false
+      source: '1742448389805'
+      sourceHandle: 'true'
+      target: '17435117558650'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 17435117512250-source-1742447067053-target
+      selected: false
+      source: '17435117512250'
+      sourceHandle: source
+      target: '1742447067053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 1743501210955-source-17435128925960-target
+      selected: false
+      source: '1743501210955'
+      sourceHandle: source
+      target: '17435128925960'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435128925960-source-1743509989605-target
+      selected: false
+      source: '17435128925960'
+      sourceHandle: source
+      target: '1743509989605'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 17435117558650-source-17435131894560-target
+      selected: false
+      source: '17435117558650'
+      sourceHandle: source
+      target: '17435131894560'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435131894560-source-17435117512250-target
+      selected: false
+      source: '17435131894560'
+      sourceHandle: source
+      target: '17435117512250'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 1742442730885-source-17435132396410-target
+      selected: false
+      source: '1742442730885'
+      sourceHandle: source
+      target: '17435132396410'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 1742442828989-source-17435138487230-target
+      selected: false
+      source: '1742442828989'
+      sourceHandle: source
+      target: '17435138487230'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 17435142956850-source-17435143717210-target
+      selected: false
+      source: '17435142956850'
+      sourceHandle: source
+      target: '17435143717210'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1742442861275-source-17435142956850-target
+      selected: false
+      source: '1742442861275'
+      sourceHandle: source
+      target: '17435142956850'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435143717210-source-17435145116790-target
+      selected: false
+      source: '17435143717210'
+      sourceHandle: source
+      target: '17435145116790'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435146281790-source-17435146350620-target
+      selected: false
+      source: '17435146281790'
+      sourceHandle: source
+      target: '17435146350620'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 17435145116790-source-1742472808495-target
+      selected: false
+      source: '17435145116790'
+      sourceHandle: source
+      target: '1742472808495'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1742447332580-false-17435146281790-target
+      selected: false
+      source: '1742447332580'
+      sourceHandle: 'false'
+      target: '17435146281790'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: parameter-extractor
+        targetType: code
+      id: 1742472982494-source-1743661175478-target
+      selected: false
+      source: '1742472982494'
+      sourceHandle: source
+      target: '1743661175478'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: answer
+      id: 1743661175478-source-1742475383217-target
+      selected: false
+      source: '1743661175478'
+      sourceHandle: source
+      target: '1742475383217'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: assigner
+      id: 1742442590290-source-1743511206372-target
+      selected: false
+      source: '1742442590290'
+      sourceHandle: source
+      target: '1743511206372'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: if-else
+      id: 1742475383217-source-1743667086008-target
+      source: '1742475383217'
+      sourceHandle: source
+      target: '1743667086008'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1743667086008-true-1743667208599-target
+      source: '1743667086008'
+      sourceHandle: 'true'
+      target: '1743667208599'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1743667086008-false-1743667490302-target
+      source: '1743667086008'
+      sourceHandle: 'false'
+      target: '1743667490302'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 開始
+        type: start
+        variables:
+        - label: conversation_uid
+          max_length: 48
+          options: []
+          required: false
+          type: text-input
+          variable: conversation_uid
+      height: 90
+      id: '1742442590290'
+      position:
+        x: -538.0076594638963
+        y: 262
+      positionAbsolute:
+        x: -538.0076594638963
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '[Error] 我是 ITRI SMO 專屬助理，只能針對 SMO 相關功能與需求提供問答服務，並非通用型助理。'
+        desc: ''
+        selected: false
+        title: '[ Error ]意圖識別階段'
+        type: answer
+        variables: []
+      height: 132
+      id: '1742442730885'
+      position:
+        x: 1035.7134607181292
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 1035.7134607181292
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '[ Warning ] 目前系統僅支援單一意圖類型的操作，請重新描述您的單一需求'
+        desc: ''
+        selected: false
+        title: '[ WARNING ] 複雜意圖階段'
+        type: answer
+        variables: []
+      height: 116
+      id: '1742442828989'
+      position:
+        x: 2476.959105308413
+        y: 470.45141161560025
+      positionAbsolute:
+        x: 2476.959105308413
+        y: 470.45141161560025
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        dataset_ids:
+        - 32cc60e0-ee5d-4a81-a045-dae8bfd6eb4d
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: reranking_model
+          reranking_model:
+            model: rerank-english-v2.0
+            provider: cohere
+          score_threshold: null
+          top_k: 1
+        query_variable_selector:
+        - '1742447067053'
+        - text
+        retrieval_mode: multiple
+        selected: false
+        title: '[Done]意圖轉Scenario轉換器'
+        type: knowledge-retrieval
+      height: 92
+      id: '1742442861275'
+      position:
+        x: 3825.405232068553
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 3825.405232068553
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        author: test
+        desc: ''
+        height: 528
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"意圖識別階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 2969
+      height: 528
+      id: '1742442983144'
+      position:
+        x: 188.08375925170913
+        y: 158.8733612444438
+      positionAbsolute:
+        x: 188.08375925170913
+        y: 158.8733612444438
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 2969
+    - data:
+        author: test
+        desc: ''
+        height: 558
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"意圖處理階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ' (1)'
+        type: ''
+        width: 2092
+      height: 558
+      id: '17424430040480'
+      position:
+        x: 3242.651327425774
+        y: 158.8733612444438
+      positionAbsolute:
+        x: 3242.651327425774
+        y: 158.8733612444438
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 2092
+    - data:
+        author: test
+        desc: ''
+        height: 598
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"參數補充階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: '  (2)'
+        type: ''
+        width: 2225
+      height: 598
+      id: '17424431355940'
+      position:
+        x: 5454.926447112264
+        y: 166.90377469055
+      positionAbsolute:
+        x: 5454.926447112264
+        y: 166.90377469055
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 2225
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - sys
+          - query
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: openai
+        prompt_template:
+        - id: cc5a2610-c9fc-43f8-9bca-3f3f5281fde3
+          role: system
+          text: "請閱讀以下文本，並判斷其是否與網管 SMO（Service Management and Orchestration）相關：\n\
+            文本:\n\n{{#sys.query#}}\n\n若相關，請在「reason」欄位中列出與 SMO 相關的關鍵字或核心概念，並簡要說明原因；\n\
+            若不相關，請在「reason」欄位中簡要說明不相關的原因。\n\n請以 JSON 格式輸出分析結果，結構如下：\n\n{\n  \"result\"\
+            : \"TRUE\" 或 \"FALSE\",\n  \"reason\": \"說明原因 (若為 TRUE，請列出 SMO 相關關鍵字並簡要說明；若為\
+            \ FALSE，則說明不相關原因)\"\n}\n\n目前 SMO 可支援的意圖包括：\n- 「抑制單一場域訊號干擾」\n- 「查詢單一場域基站資訊」\n\
+            \n（由於「取得 UE 資訊（連線狀態、訊號品質、SINR Map 等）」也屬於網管層級的查詢行為，因此視為 SMO 相關領域。）\n\n\
+            請依上述需求給出最終結果。\n"
+        selected: false
+        title: '[Done]網管SMO內容分別器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1742445883218'
+      position:
+        x: 213.9230434412757
+        y: 262
+      positionAbsolute:
+        x: 213.9230434412757
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+          conditions:
+          - comparison_operator: contains
+            id: 2b9bc372-6143-4bb9-81d4-63963c848bd4
+            value: 'TRUE'
+            varType: string
+            variable_selector:
+            - '1742445883218'
+            - text
+          id: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[Done]網管SMO內容分別器'
+        type: if-else
+      height: 126
+      id: '1742446926046'
+      position:
+        x: 478.61515631894935
+        y: 262
+      positionAbsolute:
+        x: 478.61515631894935
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - sys
+          - query
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: 09ddf340-a502-4a03-89b5-b69469d3d650
+          role: system
+          text: "請閱讀以下文本：\n\n{{#sys.query#}}\n\n以下為目前「意圖列表」與其範圍：\n\n「查看UE的Throughput」：\n\
+            透過下列 API 查詢並過濾回傳資料，以檢視特定 UE（或一群 UE）的連線狀態、訊號品質、Throughput 等相關統計資訊。\n例如：取得並篩選特定\
+            \ UE 的吞吐量、連線狀態與訊號品質等。\n\n「查詢 Cell 裡面的 SINR Map」：\n針對指定之 Cell，查詢該 Cell\
+            \ 中 的 SINR（Signal-to-Interference-plus-Noise Ratio）指標，\n並可擴及 SINR 的分佈情形或視覺化資訊（如\
+            \ SINR Map）。\n例如：想了解特定 Cell 或範圍內 的 SINR 分佈、請求提供或檢視某 Cell 中 SINR Map 的詳細資訊等。\n\
+            \n請根據上述定義，判斷文本是否符合任一意圖：\n\n若符合任一意圖，請以 JSON 格式回傳，包含以下欄位：\n{\n  \"intent\"\
+            : \"對應的意圖名稱\",\n  \"reason\": \"判斷該意圖的原因\"\n}\n\n若文本與列表中所有意圖皆不符合，請回傳：\n\
+            {\n  \"intent\": \"NONE\",\n  \"reason\": \"無法對應至任何已知意圖\"\n}\n\n請勿包含任何其他文字或解釋。\n"
+        selected: false
+        title: '[Done]文本轉單一意圖器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1742447067053'
+      position:
+        x: 3249.7247111887123
+        y: 292.74373086275045
+      positionAbsolute:
+        x: 3249.7247111887123
+        y: 292.74373086275045
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not contains
+            id: bf0d6b33-24ef-423f-9ba1-50fbe2f5191b
+            value: NONE
+            varType: string
+            variable_selector:
+            - '1742447067053'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[Done]單一意圖提取器'
+        type: if-else
+      height: 126
+      id: '1742447332580'
+      position:
+        x: 3516.287474197739
+        y: 292.74373086275045
+      positionAbsolute:
+        x: 3516.287474197739
+        y: 292.74373086275045
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - sys
+          - query
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: openai
+        prompt_template:
+        - id: 60043e91-9fda-43bc-941a-8d0e748d9b53
+          role: system
+          text: "請判斷以下文本是否只包含單一意圖。若是單一意圖，請輸出：\n{\n  \"intent\": \"single_intent\"\
+            ,\n  \"reason\": \"此處填入判斷該文本為單一意圖的原因\"\n}\n若包含多個意圖，請輸出：\n{\n  \"intent\"\
+            : \"multi_intent\",\n  \"reason\": \"此處填入判斷該文本包含多個意圖的原因\"\n}\n請勿輸出任何其他文字或解釋。\n\
+            \n文本：\n\"\"\"\n{{#sys.query#}}\n\"\"\"\n"
+        selected: false
+        title: '[Done]單一意圖辨識器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1742448090528'
+      position:
+        x: 1581.826896483987
+        y: 262
+      positionAbsolute:
+        x: 1581.826896483987
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 581b06eb-cb6f-4bfb-a796-b26475c573e1
+            value: single_intent
+            varType: string
+            variable_selector:
+            - '1742448090528'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[Done]條件分支 4'
+        type: if-else
+      height: 126
+      id: '1742448389805'
+      position:
+        x: 1866.46040477732
+        y: 262
+      positionAbsolute:
+        x: 1866.46040477732
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1742442861275'
+          - result
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: openai
+        prompt_template:
+        - id: 3e94dad6-489b-4699-83fb-61de468de245
+          role: system
+          text: 你是一個專業的工作流管理檢查員，會請執行一系列的檢查。
+        - id: fa92de14-f33b-41f9-b720-be442a1cac8d
+          role: user
+          text: '請確認以下的內容是否為 n8n 的 workflow 格式，並且解釋這段 workflow 是否有扣緊有關於，如果我沒有 path
+            就幫我設為 None，如果有請把 path 給找出來。
+
+            提供的意圖：
+
+            {{#1742447067053.text#}}
+
+            內容：
+
+            {{#context#}}'
+        - id: 70f5b694-49c1-44b2-afc6-3e6acc2eaf55
+          role: assistant
+          text: "請輸出為 JSON 格式，格式如下：\njson\n{\n  \"path\": \"XXX\",\n  \"reason\":\
+            \ \"這裡填寫檢查或解釋的原因\"\n}"
+        selected: false
+        title: 確認參數存在
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1742472808495'
+      position:
+        x: 5439.710829265763
+        y: 322.4644925048009
+      positionAbsolute:
+        x: 5439.710829265763
+        y: 322.4644925048009
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: 請提取出 {{#1742472808495.text#}}內的path參數
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: openai
+        parameters:
+        - description: path
+          name: path
+          required: false
+          type: string
+        query:
+        - '1742472808495'
+        - text
+        reasoning_mode: prompt
+        selected: false
+        title: Workflow API路徑提取器
+        type: parameter-extractor
+        variables: []
+        vision:
+          configs:
+            detail: high
+            variable_selector:
+            - sys
+            - files
+          enabled: false
+      height: 98
+      id: '1742472982494'
+      position:
+        x: 5739.3320482277795
+        y: 322.4644925048009
+      positionAbsolute:
+        x: 5739.3320482277795
+        y: 322.4644925048009
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '[ Info ] 以下是關於API的輸出結果：
+
+          {{#1743661175478.content#}}'
+        desc: ''
+        selected: false
+        title: '[回覆] '
+        type: answer
+        variables: []
+      height: 119
+      id: '1742475383217'
+      position:
+        x: 6380.32653871121
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 6380.32653871121
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - sys
+          - query
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據下列資訊，以一句話回覆使用者。請在句子開頭加上「[Info ]」。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1742445883218.text#}}'
+        selected: false
+        title: '[回覆]網管SMO內容分別器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '1743501210955'
+      position:
+        x: 757.8806889418556
+        y: 262
+      positionAbsolute:
+        x: 757.8806889418556
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-4
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#1743501210955.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆]網管SMO內容分別器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '1743509989605'
+      position:
+        x: 1307.0429525171987
+        y: 262
+      positionAbsolute:
+        x: 1307.0429525171987
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1742442590290'
+          - conversation_uid
+          variable_selector:
+          - conversation
+          - conversation_uid
+          write_mode: over-write
+        selected: false
+        title: 儲存conversation_uid
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1743511206372'
+      position:
+        x: -197.76639510974601
+        y: 262
+      positionAbsolute:
+        x: -197.76639510974601
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        author: test
+        desc: ''
+        height: 528
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"確定聊天UID","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 369
+      height: 528
+      id: '1743511256837'
+      position:
+        x: -232.227345759657
+        y: 158.8733612444438
+      positionAbsolute:
+        x: -232.227345759657
+        y: 158.8733612444438
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 369
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-5
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#17435117558650.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆]單一意圖辨識器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435117512250'
+      position:
+        x: 2818.2725725404694
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2818.2725725404694
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - sys
+          - query
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據下列資訊，以一句話回覆使用者。請在句子開頭加上「[Info ]」。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1742445883218.text#}}'
+        selected: false
+        title: '[回覆]單一意圖辨識器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17435117558650'
+      position:
+        x: 2167.246725870651
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2167.246725870651
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1743501210955.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆]網管SMO內容分別器'
+        type: answer
+        variables: []
+      height: 103
+      id: '17435128925960'
+      position:
+        x: 1035.7134607181292
+        y: 262
+      positionAbsolute:
+        x: 1035.7134607181292
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#17435117558650.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆]單一意圖辨識器'
+        type: answer
+        variables: []
+      height: 103
+      id: '17435131894560'
+      position:
+        x: 2486.0199611249927
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2486.0199611249927
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-7
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"[Error] 我是 ITRI SMO 專屬助理，只能針對 SMO 相關功能與需求提供問答服務，並非通用型助理。\"\
+              \n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[ Error ]意圖識別階段'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435132396410'
+      position:
+        x: 1307.0429525171987
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 1307.0429525171987
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-6
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"[ Warning ] 目前系統僅支援單一意圖類型的操作，請重新描述您的單一需求。\"\n    }\n\
+              \  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[ Error ]意圖識別階段 (1)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435138487230'
+      position:
+        x: 2818.2725725404694
+        y: 470.45141161560025
+      positionAbsolute:
+        x: 2818.2725725404694
+        y: 470.45141161560025
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - sys
+          - query
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據下列資訊，以一句話回覆使用者。請在句子開頭加上「[Info ]」。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1742447067053.text#}}'
+        selected: false
+        title: '[回覆]文本轉單一意圖器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: '17435142956850'
+      position:
+        x: 4142.827661495694
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 4142.827661495694
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#17435142956850.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆] 文本轉單一意圖器'
+        type: answer
+        variables: []
+      height: 103
+      id: '17435143717210'
+      position:
+        x: 4456.870544259646
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 4456.870544259646
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-1
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#17435142956850.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 文本轉單一意圖器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435145116790'
+      position:
+        x: 4818.415711811417
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 4818.415711811417
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '[ Error ] 無法對應到任何已提供的意圖'
+        desc: ''
+        selected: false
+        title: '[回覆] 文本轉單一意圖器 (1)'
+        type: answer
+        variables: []
+      height: 100
+      id: '17435146281790'
+      position:
+        x: 4456.870544259646
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 4456.870544259646
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"[ Error ] 無法對應到任何已提供的意圖\"\n        }\n\
+              \    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 文本轉單一意圖器 (1)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435146350620'
+      position:
+        x: 4818.415711811417
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 4818.415711811417
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "import requests\nimport base64\nfrom typing import Any, Dict, Union\n\
+          \ndef main(base_url: str, path: str) -> Dict[str, Union[bool, str, dict,\
+          \ None]]:\n    \"\"\"\n    從指定路徑抓取內容，若是圖片則回傳 Base64 字串，\n    若是 JSON 或其他非圖片格式，則嘗試以\
+          \ JSON 解析，\n    若解析失敗，則直接回傳原始文字內容。\n    \n    參數:\n        base_url (str):\
+          \ 主機或 API 的基底網址\n        path (str): 具體路徑 (可能取得圖片或 JSON)\n\n    回傳:\n  \
+          \      {\n            \"is_image\": bool,\n            \"content\": str\
+          \ 或 dict 或 None\n        }\n    \"\"\"\n    url = f\"{base_url}{path}\"\n\
+          \    response = requests.get(url)\n\n    if response.status_code == 200:\n\
+          \        # 嘗試根據 Content-Type 判斷是否為圖片\n        content_type = response.headers.get(\"\
+          Content-Type\", \"\").lower()\n        \n        if \"image\" in content_type:\n\
+          \            # 以 Base64 形式回傳圖片內容\n            base64_str = base64.b64encode(response.content).decode(\"\
+          utf-8\")\n            return {\n        \n                \"is_image\":\
+          \ \"true\",\n                \"content\": base64_str\n                 \
+          \  } \n        else:\n            # 嘗試以 JSON 解析\n            try:\n    \
+          \            json_data = response.json()\n                return {\n   \
+          \          \n                    \"is_image\": \"false\",\n            \
+          \        \"content\": str(json_data)\n                      }\n        \
+          \    except ValueError:\n                # 如果不是 JSON，就以文字回傳\n          \
+          \      return {\n          \n                    \"is_image\": False,\n\
+          \                    \"content\": response.text\n                }\n   \
+          \ else:\n        # 若非 200，回傳 None 或其他錯誤資訊\n        return {\n\n        \
+          \    \"is_image\": \"\",\n            \"content\": \"\"\n            \n\
+          \        }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          content:
+            children: null
+            type: string
+          is_image:
+            children: null
+            type: string
+        selected: false
+        title: 執行含有呼叫API的Code
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - N8N_ACTIVE_BASE_URL
+          variable: base_url
+        - value_selector:
+          - '1742472982494'
+          - path
+          variable: path
+      height: 54
+      id: '1743661175478'
+      position:
+        x: 6043.3320482277795
+        y: 322.4644925048009
+      positionAbsolute:
+        x: 6043.3320482277795
+        y: 322.4644925048009
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: d5505302-2a64-4b53-bada-9803e5db7fa0
+            value: 'true'
+            varType: string
+            variable_selector:
+            - '1743661175478'
+            - is_image
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 條件分支 4
+        type: if-else
+      height: 126
+      id: '1743667086008'
+      position:
+        x: 6684.32653871121
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 6684.32653871121
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-13
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"image\",\n      \"\
+              content\": \"{{#1743661175478.content#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 圖片'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '1743667208599'
+      position:
+        x: 7112.360282323862
+        y: 349.88605597684034
+      positionAbsolute:
+        x: 7112.360282323862
+        y: 349.88605597684034
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-14
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"table\",\n      \"\
+              content\": \"{{#1743661175478.content#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 文字'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '1743667490302'
+      position:
+        x: 7112.360282323862
+        y: 511.3682582300248
+      positionAbsolute:
+        x: 7112.360282323862
+        y: 511.3682582300248
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: -140.56072718585892
+      y: -58.82217778765073
+      zoom: 1.0000000000000009
