@@ -34,6 +34,7 @@ git clone --recurse-submodules https://github.com/cai-yihua/ITRI-Intent-Based.gi
     ```
 2. 建立虛擬環境
     ```bash
+    cd ..
     uv venv
     ```
 3. 啟動虛擬環境
@@ -42,6 +43,5 @@ git clone --recurse-submodules https://github.com/cai-yihua/ITRI-Intent-Based.gi
     ```
 4. 安裝依賴套件
     ```bash
-    uv pip install -r requirements/base.txt
+    uv pip install -r ./Backend/requirements/base.txt
     ```
-
