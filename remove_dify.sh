@@ -1,27 +1,31 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TARGET_DIR="$SCRIPT_DIR/dify"
 
-DIFY_DIR="dify"
+# ① 找 compose 檔
+for file in "$TARGET_DIR/docker/docker-compose."{yml,yaml}; do
+  [[ -f "$file" ]] && COMPOSE_FILE="$file" && break
+done
 
-echo "🧹 停止並刪除 Dify 所有容器..."
-cd $DIFY_DIR/docker || { echo "❌ 找不到 Dify docker 資料夾"; exit 1; }
-
-docker compose down -v --remove-orphans
-
-echo "🗑️ 刪除 Docker volumes（若需要可打開這段）..."
-docker volume rm $(docker volume ls -q | grep 'docker_') || true
-
-echo "✅ Docker compose 清理完成"
-
-# (可選) 完全刪除 Dify 專案資料夾
-read -p "是否要刪除 Dify 原始碼資料夾？(y/n): " delete_code
-if [ "$delete_code" = "y" ]; then
-    cd ../..              # 先離開 dify 目錄
-    DIFY_ABS=$(realpath "$DIFY_DIR")
-    echo "🧨 正在刪除資料夾：$DIFY_ABS"
-    rm -rf "$DIFY_ABS"
-    echo "🧨 已刪除 dify/ 專案資料夾"
+# ② 推導 project name = compose 檔所在資料夾名稱
+PROJECT_NAME=""
+if [[ -n "${COMPOSE_FILE:-}" ]]; then
+  PROJECT_NAME="$(basename "$(dirname "$COMPOSE_FILE")")"   # ← "docker"
 fi
 
-echo "✅ Dify 環境已重置完成"
+# ③ 停容器、刪 named volumes
+if [[ -n "${COMPOSE_FILE:-}" ]]; then
+  echo "🐳 停止並移除 Dify 相關容器..."
+  sudo docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" down --remove-orphans --volumes
+fi
+
+# ④ 刪整個目錄（可能含 root 檔案）
+if [[ -d "$TARGET_DIR" ]]; then
+  echo "🗑  正在刪除 $TARGET_DIR/ ..."
+  sudo rm -rf "$TARGET_DIR"
+  echo "✅ 已成功刪除 $TARGET_DIR/"
+else
+  echo "ℹ️  目錄 $TARGET_DIR/ 不存在，無需刪除"
+fi

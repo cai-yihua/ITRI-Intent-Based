@@ -1,11 +1,9 @@
 import os
 import json
-import yaml
 import time
-import docker
 import requests
 import subprocess
-from dotenv import load_dotenv, dotenv_values, set_key
+from dotenv import load_dotenv, set_key
 from datetime import datetime, timezone
 
 
@@ -52,20 +50,20 @@ def run_shell_script(script_name):
     except Exception as e:
         print(f"❗ 未預期錯誤：{e}")
 
-def wait_for_n8n_ready(url, timeout=50):
-    print("⏳ 等待 n8n 啟動中...", end="")
+def wait_for_container_ready(url, timeout=50):
+    print("⏳ 等待 container 啟動中...", end="")
     for i in range(timeout):
         try:
             response = requests.get(url)
             if response.status_code == 200:
-                print("✅ n8n 已就緒")
+                print("✅ container 已就緒")
                 time.sleep(5)
                 return True
         except requests.exceptions.ConnectionError:
             pass
         print(".", end="", flush=True)
         time.sleep(1)
-    print("\n❌ n8n 未在預期時間內就緒")
+    print("\n❌ container 未在預期時間內就緒")
     return False
 
 
@@ -265,7 +263,6 @@ def n8n_create_workflow(payloads):
 
         for payload in payloads:
             workflow_content = payload["json_payload"]
-            print(workflow_content)
 
             response = requests.post(N8N_API_URL, json=workflow_content, headers=headers)
             print("📡 伺服器回應：", response.status_code)
@@ -311,7 +308,7 @@ def dify_setup_owner():
         response.raise_for_status()
         result = response.json()
 
-        if result.get("data"):
+        if result.get("result") == "success":
             print("✅ 註冊成功")
         else:
             print("❌ 註冊失敗")
@@ -385,7 +382,6 @@ def dify_create_workflow(payload, token):
         }
         response = requests.post(DIFY_IMPORT_URL, json=payload, headers=headers)
         print("📡 伺服器回應：", response.status_code)
-        print(response.text)
 
         if response.status_code == 200:
             print("✅ 成功創建")
@@ -445,58 +441,58 @@ def update_backend_api_key_base(new_api_key_base):
 if __name__ == "__main__":
     # 刪除舊容器
     run_shell_script("remove_n8n.sh")
-    # run_shell_script("remove_dify.sh")
+    run_shell_script("remove_dify.sh")
 
-    # ########## n8n 佈署 ##########
-    # # 1) 啟動 n8n container 並等待服務可用
-    # run_shell_script("run_n8n.sh")
-    # wait_for_n8n_ready(N8N_BASE_URL)
+    input("輸入任一鍵以繼續")
+    time.sleep(5)
 
-    # # 2) 註冊 owner
-    # token = n8n_setup_owner()
-    # print(f"token: {token}")
+    #################### n8n 佈署 ####################
+    # 1) 啟動 n8n container 並等待服務可用
+    run_shell_script("run_n8n.sh")
+    wait_for_container_ready(N8N_BASE_URL)
 
-    # # 3) 登入
-    # session = n8n_login()
+    # 2) 註冊 owner
+    token = n8n_setup_owner()
+    print(f"token: {token}")
 
-    # if session:
-    #     # 4) 填寫調查問卷
-    #     n8n_survey(session)
+    # 3) 登入
+    session = n8n_login()
+    if session:
+        # 4) 填寫調查問卷
+        n8n_survey(session)
 
-    #     # 5) 獲取 API_KEY
-    #     api_key = n8n_get_api_key(session)
+        # 5) 獲取 API_KEY
+        api_key = n8n_get_api_key(session)
 
-    # # 6) 更新 .env N8N_API_KEY
-    # update_n8n_api_key(api_key)
+    # 6) 更新 .env N8N_API_KEY
+    update_n8n_api_key(api_key)
 
-    # # 7) 讀取 tag 對應的 n8n JSON(s)
-    # n8n_payloads = json_to_payload()
+    # 7) 讀取 tag 對應的 n8n JSON(s)
+    n8n_payloads = json_to_payload()
     
-    # # 8) 創建 n8n workflow(s) 並 active
-    # resp = n8n_create_workflow(n8n_payloads)
+    # 8) 創建 n8n workflow(s) 並 active
+    resp = n8n_create_workflow(n8n_payloads)
 
 
-    # ########## dify 佈署 ##########
-    # # 1) 啟動 dify container
-    # run_shell_script("run_dify.sh")
+    #################### dify 佈署 ####################
+    # 1) 啟動 dify container
+    run_shell_script("run_dify.sh")
+    wait_for_container_ready(DIFY_SETUP_URL)
 
-    # # 2) 註冊 owner
-    # dify_setup_owner()
+    # 2) 註冊 owner
+    dify_setup_owner()
 
-    # # # 1) 登入並取得 token
-    # dify_token = dify_login_and_get_token()
+    # 3) 登入並取得 token
+    dify_token = dify_login_and_get_token()
 
-    # # # 2) 讀取 tag 對應的 dify YAML
-    # # dify_payload = yaml_to_payload()
+    # 4) 讀取 tag 對應的 dify YAML
+    dify_payload = yaml_to_payload()
 
-    # # # 3) 創建 dify workflow
-    # # app_id = dify_create_workflow(dify_payload, dify_token)
+    # 5) 創建 dify workflow
+    app_id = dify_create_workflow(dify_payload, dify_token)
 
-    # # # 4) 取得 workflow token
-    # # dify_workflow_token = get_workflow_token(app_id, dify_token)
+    # 6) 取得 workflow token
+    dify_workflow_token = get_workflow_token(app_id, dify_token)
 
-    # # # 5) 更新 Backend .env DIFY_API_KEY
-    # # update_backend_api_key_base(dify_workflow_token)
-
-
-
+    # 7) 更新 Backend .env DIFY_API_KEY
+    update_backend_api_key_base(dify_workflow_token)
