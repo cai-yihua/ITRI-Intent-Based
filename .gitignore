@@ -1,0 +1,4 @@
+.env
+.venv
+dify/
+uv.lock

@@ -1,0 +1,94 @@
+{
+  "name": "Get SINRMap",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "37ead73c-deeb-4468-830b-0c1c49d43dd4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        120,
+        -80
+      ],
+      "id": "9734c902-477b-439a-a373-25867b2f3376",
+      "name": "Webhook",
+      "webhookId": "37ead73c-deeb-4468-830b-0c1c49d43dd4"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "responseDataSource": "set",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        -80
+      ],
+      "id": "3a828926-aea1-4941-9268-a91f8079d067",
+      "name": "Respond to Webhook",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "http://140.118.162.92:8000/image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        340,
+        -80
+      ],
+      "id": "ba728f0f-ddd5-4cf9-ba9b-2a5668e7c5db",
+      "name": "HTTP Request",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "528adc3d-4119-4468-9c93-46a32a1d332d",
+  "meta": {
+    "instanceId": "e03a44b4d21b2960b42f8312130312bf599a1bfd844d9f7c71049665179feca0"
+  },
+  "id": "A8ysTdjepgZhFHKl",
+  "tags": [
+    {
+      "name": "v1.1-dev",
+      "id": "v070ZKifOh5IyKfK",
+      "createdAt": "2025-04-04T07:45:18.529Z",
+      "updatedAt": "2025-04-04T07:45:18.529Z"
+    }
+  ]
+}
