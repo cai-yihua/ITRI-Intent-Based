@@ -439,60 +439,68 @@ def update_backend_api_key_base(new_api_key_base):
 
 
 if __name__ == "__main__":
-    # 刪除舊容器
-    run_shell_script("remove_n8n.sh")
-    run_shell_script("remove_dify.sh")
+    # # 刪除舊容器
+    # run_shell_script("remove_n8n.sh")
+    # run_shell_script("remove_dify.sh")
 
-    input("輸入任一鍵以繼續")
-    time.sleep(5)
+    # input("輸入任一鍵以繼續")
+    # time.sleep(5)
 
-    #################### n8n 佈署 ####################
-    # 1) 啟動 n8n container 並等待服務可用
-    run_shell_script("run_n8n.sh")
-    wait_for_container_ready(N8N_BASE_URL)
+    # #################### n8n 佈署 ####################
+    # # 1) 啟動 n8n container 並等待服務可用
+    # run_shell_script("run_n8n.sh")
+    # wait_for_container_ready(N8N_BASE_URL)
 
-    # 2) 註冊 owner
-    token = n8n_setup_owner()
-    print(f"token: {token}")
+    # # 2) 註冊 owner
+    # token = n8n_setup_owner()
+    # print(f"token: {token}")
 
-    # 3) 登入
-    session = n8n_login()
-    if session:
-        # 4) 填寫調查問卷
-        n8n_survey(session)
+    # # 3) 登入
+    # session = n8n_login()
+    # if session:
+    #     # 4) 填寫調查問卷
+    #     n8n_survey(session)
 
-        # 5) 獲取 API_KEY
-        api_key = n8n_get_api_key(session)
+    #     # 5) 獲取 API_KEY
+    #     api_key = n8n_get_api_key(session)
 
-    # 6) 更新 .env N8N_API_KEY
-    update_n8n_api_key(api_key)
+    # # 6) 更新 .env N8N_API_KEY
+    # update_n8n_api_key(api_key)
 
-    # 7) 讀取 tag 對應的 n8n JSON(s)
-    n8n_payloads = json_to_payload()
+    # # 7) 讀取 tag 對應的 n8n JSON(s)
+    # n8n_payloads = json_to_payload()
     
-    # 8) 創建 n8n workflow(s) 並 active
-    resp = n8n_create_workflow(n8n_payloads)
+    # # 8) 創建 n8n workflow(s) 並 active
+    # resp = n8n_create_workflow(n8n_payloads)
 
 
-    #################### dify 佈署 ####################
-    # 1) 啟動 dify container
-    run_shell_script("run_dify.sh")
-    wait_for_container_ready(DIFY_SETUP_URL)
+    # #################### dify 佈署 ####################
+    # # 1) 啟動 dify container
+    # run_shell_script("run_dify.sh")
+    # wait_for_container_ready(DIFY_SETUP_URL)
 
-    # 2) 註冊 owner
-    dify_setup_owner()
+    # # 2) 註冊 owner
+    # dify_setup_owner()
 
-    # 3) 登入並取得 token
-    dify_token = dify_login_and_get_token()
+    # # 3) 登入並取得 token
+    # dify_token = dify_login_and_get_token()
 
-    # 4) 讀取 tag 對應的 dify YAML
-    dify_payload = yaml_to_payload()
+    # # 4) 讀取 tag 對應的 dify YAML
+    # dify_payload = yaml_to_payload()
 
-    # 5) 創建 dify workflow
-    app_id = dify_create_workflow(dify_payload, dify_token)
+    # # 5) 創建 dify workflow
+    # app_id = dify_create_workflow(dify_payload, dify_token)
 
-    # 6) 取得 workflow token
-    dify_workflow_token = get_workflow_token(app_id, dify_token)
+    # # 6) 取得 workflow token
+    # dify_workflow_token = get_workflow_token(app_id, dify_token)
 
-    # 7) 更新 Backend .env DIFY_API_KEY
-    update_backend_api_key_base(dify_workflow_token)
+    # # 7) 更新 Backend .env DIFY_API_KEY
+    # update_backend_api_key_base(dify_workflow_token)
+
+
+    ################## Backend 佈署 ###################
+    # 1) 啟動 Backend container
+    run_shell_script("run_backend.sh")
+
+    ############### User Dashbroad 佈署 ###############
+    # 1) 啟動 User Dashbroad
