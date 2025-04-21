@@ -7,10 +7,10 @@ docker rm itri-intent-user-dashboard || true
 
 # 2) 讀取 .env 內的環境變數
 # （若你不想在 build 時使用，則可以只在 run 時指定 --env-file）
-source .env
+source User-Dashboard/.env
 
 # 3) 重新 build docker image
-docker build -t itri-intent-user-dashboard .
+docker build --no-cache -t itri-intent-user-dashboard ./User-Dashboard
 
 # 4) 執行容器並將埠號用 .env 裡的參數帶入
 #   - 假設你在 .env 裡有 FRONTEND_PORT=3000
@@ -19,6 +19,4 @@ docker build -t itri-intent-user-dashboard .
 docker run -d \
   --name itri-intent-user-dashboard \
   -p ${FRONTEND_PORT}:${FRONTEND_PORT} \
-  -v $(pwd):/app \
-  --env-file ./User-Dashboard/.env \
   itri-intent-user-dashboard
