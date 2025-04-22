@@ -2,5 +2,5 @@
 	path = Backend
 	url = https://github.com/jasper33977296/ITRI-Intent-Based-SMO.git
 [submodule "User-Dashboard"]
-	path = User-Dashboard
+	path = Dashboard
 	url = https://github.com/ITRI-IntentBaseControl/intentbase_user_dashbpard.git
