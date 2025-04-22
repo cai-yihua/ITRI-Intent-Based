@@ -1,0 +1,336 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "path": "71279998-7aa1-4819-b2d6-3287b435fa5f",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -540
+      ],
+      "id": "586583eb-198b-4c29-a8e3-6fd3f65aa4f1",
+      "name": "Webhook",
+      "webhookId": "71279998-7aa1-4819-b2d6-3287b435fa5f"
+    },
+    {
+      "parameters": {
+        "url": "http://140.96.102.162:32330/api/v1/stop",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        -540
+      ],
+      "id": "952e6989-7977-42ca-982e-117dd08c3616",
+      "name": "Stop the previous task"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://140.96.102.162:32330/api/v1/set_ctrl",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n\t\"num_of_times_to_work\": 1,\n\t\"reset_rb_enable\": 0,\n\t\"im_control_msg\": \"\",\n\t\"outputTempResult\": 0\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        -540
+      ],
+      "id": "99c0374b-ff4d-488e-8acf-9973f35870c2",
+      "name": "set parameter"
+    },
+    {
+      "parameters": {
+        "url": "http://140.96.102.162:32330/api/v1/start",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -540
+      ],
+      "id": "ff8e94c1-7db7-4eb8-acef-398453cdabfb",
+      "name": "reset the resource blocks"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        -320
+      ],
+      "id": "9431986e-0992-42fa-8411-a99a5c01fc4e",
+      "name": "Wait",
+      "webhookId": "2d90e5e4-b167-41a4-bf7d-887ece9d5455"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT mqtt from intent_interference;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        840,
+        -320
+      ],
+      "id": "bc1fd938-47b4-4e3c-b2c6-35931de08f3e",
+      "name": "MySQL1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "asYAK3RTsxw4JFvs",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop through each item in n8n's input\nconst results = $input.first().json.mqtt\n\n// Return the new JSON structure\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        -320
+      ],
+      "id": "a7c95c1b-52fa-4147-8fcb-562d96d04b9f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "http://140.96.102.136:8001/getSINRMap",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        -320
+      ],
+      "id": "1495958d-d554-4b91-8c79-69945f6fbc9d",
+      "name": "Active selenium"
+    },
+    {
+      "parameters": {
+        "url": "=http://140.96.102.136:8000/sinrmap.png",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        -320
+      ],
+      "id": "e630e677-4b66-4dd7-8eb5-915bc8172013",
+      "name": "Get SINR Map",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2280,
+        -320
+      ],
+      "id": "783a8073-e708-454f-a16d-bbcb3f79a92c",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --------------------------------------\n// Function Node (最後一個節點) 範例\n// --------------------------------------\n\n// 假設:\n//   來源1 (OpenAI Node): 文字訊息\n//   來源2 (Get SINR Map): 圖片 (binary)\n\n// 1) 取得文字\nconst openAiItems = $input.first().json.content \n  || \"調整完畢。目前在ITRI 51館5F的網路訊號已有所提升，繪製如下圖\";\n\n// 2) 取得圖片 (binary)\nconst imageBinary = $('Get SINR Map').first().binary;\n\n// 3) 建立 chainOutput 陣列\nconst chainOutput = [];\n\n// (A) 第一個訊息: 文字\nchainOutput.push({\n  type: \"message\",\n  content: openAiItems\n});\n\n// (B) 第二個訊息: 圖片 (雙層 data)\n//    - Dify parse_chain() 預期在 image 時，會從 content.data.data 取到 base64\nchainOutput.push({\n  type: \"image\",\n  content: {\n    // 注意：此處將「data」再包一層 data 物件，\n    // 以符合 parse_chain() 時的資料結構\n\n      mimeType: imageBinary.mimeType,\n      // 若要一致顯示為 png，可寫死 \"image/png\"\n      // 也可動態調整成 imageBinary.mimeType\n      fileType: \"image\",\n      fileExtension: \"png\", \n      data: imageBinary.data // Base64 字串\n    \n  }\n});\n\n// 4) 回傳結果\n//    - 直接回傳物件 (外層系統會再加上 \"]\")\nreturn {\n  chain: chainOutput\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1880,
+        -580
+      ],
+      "id": "b7679739-7694-473f-8ede-f5d92864d52e",
+      "name": "Code1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://140.96.102.105:5000/restore",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2040,
+        -100
+      ],
+      "id": "e8dc41a5-e326-43d1-8995-5bdef4991e0f",
+      "name": "restore IM"
+    },
+    {
+      "parameters": {
+        "url": "http://140.96.102.162:32330/api/v1/stop",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1860,
+        -100
+      ],
+      "id": "c7397017-16c1-4bf3-9c19-d48520aee06c",
+      "name": "Stop the previous task1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Stop the previous task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop the previous task": {
+      "main": [
+        [
+          {
+            "node": "set parameter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set parameter": {
+      "main": [
+        [
+          {
+            "node": "reset the resource blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reset the resource blocks": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Active selenium",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Active selenium": {
+      "main": [
+        [
+          {
+            "node": "Get SINR Map",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get SINR Map": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Stop the previous task1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop the previous task1": {
+      "main": [
+        [
+          {
+            "node": "restore IM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7de348537acee2b0028f62848811b8b267540c16db86c846ff113b32c5a94864"
+  }
+}
