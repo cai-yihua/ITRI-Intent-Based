@@ -497,10 +497,11 @@ if __name__ == "__main__":
     update_backend_api_key_base(dify_workflow_token)
 
 
-    ################## Backend 佈署 ###################
-    # 1) 啟動 Backend container
-    run_shell_script("run_backend.sh")
-
     ############### User Dashbroad 佈署 ###############
     # 1) 啟動 User Dashbroad
     run_shell_script("run_user_dashboard.sh")
+
+
+    ################## Backend 佈署 ###################
+    # 1) 啟動 Backend container
+    run_shell_script("run_backend.sh")

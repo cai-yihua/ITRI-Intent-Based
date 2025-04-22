@@ -15,7 +15,9 @@ docker rm itri-intent-user-dashboard || true
 source User-Dashboard/.env
 
 # 3) 重新 build docker image
-docker build --no-cache -t itri-intent-user-dashboard ./User-Dashboard
+docker build --no-cache \
+  --build-arg PORT=${FRONTEND_PORT} \
+  -t itri-intent-user-dashboard ./User-Dashboard
 
 # 4) 執行容器並將埠號用 .env 裡的參數帶入
 #   - 假設你在 .env 裡有 FRONTEND_PORT=3000

@@ -5,27 +5,6 @@ git clone --recurse-submodules https://github.com/cai-yihua/ITRI-Intent-Based.gi
 ```
 
 ## 本地環境部屬
-### n8n
-
-### dify
-
-### Dashbroad
-1. 安裝 nvm
-    ```bash
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-    source ~/.nvm/nvm.sh
-    ```
-2. 安裝並啟動 Node.js
-    ```bash
-    nvm install 20.18.0
-    nvm use 20.18.0
-    ```
-3. 安裝依賴套件
-    ```bash
-    cd User-Dashbroad/
-    npm install
-    ```
-
 ### Backend
 1. 安裝 uv
     ```bash
@@ -45,3 +24,31 @@ git clone --recurse-submodules https://github.com/cai-yihua/ITRI-Intent-Based.gi
     ```bash
     uv pip install -r ./Backend/requirements/base.txt
     ```
+
+## docker 環境部屬
+### 安裝步驟
+部屬順序: n8n, dify, Dashboard, Backend
+1. 新增 ```.env```
+2. 新增 ```Dashboard/.env```
+3. 新增 ```Backend/.env```
+4. 修改 ```Backend/Dockerfile```
+    ```bash
+    FROM python:3.9
+
+    WORKDIR /app
+
+    COPY . .
+
+    RUN pip install --no-cache-dir -r requirements/base.txt
+
+    CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:30000"]
+    ```
+5. 執行佈署腳本
+    ```bash
+    uv run python build.py
+    ```
+
+### 問題解決
+1. Sandbox 設定問題
+    
+    ![alt text](Sandbox-setting.png)
