@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# 建立 network
+NETWORK=itri-net
+docker network inspect $NETWORK >/dev/null 2>&1 || docker network create $NETWORK
+
 set -e
 
 # 1) 先停止並移除容器 (若容器不存在不會中斷腳本)
@@ -16,7 +21,7 @@ docker build --no-cache -t itri-intent-user-dashboard ./User-Dashboard
 #   - 假設你在 .env 裡有 FRONTEND_PORT=3000
 #   - 如果需要前後端同埠，則 -p ${FRONTEND_PORT}:${FRONTEND_PORT}
 #   - 如果你只是單純固定內部容器跑 3000 埠，但對外要 3000，就用 -p ${FRONTEND_PORT}:3000
-docker run -d \
+docker run -d --network $NETWORK \
   --name itri-intent-user-dashboard \
   -p ${FRONTEND_PORT}:${FRONTEND_PORT} \
   itri-intent-user-dashboard

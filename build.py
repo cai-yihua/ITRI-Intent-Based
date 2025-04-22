@@ -443,8 +443,8 @@ if __name__ == "__main__":
     run_shell_script("remove_n8n.sh")
     run_shell_script("remove_dify.sh")
 
-    input("輸入任一鍵以繼續")
-    # time.sleep(5)
+    # input("輸入任一鍵以繼續")
+    time.sleep(5)
 
     #################### n8n 佈署 ####################
     # 1) 啟動 n8n container 並等待服務可用
