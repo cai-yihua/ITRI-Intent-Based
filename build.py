@@ -603,12 +603,12 @@ if __name__ == "__main__":
     run_shell_script("remove_dify.sh")
 
     # input("輸入任一鍵以繼續")
-    time.sleep(5)
 
     #################### n8n 佈署 ####################
     # 1) 啟動 n8n container 並等待服務可用
     run_shell_script("run_n8n.sh")
     wait_for_container_ready(N8N_BASE_URL)
+    time.sleep(5)
 
     # 2) 註冊 owner
     token = n8n_setup_owner()
