@@ -1,5 +1,5 @@
+Query UE Throughput
 {
-  "name": "Query UE Throughput",
   "nodes": [
     {
       "parameters": {
@@ -113,7 +113,6 @@
       "name": "Arrange Output"
     }
   ],
-  "pinData": {},
   "connections": {
     "Webhook": {
       "main": [
@@ -171,22 +170,9 @@
       ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "0fa1afc2-5c39-4635-b8d1-f24d33812599",
+  "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7de348537acee2b0028f62848811b8b267540c16db86c846ff113b32c5a94864"
-  },
-  "id": "YzY7cAVHT0wQiMHu",
-  "tags": [
-    {
-      "createdAt": "2025-04-01T08:26:25.955Z",
-      "updatedAt": "2025-04-01T08:26:25.955Z",
-      "id": "rK74ZMzlRcIWWBG2",
-      "name": "v1.0-prod"
-    }
-  ]
+  }
 }

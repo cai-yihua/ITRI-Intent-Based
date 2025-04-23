@@ -1,5 +1,5 @@
+Get SINR Map
 {
-  "name": "Get SINR Map",
   "nodes": [
     {
       "parameters": {
@@ -111,7 +111,6 @@
       }
     }
   ],
-  "pinData": {},
   "connections": {
     "Webhook": {
       "main": [
@@ -169,28 +168,9 @@
       ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "b347e514-332f-4241-9c44-82a8e1633953",
+  "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7de348537acee2b0028f62848811b8b267540c16db86c846ff113b32c5a94864"
-  },
-  "id": "ESGZ2ooWfBMP3tju",
-  "tags": [
-    {
-      "createdAt": "2025-03-25T07:24:16.196Z",
-      "updatedAt": "2025-03-25T07:24:16.196Z",
-      "id": "Lt9jyKG3jtS7aDfb",
-      "name": "interference"
-    },
-    {
-      "createdAt": "2025-04-01T08:26:25.955Z",
-      "updatedAt": "2025-04-01T08:26:25.955Z",
-      "id": "rK74ZMzlRcIWWBG2",
-      "name": "v1.0-prod"
-    }
-  ]
+  }
 }

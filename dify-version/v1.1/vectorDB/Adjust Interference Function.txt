@@ -1,5 +1,5 @@
+Adjust Interference Function
 {
-  "name": "Adjust_Interference_Function",
   "nodes": [
     {
       "parameters": {
@@ -201,7 +201,6 @@
       "name": "Stop the previous task1"
     }
   ],
-  "pinData": {},
   "connections": {
     "Webhook": {
       "main": [
@@ -330,22 +329,9 @@
       ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "656d9406-c9cc-475e-bb46-ae97c999c4e1",
+  "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7de348537acee2b0028f62848811b8b267540c16db86c846ff113b32c5a94864"
-  },
-  "id": "C8HzXrpEHIrS3cv6",
-  "tags": [
-    {
-      "createdAt": "2025-04-01T08:26:25.955Z",
-      "updatedAt": "2025-04-01T08:26:25.955Z",
-      "id": "rK74ZMzlRcIWWBG2",
-      "name": "v1.0-prod"
-    }
-  ]
+  }
 }

@@ -1,5 +1,5 @@
+Interference Algo Predict
 {
-  "name": "Interference Algo Predict",
   "nodes": [
     {
       "parameters": {
@@ -208,7 +208,6 @@
       "name": "After"
     }
   ],
-  "pinData": {},
   "connections": {
     "Webhook": {
       "main": [
@@ -332,22 +331,9 @@
       ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "71c243cd-3b1e-4c19-995e-6bef9b7de4ba",
+  "pinData": {},
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "7de348537acee2b0028f62848811b8b267540c16db86c846ff113b32c5a94864"
-  },
-  "id": "j18QP2cMpMGzHQUV",
-  "tags": [
-    {
-      "createdAt": "2025-04-01T08:26:25.955Z",
-      "updatedAt": "2025-04-01T08:26:25.955Z",
-      "id": "rK74ZMzlRcIWWBG2",
-      "name": "v1.0-prod"
-    }
-  ]
+  }
 }
