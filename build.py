@@ -577,7 +577,7 @@ def init_db(file_ids, token):
             print("⚠️ 設定資料庫失敗")
             return None
         
-        ds_id   = response.json()["dataset"]["id"]
+        ds_id  = response.json()["dataset"]["id"]
         print("✅ 設定資料庫成功 id =", ds_id)
 
         # ---------- rename ----------
@@ -589,7 +589,7 @@ def init_db(file_ids, token):
         if rp.status_code == 200:
             print("✅ 名稱已改為", DIFY_TAG)
         else:
-            print("⚠️  改名失敗：", rp.text)
+            print("⚠️ 改名失敗：", rp.text)
 
         return ds_id
 
@@ -602,7 +602,7 @@ if __name__ == "__main__":
     run_shell_script("remove_n8n.sh")
     run_shell_script("remove_dify.sh")
 
-    input("輸入任一鍵以繼續")
+    # input("輸入任一鍵以繼續")
     time.sleep(5)
 
     #################### n8n 佈署 ####################
@@ -655,9 +655,10 @@ if __name__ == "__main__":
     # 7) 更新 Backend .env DIFY_API_KEY
     update_backend_api_key_base(dify_workflow_token)
 
-    # 8) 安裝 OPENAI 模型供應商
+    # 8) 安裝 OPENAI 模型供應商，並等安裝完成
     payload = {"plugin_unique_identifiers":["langgenius/openai:0.0.19@6b2b2e115b1b9d34a63eb26fadcc33d74330fd2ec06071bb30b8a24b1fab107a"]}
     add_model_vendor(payload, dify_token)
+    time.sleep(10)
 
     # 9) 設定 OPENAI API_KEY
     set_openai_api_key(dify_token)
