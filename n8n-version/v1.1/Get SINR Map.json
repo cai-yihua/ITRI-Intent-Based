@@ -1,0 +1,196 @@
+{
+  "name": "Get SINR Map",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "1f7d9e8a-ebe1-4cf0-93dc-d4b9f54ea3b1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -80
+      ],
+      "id": "93c02467-733d-4bd3-82ed-93bd5830521f",
+      "name": "Webhook",
+      "webhookId": "1f7d9e8a-ebe1-4cf0-93dc-d4b9f54ea3b1"
+    },
+    {
+      "parameters": {
+        "url": "http://140.96.102.136:8001/getSINRMap",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -260,
+        -80
+      ],
+      "id": "ee87406e-a63d-45d9-b215-d4c429104501",
+      "name": "Active selenium"
+    },
+    {
+      "parameters": {
+        "url": "=http://140.96.102.136:8000/sinrmap.png",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "087f8b79-c41b-413a-b20f-c2788b5301c5",
+      "name": "Get SINR Map",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// --------------------------------------\n// 假設: \n//   來源1 (OpenAI Node): 文字輸出\n//   來源2 (Get SINR Map): 圖片 (binary)\n// --------------------------------------\n\n// 從上一個節點（OpenAI Node）取得文字\nconst openAiItems = \"如下圖所示為ITRI 51館 5樓的SINR Map\";\n\n// 從上一個節點（Get SINR Map）取得圖片 (binary)\nconst imageBinary = $('Get SINR Map').first().binary;\n\n// 建立一個陣列來存放鏈式輸出\nconst chainOutput = [];\n\n// 1) 文字訊息\nchainOutput.push({\n  type: \"message\",\n  content: openAiItems\n});\n\n// 2) 圖片訊息\n//   確保圖片的 base64 放在 content.data.data\nchainOutput.push({\n  type: \"image\",\n  content: {\n      data: imageBinary.data,\n      mimeType: imageBinary.mimeType,\n      fileName: imageBinary.fileName\n  }\n});\n\n// 最後以包含 chain 的結構回傳\nreturn [\n  {\n    chain: chainOutput\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        -80
+      ],
+      "id": "f25692fd-3278-4e38-963c-d14c5ede714d",
+      "name": "Code",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200,
+          "responseKey": ""
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        -80
+      ],
+      "id": "be5f84f0-04e1-4857-a4aa-cf17c7e3294e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "請重複輸出這段話\n\"\"\"\n以下顯示的這張圖片是 ITRI 51館 5樓的SINR熱圖\n\"\"\"\n使用一般的text (文本輸出結果)，並以繁體中文輸出結果",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        160,
+        -80
+      ],
+      "id": "53d76575-ef2a-43ae-850c-db46c3412021",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "VZOUPii6afDTXBXw",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Active selenium",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Active selenium": {
+      "main": [
+        [
+          {
+            "node": "Get SINR Map",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get SINR Map": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b347e514-332f-4241-9c44-82a8e1633953",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7de348537acee2b0028f62848811b8b267540c16db86c846ff113b32c5a94864"
+  },
+  "id": "ESGZ2ooWfBMP3tju",
+  "tags": [
+    {
+      "createdAt": "2025-03-25T07:24:16.196Z",
+      "updatedAt": "2025-03-25T07:24:16.196Z",
+      "id": "Lt9jyKG3jtS7aDfb",
+      "name": "interference"
+    },
+    {
+      "createdAt": "2025-04-01T08:26:25.955Z",
+      "updatedAt": "2025-04-01T08:26:25.955Z",
+      "id": "rK74ZMzlRcIWWBG2",
+      "name": "v1.0-prod"
+    }
+  ]
+}

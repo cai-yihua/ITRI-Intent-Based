@@ -1,0 +1,353 @@
+{
+  "name": "Interference Algo Predict",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "d4f93f32-a552-41ae-a7d4-56e1907b41a5",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -540
+      ],
+      "id": "282138e4-d149-4482-9bfa-fdd43b18f3b2",
+      "name": "Webhook",
+      "webhookId": "d4f93f32-a552-41ae-a7d4-56e1907b41a5"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        940,
+        -40
+      ],
+      "id": "61b45bf9-ddb7-4f98-a297-4c6c13937fbe",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT mqtt from intent_interference;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        120,
+        -540
+      ],
+      "id": "aac7323c-ba96-44ad-83f8-7771dc8f52f9",
+      "name": "MySQL",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "asYAK3RTsxw4JFvs",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://140.96.102.162:32330/api/v1/stop",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        -540
+      ],
+      "id": "f44debca-fd43-49c0-9a4c-9c7afe1a8d2c",
+      "name": "Stop the previous task"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://140.96.102.162:32330/api/v1/set_ctrl",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n\t\"num_of_times_to_work\": 1,\n\t\"reset_rb_enable\": 0,\n\t\"im_control_msg\": \"\",\n\t\"outputTempResult\": 1\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        -540
+      ],
+      "id": "bf2ab369-f412-4770-91f5-3e405cf6f178",
+      "name": "set parameter"
+    },
+    {
+      "parameters": {
+        "url": "http://140.96.102.162:32330/api/v1/start",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -540
+      ],
+      "id": "ed73586a-e7e6-40b2-a908-8277e19ef1c9",
+      "name": "reset the resource blocks"
+    },
+    {
+      "parameters": {
+        "amount": 1.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        -320
+      ],
+      "id": "1a4cde10-e2e9-4731-862a-854d6e30ebb4",
+      "name": "Wait",
+      "webhookId": "4e5a8ff4-65e4-4ab9-94b6-7e268478ab24"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT mqtt from im_tmp;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        840,
+        -320
+      ],
+      "id": "bc5494f1-924c-4cc3-8826-3980f52e6633",
+      "name": "MySQL1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "asYAK3RTsxw4JFvs",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "請將以下這句話換句話說，以繁體中文輸出結果，專有名詞使用英文代替\n\"\"\"\n好的。如果想提升UE的throughput，可以調整基站和各終端的resource block配置。\n調整方案建議如下，請問是否要進行以下調整來提升UE的throughput？\n\"\"\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        220,
+        -100
+      ],
+      "id": "bf99cd62-5819-4253-996f-97b53d22c521",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "VZOUPii6afDTXBXw",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * 假設在 n8n 中，\n *  - Node #1（查詢UE資料 Before）的名稱為 \"Query UE Before\"\n *  - Node #3（查詢UE資料 After）的名稱為 \"Query UE After\"\n * 接著在 Node #4（Function Node） 中撰寫以下程式：\n */\n\n// 1. 透過 $('NodeName') 取得其他節點的輸出 (範例用命名 \"Before\" 與 \"After\")\nconst dataBefore = $('Before').first().json;\nconst dataAfter  = $('After').first().json;\n\n// 2. 呼叫 createTwoTables(before, after)，並 return 結果\nreturn createTwoTables(dataBefore, dataAfter);\n\n/*----------------------------------------------------------------\n * 以下是您的兩張表格邏輯 (createTwoTables + 輔助函式)，\n * 直接貼在同一個 Function Node 內即可\n ----------------------------------------------------------------*/\n\n/**\n * 主函式：同時接收 beforeData / afterData，然後回傳結果。\n * - 先建構一個 message\n * - 再建構 2 個 table (Summary, Details)\n * - 最後以 chain 的形式回傳\n */\nfunction createTwoTables(beforeData, afterData) {\n  // 1. 取得 Summary 統計 (Before / After)\n  const summaryBefore = computeCenterEdge(beforeData);\n  const summaryAfter  = computeCenterEdge(afterData);\n\n  // 2. 計算 Improvement (%)\n  const centerTotalImp = pctImprovement(summaryBefore.centerTotal, summaryAfter.centerTotal);\n  const edgeTotalImp   = pctImprovement(summaryBefore.edgeTotal,   summaryAfter.edgeTotal);\n  const totalSumImp    = pctImprovement(\n    summaryBefore.centerTotal + summaryBefore.edgeTotal,\n    summaryAfter.centerTotal  + summaryAfter.edgeTotal\n  );\n\n  const centerAvgBefore = summaryBefore.centerCount\n    ? summaryBefore.centerTotal / summaryBefore.centerCount : 0;\n  const edgeAvgBefore   = summaryBefore.edgeCount\n    ? summaryBefore.edgeTotal  / summaryBefore.edgeCount     : 0;\n  const centerAvgAfter  = summaryAfter.centerCount\n    ? summaryAfter.centerTotal / summaryAfter.centerCount    : 0;\n  const edgeAvgAfter    = summaryAfter.edgeCount\n    ? summaryAfter.edgeTotal  / summaryAfter.edgeCount       : 0;\n\n  const centerAvgImp = pctImprovement(centerAvgBefore, centerAvgAfter);\n  const edgeAvgImp   = pctImprovement(edgeAvgBefore,   edgeAvgAfter);\n  const totalAvgImp  = pctImprovement(\n    (centerAvgBefore + edgeAvgBefore) / 2,\n    (centerAvgAfter  + edgeAvgAfter)  / 2\n  );\n\n  // 3. 建構第一張表 (Summary)\n  //    **重點：改成把 columns/data 包在 content 物件裡**\n  const summaryColumns = [\n    `C:E = ${summaryBefore.centerCount}:${summaryBefore.edgeCount}`,\n    \"Before - Throughput (Mbps)\",\n    \"After - Throughput (Mbps)\",\n    \"Improvement (%)\"\n  ];\n  const summaryData = [\n    [\n      \"Center UE (Total)\",\n      summaryBefore.centerTotal.toFixed(2),\n      summaryAfter.centerTotal.toFixed(2),\n      centerTotalImp.toFixed(2)\n    ],\n    [\n      \"Edge UE (Total)\",\n      summaryBefore.edgeTotal.toFixed(2),\n      summaryAfter.edgeTotal.toFixed(2),\n      edgeTotalImp.toFixed(2)\n    ],\n    [\n      \"Center + Edge (Total)\",\n      (summaryBefore.centerTotal + summaryBefore.edgeTotal).toFixed(2),\n      (summaryAfter.centerTotal + summaryAfter.edgeTotal).toFixed(2),\n      totalSumImp.toFixed(2)\n    ],\n    [\n      \"Center UE (Avg.)\",\n      centerAvgBefore.toFixed(4),\n      centerAvgAfter.toFixed(4),\n      centerAvgImp.toFixed(2)\n    ],\n    [\n      \"Edge UE (Avg.)\",\n      edgeAvgBefore.toFixed(4),\n      edgeAvgAfter.toFixed(4),\n      edgeAvgImp.toFixed(2)\n    ],\n    [\n      \"Center + Edge (Avg.)\",\n      ((centerAvgBefore + edgeAvgBefore) / 2).toFixed(4),\n      ((centerAvgAfter  + edgeAvgAfter ) / 2).toFixed(4),\n      totalAvgImp.toFixed(2)\n    ]\n  ];\n\n  // 將 columns / data 放入 content\n  const summaryTable = {\n    type: \"table\",\n    content: {\n      columns: summaryColumns,\n      data: summaryData\n    }\n  };\n\n  // 4. 建構第二張表 (Details)\n  //    同樣 columns/data 包在 content 物件\n  const ueMapBefore = mapUeData(beforeData);\n  const ueMapAfter  = mapUeData(afterData);\n  const allUeIds = new Set([...Object.keys(ueMapBefore), ...Object.keys(ueMapAfter)]);\n\n  const detailColumns = [\n    \"UE no.\",\n    \"Before - RB Ratio\",\n    \"Before - Throughput (Mbps)\",\n    \"After - RB Ratio\",\n    \"After - Throughput (Mbps)\",\n    \"Improvement (%)\"\n  ];\n  const detailData = [];\n  for (const ueId of allUeIds) {\n    const beforeObj = ueMapBefore[ueId] || { rbRatio: 0, dlTp: 0 };\n    const afterObj  = ueMapAfter[ueId]  || { rbRatio: 0, dlTp: 0 };\n\n    const impPct = pctImprovement(beforeObj.dlTp, afterObj.dlTp);\n\n    detailData.push([\n      ueId,\n      beforeObj.rbRatio.toFixed(2) + \"%\",\n      beforeObj.dlTp.toFixed(2),\n      afterObj.rbRatio.toFixed(2) + \"%\",\n      afterObj.dlTp.toFixed(2),\n      impPct.toFixed(2)\n    ]);\n  }\n\n  const detailTable = {\n    type: \"table\",\n    content: {\n      columns: detailColumns,\n      data: detailData\n    }\n  };\n\n  // 5. 額外訊息 (message)\n  const explain_message = {\n    type: \"message\",\n    content: $input.first().json.message?.content \n      || \"好的。如果想要提高UE的throughput，可以對基站和各終端的resource block配置進行調整。\"\n  };\n\n  // 6. 以 chain 的形式回傳\n  //    chain 陣列裡包含:\n  //    1) explain_message\n  //    2) summaryTable\n  //    3) detailTable\n  return [\n    {\n      chain: [ explain_message, summaryTable, detailTable ]\n    }\n  ];\n}\n\n/** \n * (B) 輔助函式：計算 (afterVal - beforeVal)/beforeVal * 100 (%)\n */\nfunction pctImprovement(beforeVal, afterVal) {\n  if (!beforeVal || beforeVal === 0) {\n    // 若 beforeVal=0，可根據需求自行定義，這裡直接回傳 0\n    return 0;\n  }\n  return ((afterVal - beforeVal) / beforeVal) * 100;\n}\n\n/**\n * (C) 計算 JSON 資料中 (cells->ues)，Center vs Edge 的統計總吞吐量\n *  - interfered=0 => Center\n *  - interfered=1 => Edge\n */\nfunction computeCenterEdge(jsonData) {\n  let centerCount = 0, centerTotal = 0;\n  let edgeCount   = 0, edgeTotal  = 0;\n\n  if (jsonData && Array.isArray(jsonData.cells)) {\n    for (const cell of jsonData.cells) {\n      if (Array.isArray(cell.ues)) {\n        for (const ue of cell.ues) {\n          const dlTp = ue.dl_throughput || 0;\n          // 0 = Center, 1 = Edge\n          const isCenter = (ue.interfered === 0); \n          if (isCenter) {\n            centerCount++;\n            centerTotal += dlTp;\n          } else {\n            edgeCount++;\n            edgeTotal += dlTp;\n          }\n        }\n      }\n    }\n  }\n  return { centerCount, centerTotal, edgeCount, edgeTotal };\n}\n\n/**\n * (D) 構建 ue_id -> { rbRatio, dlTp }\n * - 將 ue.rb_width/273*100 作為 RB Ratio\n */\nfunction mapUeData(jsonData) {\n  const result = {};\n  if (jsonData && Array.isArray(jsonData.cells)) {\n    for (const cell of jsonData.cells) {\n      if (Array.isArray(cell.ues)) {\n        for (const ue of cell.ues) {\n          const ueId = ue.ue_id || \"unknown\";\n          const dlTp = ue.dl_throughput || 0;\n          // 計算 RB% (273 為假設值)\n          const ratio = ue.rb_width ? (ue.rb_width / 273) * 100 : 0;\n          result[ueId] = { rbRatio: ratio, dlTp };\n        }\n      }\n    }\n  }\n  return result;\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        -40
+      ],
+      "id": "2d0165eb-2569-49ce-88d8-64d52316c067",
+      "name": "woody_format",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop through each item in n8n's input\nconst results = $input.first().json.mqtt\n\n// Return the new JSON structure\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -540
+      ],
+      "id": "a9c9e600-1d43-4baa-9b34-b0a5f707d119",
+      "name": "Before"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop through each item in n8n's input\nconst results = $input.first().json.mqtt\n\n// Return the new JSON structure\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        -320
+      ],
+      "id": "35c1a886-9293-4d0c-a0d5-a89589397ac0",
+      "name": "After"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "MySQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL": {
+      "main": [
+        [
+          {
+            "node": "Before",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop the previous task": {
+      "main": [
+        [
+          {
+            "node": "set parameter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set parameter": {
+      "main": [
+        [
+          {
+            "node": "reset the resource blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reset the resource blocks": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "MySQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL1": {
+      "main": [
+        [
+          {
+            "node": "After",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "woody_format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "woody_format": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Before": {
+      "main": [
+        [
+          {
+            "node": "Stop the previous task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "After": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "71c243cd-3b1e-4c19-995e-6bef9b7de4ba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7de348537acee2b0028f62848811b8b267540c16db86c846ff113b32c5a94864"
+  },
+  "id": "j18QP2cMpMGzHQUV",
+  "tags": [
+    {
+      "createdAt": "2025-04-01T08:26:25.955Z",
+      "updatedAt": "2025-04-01T08:26:25.955Z",
+      "id": "rK74ZMzlRcIWWBG2",
+      "name": "v1.0-prod"
+    }
+  ]
+}
