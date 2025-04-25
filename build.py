@@ -658,7 +658,7 @@ if __name__ == "__main__":
     # 8) 安裝 OPENAI 模型供應商，並等安裝完成
     payload = {"plugin_unique_identifiers":["langgenius/openai:0.0.19@6b2b2e115b1b9d34a63eb26fadcc33d74330fd2ec06071bb30b8a24b1fab107a"]}
     add_model_vendor(payload, dify_token)
-    time.sleep(15)
+    time.sleep(30)
 
     # 9) 設定 OPENAI API_KEY
     set_openai_api_key(dify_token)
