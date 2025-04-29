@@ -602,8 +602,6 @@ if __name__ == "__main__":
     run_shell_script("remove_n8n.sh")
     run_shell_script("remove_dify.sh")
 
-    # input("輸入任一鍵以繼續")
-
     #################### n8n 佈署 ####################
     # 1) 啟動 n8n container 並等待服務可用
     run_shell_script("run_n8n.sh")
@@ -616,19 +614,16 @@ if __name__ == "__main__":
     # 3) 登入
     session = n8n_login()
     if session:
-        # 4) 填寫調查問卷
-        n8n_survey(session)
-
-        # 5) 獲取 API_KEY
+        # 4) 獲取 API_KEY
         api_key = n8n_get_api_key(session)
 
-    # 6) 更新 .env N8N_API_KEY
+    # 5) 更新 .env N8N_API_KEY
     update_n8n_api_key(api_key)
 
-    # 7) 讀取 tag 對應的 n8n JSON(s)
+    # 6) 讀取 tag 對應的 n8n JSON(s)
     n8n_payloads = json_to_payload()
     
-    # 8) 創建 n8n workflow(s) 並 active
+    # 7) 創建 n8n workflow(s) 並 active
     resp = n8n_create_workflow(n8n_payloads)
 
 
