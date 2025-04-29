@@ -2,3 +2,5 @@
 .venv
 dify/
 uv.lock
+/log_time
+/log_error
