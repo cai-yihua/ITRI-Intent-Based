@@ -58,20 +58,6 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 dotenv_path = os.path.abspath(".env")
 load_dotenv(dotenv_path=dotenv_path, override=True)  # 明確覆蓋已存在的值
 
-# n8n
-N8N_TAG = os.getenv("N8N_TAG")
-N8N_EMAIL = os.getenv("N8N_EMAIL")
-N8N_PASSWORD = os.getenv("N8N_PASSWORD")
-N8N_FIRSTNAME = os.getenv("N8N_FIRSTNAME")
-N8N_LASTNAME = os.getenv("N8N_LASTNAME")
-N8N_BASE_URL = os.getenv("N8N_BASE_URL")
-N8N_SETUP_URL = os.getenv("N8N_SETUP_URL")
-N8N_LOGIN_URL = os.getenv("N8N_LOGIN_URL")
-N8N_SURVEY_URL = os.getenv("N8N_SURVEY_URL")
-N8N_GET_API_URL = os.getenv("N8N_GET_API_URL")
-N8N_API_URL = os.getenv("N8N_API_URL")
-N8N_API_KEY = os.getenv("N8N_API_KEY")
-
 # dify
 DIFY_TAG = os.getenv("DIFY_TAG")
 DIFY_EMAIL = os.getenv("DIFY_EMAIL")
@@ -126,188 +112,6 @@ def wait_for_container_ready(url, timeout=50):
             pass
         time.sleep(1)
     log_error("❌ container 未在預期時間內就緒")
-
-# ────────────────── n8n ──────────────────
-def n8n_setup_owner():
-    """
-    設定 owner 資訊
-    """    
-    payload = {
-        "email": N8N_EMAIL,
-        "firstName": N8N_FIRSTNAME,
-        "lastName": N8N_LASTNAME,
-        "password": N8N_PASSWORD
-    }
-
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-
-    try:
-        response = requests.post(N8N_SETUP_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        result = response.json()
-
-        if result.get("data"):
-            logging.info("✅ 註冊成功")
-            token  = response.cookies.get("n8n-auth")
-            return token 
-        else:
-            log_error("❌ 註冊失敗")
-
-    except Exception as e:
-        log_error(f"註冊失敗：{e}")
-
-def n8n_login():
-    """
-    登入並取得 access_token
-    """
-    payload = {
-        "email": N8N_EMAIL,
-        "password": N8N_PASSWORD,
-        "language": "zh-Hant",
-        "remember_me": True
-    }
-    
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-    
-    session = requests.Session()
-
-    try:
-        response = session.post(N8N_LOGIN_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        auth_token = response.cookies.get("n8n-auth")
-        if auth_token:
-            session.cookies.set("n8n-auth", auth_token)
-            logging.info("✅ 登入成功")
-        else:
-            log_error("❌ 登入失敗")
-
-        return session
-
-    except Exception as e:
-        log_error(f"登入失敗：{e}")
-
-def n8n_get_api_key(session):
-    """
-    獲取 API KEY獲取 API KEY
-    """
-    payload = {
-        "expiresAt": None,
-        "label": "test"
-    }
-
-    try:
-        response = session.post(N8N_GET_API_URL, json=payload)
-        response.raise_for_status()
-        result = response.json()
-
-        if result.get("data"):
-            logging.info("✅ 獲取 API KEY 成功")
-            api_key = result["data"].get("rawApiKey")
-            return api_key
-        else:
-            log_error("❌ 獲取 API KEY 失敗")
-
-    except Exception as e:
-        log_error(f"獲取 API KEY 失敗：{e}")
- 
-def update_n8n_api_key(new_api_key):
-    try:
-        env_file = os.path.join(os.getcwd(), '.env')
-
-        if not os.path.exists(env_file):
-            raise FileNotFoundError(f".env 檔案不存在於：{env_file}")
-        
-        # 確保結尾有換行符號
-        with open(env_file, 'a+', encoding='utf-8') as f:
-            f.seek(0, os.SEEK_END)
-            if f.tell() == 0:
-                f.write('\n')  # 如果檔案是空的
-            else:
-                f.seek(f.tell() - 1)
-                last_char = f.read(1)
-                if last_char != '\n':
-                    f.write('\n')
-
-        # 更新或新增變數
-        set_key(env_file, "N8N_API_KEY", new_api_key)
-        logging.info(f"✅ 成功更新 N8N_API_KEY")
-
-    except Exception as e:
-        log_error(f"❌ 更新 .env 檔案失敗：{e}")
-
-def json_to_payload():
-    """
-    根據 N8N_TAG 尋找 /n8n-version/{N8N_TAG}/ 的所有 JSON 檔案，並將內容嵌入 JSON payload 中。
-    """
-    try:
-        allowed_fields = ["name", "nodes", "connections", "settings", "staticData"]
-        json_dir = os.path.join(os.getcwd(), 'n8n-version', N8N_TAG)
-        payloads = []
-
-        for filename in os.listdir(json_dir):
-            if filename.endswith('.json'):
-                file_path = os.path.join(json_dir, filename)
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    json_content = json.load(f)
-                    json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
-                payload = {
-                    "mode": "json-content",
-                    "json_payload": json_payload
-                }
-                payloads.append(payload)
-
-        return payloads
-
-    except Exception as e:
-        log_error(f"讀取 JSON 檔案發生錯誤：{e}")
-    
-def n8n_create_workflow(payloads):
-    """
-    發送創建 workflow 的請求，回傳 workflow_id
-    """
-    try:
-        load_dotenv(dotenv_path=dotenv_path, override=True)
-        N8N_API_KEY = os.getenv("N8N_API_KEY")
-
-        workflow_ids = []
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "X-N8N-API-KEY": N8N_API_KEY
-        }
-
-        for payload in payloads:
-            workflow_content = payload["json_payload"]
-
-            response = requests.post(N8N_API_URL, json=workflow_content, headers=headers)
-
-            if response.status_code == 200:
-                logging.info("✅ 創建成功")
-                data = response.json()
-                workflow_id = data.get("id")
-                workflow_ids.append(workflow_id)
-
-                # active workflow
-                activate_url = f"{N8N_API_URL}/{workflow_id}/activate"
-                activate_response = requests.post(activate_url, headers=headers)
-                if activate_response.status_code == 200:
-                    logging.info("✅ active 成功")
-                else:
-                    log_error(f"⚠️ active workflow workflow_id = {workflow_id} 失敗")
-            else:
-                log_error(f"⚠️ 建立 workflow 失敗")
-        
-        return workflow_ids
-
-    except Exception as e:
-        log_error(f"發送 workflow 請求錯誤：{e}")
 
 
 # ────────────────── dify ──────────────────
@@ -594,28 +398,7 @@ def init_db(file_ids, token):
 
 # ────────────────── 主要步驟封裝成函式 ──────────────────
 def step_remove_old_containers():
-    run_shell_script("remove_n8n.sh")
     run_shell_script("remove_dify.sh")
-
-def step_start_n8n():
-    run_shell_script("run_n8n.sh")
-    wait_for_container_ready(N8N_BASE_URL)
-
-def step_n8n_owner_login_api():
-    token = n8n_setup_owner()
-    session = n8n_login()
-    if not session:
-        raise RuntimeError("n8n login 失敗")
-    api_key = n8n_get_api_key(session)
-    if not api_key:
-        raise RuntimeError("n8n 取 API_KEY 失敗")
-    update_n8n_api_key(api_key)
-
-def step_n8n_workflows():
-    payloads = json_to_payload()
-    if not payloads:
-        raise RuntimeError("找不到 n8n json")
-    n8n_create_workflow(payloads)
 
 def step_start_dify():
     run_shell_script("run_dify.sh")
@@ -660,9 +443,6 @@ def step_dify_set_openai_and_init_db():
 # Tuple(顯示名稱, 對應函式)
 STEPS: List[Tuple[str, Callable[[], None]]] = [
     ("刪除舊容器",               step_remove_old_containers),
-    ("啟動 n8n",                step_start_n8n),
-    ("n8n 建立 Owner / 取 API", step_n8n_owner_login_api),
-    ("n8n 建立並啟用 Workflows", step_n8n_workflows),
     ("啟動 Dify",               step_start_dify),
     ("Dify 註冊 / 登入",        step_dify_owner_login),
     ("Dify 安裝模型與建 App",   step_dify_install_vendor_and_app),
