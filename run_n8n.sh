@@ -18,6 +18,6 @@ docker run -it -d \
   --env-file ./.env \
   -v n8n_data:/home/node/.n8n \
   -p 5678:5678 \
-  "docker.n8n.io/n8nio/n8n:${N8N_TAG}"
+  "n8nio/n8n:${N8N_TAG}"
 
 echo "✅ n8n ${N8N_TAG} 已在 http://localhost:5678 啟動"
