@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# 建立 network
+# 宣告 network
 NETWORK=itri-net
-docker network inspect $NETWORK >/dev/null 2>&1 || docker network create $NETWORK
 
 function remove_container_if_exists() {
   local container_name="$1"

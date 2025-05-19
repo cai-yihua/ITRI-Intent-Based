@@ -2,3 +2,4 @@
 .venv
 dify/
 uv.lock
+/log
