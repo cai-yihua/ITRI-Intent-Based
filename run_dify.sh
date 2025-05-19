@@ -1,6 +1,5 @@
 #!/bin/bash
 
-DIFY_BRANCH="1.2.0"
 DIFY_DIR="dify"
 
 echo "🚀 下載 dify 原始碼（分支：$DIFY_BRANCH）..."
