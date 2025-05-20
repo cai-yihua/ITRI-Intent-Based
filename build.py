@@ -1,28 +1,22 @@
-"""
-------------------------------------------
-1.  時間用量日誌   →  ./log_time/YYYYMMDD_HHMMSS.log
-2.  失敗／錯誤日誌 →  ./error_def/YYYYMMDD_HHMMSS.log
-3.  每個主要步驟包成函式，放到 STEPS list 依序執行
-4.  執行結束後，讀取 ./error_def/*.log 內最後一份檔，
-    若偵測到失敗步驟，立即 **只重跑那幾個步驟** 一次
-------------------------------------------
-"""
 from __future__ import annotations
-import os, sys, json, time, subprocess, requests
+import os, sys, json, time, subprocess, requests, logging
 from pathlib import Path
 from datetime import datetime
-import logging
-from typing import Callable, List, Tuple
 from contextlib import contextmanager
 from dotenv import load_dotenv, set_key
+from typing import Callable, List, Tuple, TypedDict
+from tenacity import retry, stop_after_attempt, wait_fixed
+import docker
+from docker.errors import NotFound, APIError
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ────────────────── 日誌路徑與檔名 ──────────────────
-_NOW_STR = datetime.now().strftime("%Y%m%d_%H%M%S")
-PATH_TIME   = Path("log_time")
-PATH_ERROR  = Path("log_error")
-PATH_TIME.mkdir(exist_ok=True)
-FILE_TIME  = PATH_TIME  / f"time_{_NOW_STR}.log"
-ERROR_FH = None
+LOG_DIR = Path("log")
+LOG_DIR.mkdir(exist_ok=True)
+
+_NOW_STR = datetime.now().strftime("%Y%m%d_%H%M")
+LOG_FILE = LOG_DIR / f"{_NOW_STR}.log"
+
 
 # ────────────────── Logging 設定 ──────────────────
 logging.basicConfig(
@@ -30,23 +24,13 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)-8s| %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
-        logging.FileHandler(FILE_TIME, encoding="utf-8"),  # 時間／流程
+        logging.FileHandler(LOG_FILE, encoding="utf-8"),
         logging.StreamHandler(sys.stdout)
     ],
 )
 
 def log_error(msg: str):
-    global ERROR_FH
     logging.error(msg)
-
-    if ERROR_FH is None:
-        PATH_ERROR.mkdir(exist_ok=True)
-        file_path = PATH_ERROR / f"error_{_NOW_STR}.log"
-        ERROR_FH = file_path.open("a", encoding="utf-8")
-
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    ERROR_FH.write(f"{timestamp} | ERROR | {msg}\n")
-    ERROR_FH.flush()
     raise RuntimeError(msg)
 
 # ────────────────── 共用工具 ──────────────────
@@ -56,7 +40,22 @@ load_dotenv(dotenv_path=dotenv_path, override=True)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 dotenv_path = os.path.abspath(".env")
-load_dotenv(dotenv_path=dotenv_path, override=True)  # 明確覆蓋已存在的值
+load_dotenv(dotenv_path=dotenv_path, override=True)
+
+SUDO_PASSWORD = os.getenv("SUDO_PASSWORD")
+
+# n8n
+N8N_TAG = os.getenv("N8N_TAG")
+N8N_EMAIL = os.getenv("N8N_EMAIL")
+N8N_PASSWORD = os.getenv("N8N_PASSWORD")
+N8N_FIRSTNAME = os.getenv("N8N_FIRSTNAME")
+N8N_LASTNAME = os.getenv("N8N_LASTNAME")
+N8N_BASE_URL = os.getenv("N8N_BASE_URL")
+N8N_SETUP_URL = os.getenv("N8N_SETUP_URL")
+N8N_LOGIN_URL = os.getenv("N8N_LOGIN_URL")
+N8N_SURVEY_URL = os.getenv("N8N_SURVEY_URL")
+N8N_GET_API_URL = os.getenv("N8N_GET_API_URL")
+N8N_API_URL = os.getenv("N8N_API_URL")
 
 # dify
 DIFY_TAG = os.getenv("DIFY_TAG")
@@ -75,43 +74,263 @@ DIFY_UPLOAD_TXT = os.getenv("DIFY_UPLOAD_TXT")
 DIFY_INIT_DB = os.getenv("DIFY_INIT_DB")
 DIFY_BASE = os.getenv("DIFY_BASE")
 
+DIFY_CONTAINERS: List[str] = [
+    "docker-nginx-1",
+    "docker-worker-1",
+    "docker-api-1",
+    "docker-ssrf_proxy-1",
+    "docker-weaviate-1",
+    "docker-sandbox-1",
+    "docker-web-1",
+]
+
+DIFY_CONTAINERS_HEALTHY: List[str] = [
+    "docker-db-1",
+    "docker-redis-1",
+    "docker-sandbox-1",
+]
+
+BACKEND_CONTAINERS: List[str] = [
+    "itri-intent-backend",
+    "intent-postgres-db",
+    "intent-redis-db",
+    "intent-pgadmin"
+]
+
+class JSONPayload(TypedDict):
+    mode: str
+    json_payload: dict[str]
+
+class YamlPayload(TypedDict):
+    mode: str
+    yaml_content: str
+
 @contextmanager
 def step_timer(label: str):
     """
-    自動把花費時間寫進 ./log_time/… 內
+    自動把花費時間寫進 ./log/… 內
     """
-    logging.info(f"▶️ {label} - 開始")
+    logging.info(f"🚩 開始 - {label}")
     start = time.perf_counter()
     try:
         yield
     finally:
         elapsed = time.perf_counter() - start
-        logging.info(f"✅ {label} - 結束，耗時 {elapsed:,.2f}s")
+        logging.info(f"🏁 結束 - {label}，耗時 {elapsed:,.2f} s")
+
+@retry(stop=stop_after_attempt(6), wait=wait_fixed(10))
+def _run_with_retry(fn, *args, **kwargs):
+    return fn(*args, **kwargs)
 
 def run_shell_script(script_name):
     try:
-        # 給予執行權限（等同於 chmod +x）
         subprocess.run(["chmod", "+x", script_name], check=True)
-
-        # 執行腳本
-        subprocess.run(["./" + script_name], check=True, text=True)
+        subprocess.run(["./" + script_name], check=True, text=True, timeout=500)
         logging.info(f"✅ {script_name} 執行成功")
     except Exception as e:
         log_error(f"❗ 未預期錯誤：{e}")
 
-def wait_for_container_ready(url, timeout=50):
-    logging.info("⏳ 等待 container 啟動中...")
-    for i in range(timeout):
-        try:
-            response = requests.get(url)
+def wait_for_container_ready(containers: List[str], timeout: int = 50, require_healthy: bool = False):
+    """
+    等待一個或多個 container 全數進入就緒狀態。
+
+    Args:
+        containers      : container 名稱列表。
+        timeout         : 每個 container 最多等待秒數。
+        require_healthy : 若 image 有 HEALTHCHECK，是否必須等到 healthy。
+
+    Returns:
+        bool: 全部就緒→True；任何一個逾時/失敗→False。
+    """
+    client = docker.from_env()
+
+    for name in containers:
+        logging.info(f"⏳ '{name:25}' container 就緒中")
+
+        for _ in range(timeout):
+            try:
+                container = client.containers.get(name)
+                container.reload()
+                state = container.attrs["State"]
+                status = state.get("Status")                    # running / exited…
+                health = state.get("Health", {}).get("Status")  # healthy / starting…
+
+                if status == "running" and (
+                    (not require_healthy) or (health == "healthy")
+                ):
+                    logging.info(f"✅ '{name:25}' container 已就緒")
+                    break                                       # 進到下一個 container
+            except NotFound:
+                logging.error(f"⚠️ 找不到名稱為 '{name}' 的 container")
+            except APIError as err:
+                logging.error(f"⚠️ Docker API error: {err}")
+
+            time.sleep(1)
+        else:
+            # for-loop 正常結束代表逾時
+            logging.error(f"❌ container '{name}' 未在 {timeout}s 內就緒")
+
+def ensure_docker_network(network_name: str = "itri-net"):
+    try:
+        # 建立新的 network
+        subprocess.run(["docker", "network", "create", network_name], check=True)
+        print(f"✅ 建立 network 成功")
+
+    except subprocess.CalledProcessError as e:
+        print(f"❌ 建立 network 失敗：{e}")
+        raise
+
+# ────────────────── n8n ──────────────────
+def n8n_setup_owner():
+    """
+    設定 owner 資訊
+    """    
+    payload = {
+        "email": N8N_EMAIL,
+        "firstName": N8N_FIRSTNAME,
+        "lastName": N8N_LASTNAME,
+        "password": N8N_PASSWORD
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+
+    try:
+        response = requests.post(N8N_SETUP_URL, json=payload, headers=headers)
+        response.raise_for_status()
+        result = response.json()
+
+        if result.get("data"):
+            logging.info("✅ 註冊成功")
+        else:
+            log_error("❌ 註冊失敗")
+
+    except Exception as e:
+        log_error(f"註冊錯誤：{e}")
+
+def n8n_login() -> requests.Session:
+    """
+    登入並取得 auth_token
+    """
+    payload = {
+        "email": N8N_EMAIL,
+        "password": N8N_PASSWORD,
+        "language": "zh-Hant",
+        "remember_me": True
+    }
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    
+    session = requests.Session()
+
+    try:
+        response = session.post(N8N_LOGIN_URL, json=payload, headers=headers)
+        response.raise_for_status()
+        auth_token = response.cookies.get("n8n-auth")
+        if auth_token:
+            session.cookies.set("n8n-auth", auth_token)
+            logging.info("✅ 登入成功")
+        else:
+            log_error("❌ 登入失敗")
+
+        return session
+
+    except Exception as e:
+        log_error(f"登入錯誤：{e}")
+
+def n8n_get_api_key(session) -> str:
+    """
+    獲取 API KEY獲取 API KEY
+    """
+    payload = {
+        "expiresAt": None,
+        "label": "test"
+    }
+
+    try:
+        response = session.post(N8N_GET_API_URL, json=payload)
+        response.raise_for_status()
+        result = response.json()
+
+        if result.get("data"):
+            logging.info("✅ 獲取 API KEY 成功")
+            api_key = result["data"].get("rawApiKey")
+            return api_key
+        else:
+            log_error("❌ 獲取 API KEY 失敗")
+
+    except Exception as e:
+        log_error(f"獲取 API KEY 錯誤：{e}")
+
+def json_to_payload() -> List[JSONPayload]:
+    """
+    根據 N8N_TAG 尋找 /n8n-version/{N8N_TAG}/ 的所有 JSON 檔案，並將內容嵌入 JSON payload 中。
+    """
+    try:
+        allowed_fields = ["name", "nodes", "connections", "settings", "staticData"]
+        json_dir = os.path.join(os.getcwd(), 'n8n-version', N8N_TAG)
+        payloads = []
+
+        for filename in os.listdir(json_dir):
+            if filename.endswith('.json'):
+                file_path = os.path.join(json_dir, filename)
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    json_content = json.load(f)
+                    json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
+                payload = {
+                    "mode": "json-content",
+                    "json_payload": json_payload
+                }
+                payloads.append(payload)
+
+        logging.info("✅ 獲取 JSONs 成功")
+        return payloads
+
+    except Exception as e:
+        log_error(f"獲取 JSON 錯誤：{e}")
+    
+def n8n_create_workflow(payloads) -> List[str]:
+    """
+    發送創建 workflow 的請求，回傳 workflow_id
+    """
+    try:
+        workflow_ids = []
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-N8N-API-KEY": N8N_API_KEY
+        }
+
+        for payload in payloads:
+            workflow_content = payload["json_payload"]
+
+            response = requests.post(N8N_API_URL, json=workflow_content, headers=headers)
             if response.status_code == 200:
-                logging.info("✅ container 已就緒")
-                time.sleep(5)
-                return True
-        except requests.exceptions.ConnectionError:
-            pass
-        time.sleep(1)
-    log_error("❌ container 未在預期時間內就緒")
+                logging.info("✅ 創建 workflow 成功")
+                data = response.json()
+                workflow_id = data.get("id")
+                workflow_ids.append(workflow_id)
+
+                # active workflow
+                activate_url = f"{N8N_API_URL}/{workflow_id}/activate"
+                activate_response = requests.post(activate_url, headers=headers)
+                if activate_response.status_code == 200:
+                    logging.info("✅ active workflow 成功")
+                else:
+                    log_error(f"⚠️ active workflow workflow_id = {workflow_id} 失敗")
+            else:
+                log_error(f"⚠️ 創建 workflow 失敗")
+        
+        return workflow_ids
+
+    except Exception as e:
+        log_error(f"創建 workflow 錯誤：{e}")
 
 
 # ────────────────── dify ──────────────────
@@ -136,9 +355,9 @@ def dify_setup_owner():
             log_error("❌ 註冊失敗")
 
     except Exception as e:
-        log_error(f"註冊失敗：{e}")
+        log_error(f"註冊錯誤：{e}")
 
-def dify_login_and_get_token():
+def dify_login_and_get_token() -> str:
     """
     登入並取得 access_token
     """
@@ -156,15 +375,16 @@ def dify_login_and_get_token():
 
         if result.get("result") == "success":
             token = result["data"]["access_token"]
+            logging.info("✅ 成功登入")
             logging.info("✅ 成功取得 access token")
             return token
         else:
             log_error("❌ 登入失敗")
 
     except Exception as e:
-        log_error(f"登入失敗：{e}")
+        log_error(f"登入錯誤：{e}")
 
-def yaml_to_payload():
+def yaml_to_payload() -> YamlPayload:
     """
     根據 DIFY_TAG 尋找 /n8n-version/{DIFY_TAG}/ 的所有 YMAL 檔案，並將內容嵌入 YAML payload 中。
     """
@@ -183,12 +403,13 @@ def yaml_to_payload():
             "yaml_content": yaml_content
         }
 
+        logging.info("✅ 獲取 yaml 成功")
         return payload
 
     except Exception as e:
-        log_error(f"讀取 YAML 發生錯誤：{e}")
+        log_error(f"獲取 yaml 錯誤：{e}")
 
-def dify_create_workflow(payload, token):
+def dify_create_workflow(payload, token) -> str:
     """
     發送創建 workflow 的請求，回傳 app_id
     """
@@ -200,16 +421,16 @@ def dify_create_workflow(payload, token):
         response = requests.post(DIFY_IMPORT_URL, json=payload, headers=headers)
 
         if response.status_code == 200:
-            logging.info("✅ 成功創建")
+            logging.info("✅ 創建 workflow 成功")
             data = response.json()
             return data.get("app_id")
         else:
-            log_error("⚠️ 建立 workflow 失敗")
+            log_error("⚠️ 創建 workflow 失敗")
 
     except Exception as e:
-        log_error(f"發送 workflow 請求錯誤：{e}")
+        log_error(f"創建 workflow 錯誤：{e}")
 
-def get_workflow_token(app_id, token):
+def get_workflow_token(app_id, token) -> str:
     """
     透過 app_id 拿到 workflow 的 token
     """
@@ -222,10 +443,10 @@ def get_workflow_token(app_id, token):
         response = requests.post(url, headers=headers)
         response.raise_for_status()
         data = response.json()
-        logging.info("✅ 成功取得 Workflow Token")
+        logging.info("✅ 取得 workflow token 成功")
         return data["token"]
     except Exception as e:
-        log_error(f"取得 workflow token 發生錯誤：{e}")
+        log_error(f"取得 workflow token 錯誤：{e}")
 
 def update_backend_api_key_base(new_api_key_base):
     try:
@@ -244,10 +465,10 @@ def update_backend_api_key_base(new_api_key_base):
 
         # 更新或新增 DIFY_API_KEY
         set_key(env_file, "DIFY_API_KEY", new_api_key_base)
-        logging.info(f"✅ 成功更新 DIFY_API_KEY")
+        logging.info(f"✅ 更新 DIFY_API_KEY 成功")
 
     except Exception as e:
-        log_error(f"更新 .env 檔案失敗：{e}")
+        log_error(f"更新 DIFY_API_KEY 錯誤：{e}")
 
 def add_model_vendor(payload, token):
     try:
@@ -265,7 +486,7 @@ def add_model_vendor(payload, token):
     except Exception as e:
         log_error(f"安裝模型供應商錯誤：{e}")
 
-def set_openai_api_key(token):
+def set_openai_api_key(token) -> bool:
     try:
         payload = {
             "config_from":"predefined-model",
@@ -283,18 +504,18 @@ def set_openai_api_key(token):
             try:
                 response = requests.post(DIFY_SET_OPENAI_API_KEY, json=payload, headers=headers)
                 if response.status_code == 201:
-                    logging.info("✅ 設定 OPENAI 成功")
+                    logging.info("✅ 設定 OPENAI API KEY 成功")
                     return True
                 
                 time.sleep(1)
             except Exception as e:
-                log_error(f"設定 OPENAI 失敗：{e}")
-        log_error("⚠️ 設定 OPENAI 失敗")
+                log_error(f"設定 OPENAI API KEY 失敗：{e}")
+        log_error("⚠️ 設定 OPENAI API KEY 失敗")
 
     except Exception as e:
-        log_error(f"設定 OPENAI 錯誤：{e}")
+        log_error(f"設定 OPENAI API KEY 錯誤：{e}")
 
-def upload_file(token):
+def upload_file(token) -> List[str]:
     try:
         vector_dir = Path(f"dify-version/{DIFY_TAG}/vectorDB")
         if not vector_dir.exists():
@@ -329,7 +550,7 @@ def upload_file(token):
     except Exception as e:
         log_error(f"上傳 file 錯誤：{e}")
 
-def init_db(file_ids, token):
+def init_db(file_ids, token) -> str:
     try:
         payload = {
             "data_source":{
@@ -396,90 +617,96 @@ def init_db(file_ids, token):
     except Exception as e:
         log_error(f"設定資料庫錯誤：{e}")
 
+
 # ────────────────── 主要步驟封裝成函式 ──────────────────
-def step_remove_old_containers():
-    run_shell_script("remove_dify.sh")
+def step_n8n():
+    def step_n8n_setup_container():
+        run_shell_script("remove_n8n.sh")
+        run_shell_script("run_n8n.sh")
+        wait_for_container_ready(["n8n"], timeout=50, require_healthy=False)
 
-def step_start_dify():
-    run_shell_script("run_dify.sh")
-    wait_for_container_ready(DIFY_SETUP_URL)
+    def step_n8n_get_api_key():
+        n8n_setup_owner()
+        session = n8n_login()
+        global N8N_API_KEY
+        N8N_API_KEY = n8n_get_api_key(session)
 
-def step_dify_owner_login():
-    dify_setup_owner()
-    global DIFY_TOKEN
-    DIFY_TOKEN = dify_login_and_get_token()
-    if not DIFY_TOKEN:
-        raise RuntimeError("dify login 失敗")
+    def step_n8n_init_workflow():
+        payloads = json_to_payload()
+        n8n_create_workflow(payloads)
 
-def step_dify_install_vendor_and_app():
-    payload = {
-        "plugin_unique_identifiers": [
-            "langgenius/openai:0.0.19@6b2b2e115b1b9d34a63eb26fadcc33d74330fd2ec06071bb30b8a24b1fab107a"
-        ]
-    }
-    add_model_vendor(payload, DIFY_TOKEN)
-    dify_payload = yaml_to_payload()
-    app_id = dify_create_workflow(dify_payload, DIFY_TOKEN)
-    workflow_token = get_workflow_token(app_id, DIFY_TOKEN)
-    update_backend_api_key_base(workflow_token)
+    with step_timer("step_n8n_setup_container"):
+        _run_with_retry(step_n8n_setup_container)
 
-def step_dify_upload_vector():
-    global FILE_IDS
-    FILE_IDS = upload_file(DIFY_TOKEN)
-    if FILE_IDS is None:
-        raise RuntimeError("上傳向量檔失敗")
+    with step_timer("step_n8n_get_api_key"):
+        _run_with_retry(step_n8n_get_api_key)
 
-def step_build_dashboard():
-    run_shell_script("run_dashboard.sh")
+    with step_timer("step_n8n_init_workflow"):
+        _run_with_retry(step_n8n_init_workflow)
 
-def step_build_backend():
-    run_shell_script("run_backend.sh")
+def step_dify():
+    def step_dify_setup_container():
+        run_shell_script("remove_dify.sh")
+        run_shell_script("run_dify.sh")
+        wait_for_container_ready(DIFY_CONTAINERS, timeout=50, require_healthy=False)
+        wait_for_container_ready(DIFY_CONTAINERS_HEALTHY, timeout=300, require_healthy=True)
+    
+    def step_dify_setup_owner():
+        dify_setup_owner()
+        global DIFY_TOKEN
+        DIFY_TOKEN = dify_login_and_get_token()
 
-def step_dify_set_openai_and_init_db():
-    set_openai_api_key(DIFY_TOKEN)
-    init_db(FILE_IDS, DIFY_TOKEN)
+    def step_dify_init_workflow():
+        dify_payload = yaml_to_payload()
+        app_id = dify_create_workflow(dify_payload, DIFY_TOKEN)
+        workflow_token = get_workflow_token(app_id, DIFY_TOKEN)
+        update_backend_api_key_base(workflow_token)
+        
+    def step_dify_init_db():
+        payload = {
+            "plugin_unique_identifiers": [
+                "langgenius/openai:0.0.19@6b2b2e115b1b9d34a63eb26fadcc33d74330fd2ec06071bb30b8a24b1fab107a"
+            ]
+        }
+        add_model_vendor(payload, DIFY_TOKEN)
+        with step_timer("dify_set_openai_api_key"):
+            _run_with_retry(set_openai_api_key, DIFY_TOKEN)
+        file_ids = upload_file(DIFY_TOKEN)
+        init_db(file_ids, DIFY_TOKEN)
 
-# ────────────────── 步驟清單 & 控制迴圈 ──────────────────
-# Tuple(顯示名稱, 對應函式)
-STEPS: List[Tuple[str, Callable[[], None]]] = [
-    ("刪除舊容器",               step_remove_old_containers),
-    ("啟動 Dify",               step_start_dify),
-    ("Dify 註冊 / 登入",        step_dify_owner_login),
-    ("Dify 安裝模型與建 App",   step_dify_install_vendor_and_app),
-    ("Dify 上傳向量檔",         step_dify_upload_vector),
-    ("建置 Dashboard",         step_build_dashboard),
-    ("建置 Backend",           step_build_backend),
-    ("Dify 設定 OpenAI / InitDB", step_dify_set_openai_and_init_db),
-]
+    with step_timer("dify_setup_container"):
+        _run_with_retry(step_dify_setup_container)
 
-def run_steps(target_steps: List[str] | None = None) -> List[str]:
-    """
-    執行所有（或指定）步驟；回傳失敗步驟名稱 list
-    """
-    failed = []
-    for name, fn in STEPS:
-        if target_steps and name not in target_steps:
-            continue
-        try:
-            with step_timer(name):
-                fn()
-        except Exception as e:
-            failed.append(name)
-    return failed
+    with step_timer("dify_setup_owner"):
+        _run_with_retry(step_dify_setup_owner)
+
+    with step_timer("dify_init_workflow"):
+        _run_with_retry(step_dify_init_workflow)
+
+    with step_timer("dify_init_db"):
+        _run_with_retry(step_dify_init_db)
+
+def step_backend():
+    with step_timer("backend_init"):
+        run_shell_script("run_backend.sh")
+        wait_for_container_ready(BACKEND_CONTAINERS, timeout=50, require_healthy=False)
+        
+
+def step_dashboard():
+    with step_timer("dashboard_init"):
+        run_shell_script("run_dashboard.sh")
+        wait_for_container_ready(["itri-intent-dashboard"], timeout=50, require_healthy=False)
+
 
 # ────────────────── 主程式 ──────────────────
 if __name__ == "__main__":
-    # 初次跑全部
-    failed_steps = run_steps()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futs = [pool.submit(step_dify), pool.submit(step_n8n)]
+        for f in as_completed(futs): f.result()
 
-    # 若有失敗 → 只重跑失敗的步驟一次
-    if failed_steps:
-        logging.info(f"⚠️ 第一次執行失敗步驟：{failed_steps}，嘗試重跑一次…")
-        retry_failed = run_steps(failed_steps)
-
-        if retry_failed:
-            logging.error("❌ 仍有步驟失敗，請查看 ./log_error/ 下最新檔案")
-        else:
-            logging.info("✅ 重跑成功，全部完成！")
-    else:
-        logging.info("🎉 部屬全部成功！")
+    ensure_docker_network()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futs = [pool.submit(step_backend), pool.submit(step_dashboard)]
+        for f in as_completed(futs): f.result()
+        
+    logging.info("🎉 部屬全部成功！")
