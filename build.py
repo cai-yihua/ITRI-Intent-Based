@@ -44,19 +44,6 @@ load_dotenv(dotenv_path=dotenv_path, override=True)
 
 SUDO_PASSWORD = os.getenv("SUDO_PASSWORD")
 
-# n8n
-N8N_TAG = os.getenv("N8N_TAG")
-N8N_EMAIL = os.getenv("N8N_EMAIL")
-N8N_PASSWORD = os.getenv("N8N_PASSWORD")
-N8N_FIRSTNAME = os.getenv("N8N_FIRSTNAME")
-N8N_LASTNAME = os.getenv("N8N_LASTNAME")
-N8N_BASE_URL = os.getenv("N8N_BASE_URL")
-N8N_SETUP_URL = os.getenv("N8N_SETUP_URL")
-N8N_LOGIN_URL = os.getenv("N8N_LOGIN_URL")
-N8N_SURVEY_URL = os.getenv("N8N_SURVEY_URL")
-N8N_GET_API_URL = os.getenv("N8N_GET_API_URL")
-N8N_API_URL = os.getenv("N8N_API_URL")
-
 # dify
 DIFY_TAG = os.getenv("DIFY_TAG")
 DIFY_EMAIL = os.getenv("DIFY_EMAIL")
@@ -96,10 +83,6 @@ BACKEND_CONTAINERS: List[str] = [
     "intent-redis-db",
     "intent-pgadmin"
 ]
-
-class JSONPayload(TypedDict):
-    mode: str
-    json_payload: dict[str]
 
 class YamlPayload(TypedDict):
     mode: str
@@ -179,159 +162,6 @@ def ensure_docker_network(network_name: str = "itri-net"):
     except subprocess.CalledProcessError as e:
         print(f"❌ 建立 network 失敗：{e}")
         raise
-
-# ────────────────── n8n ──────────────────
-def n8n_setup_owner():
-    """
-    設定 owner 資訊
-    """    
-    payload = {
-        "email": N8N_EMAIL,
-        "firstName": N8N_FIRSTNAME,
-        "lastName": N8N_LASTNAME,
-        "password": N8N_PASSWORD
-    }
-
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-
-    try:
-        response = requests.post(N8N_SETUP_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        result = response.json()
-
-        if result.get("data"):
-            logging.info("✅ 註冊成功")
-        else:
-            log_error("❌ 註冊失敗")
-
-    except Exception as e:
-        log_error(f"註冊錯誤：{e}")
-
-def n8n_login() -> requests.Session:
-    """
-    登入並取得 auth_token
-    """
-    payload = {
-        "email": N8N_EMAIL,
-        "password": N8N_PASSWORD,
-        "language": "zh-Hant",
-        "remember_me": True
-    }
-    
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-    
-    session = requests.Session()
-
-    try:
-        response = session.post(N8N_LOGIN_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        auth_token = response.cookies.get("n8n-auth")
-        if auth_token:
-            session.cookies.set("n8n-auth", auth_token)
-            logging.info("✅ 登入成功")
-        else:
-            log_error("❌ 登入失敗")
-
-        return session
-
-    except Exception as e:
-        log_error(f"登入錯誤：{e}")
-
-def n8n_get_api_key(session) -> str:
-    """
-    獲取 API KEY獲取 API KEY
-    """
-    payload = {
-        "expiresAt": None,
-        "label": "test"
-    }
-
-    try:
-        response = session.post(N8N_GET_API_URL, json=payload)
-        response.raise_for_status()
-        result = response.json()
-
-        if result.get("data"):
-            logging.info("✅ 獲取 API KEY 成功")
-            api_key = result["data"].get("rawApiKey")
-            return api_key
-        else:
-            log_error("❌ 獲取 API KEY 失敗")
-
-    except Exception as e:
-        log_error(f"獲取 API KEY 錯誤：{e}")
-
-def json_to_payload() -> List[JSONPayload]:
-    """
-    根據 N8N_TAG 尋找 /n8n-version/{N8N_TAG}/ 的所有 JSON 檔案，並將內容嵌入 JSON payload 中。
-    """
-    try:
-        allowed_fields = ["name", "nodes", "connections", "settings", "staticData"]
-        json_dir = os.path.join(os.getcwd(), 'n8n-version', N8N_TAG)
-        payloads = []
-
-        for filename in os.listdir(json_dir):
-            if filename.endswith('.json'):
-                file_path = os.path.join(json_dir, filename)
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    json_content = json.load(f)
-                    json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
-                payload = {
-                    "mode": "json-content",
-                    "json_payload": json_payload
-                }
-                payloads.append(payload)
-
-        logging.info("✅ 獲取 JSONs 成功")
-        return payloads
-
-    except Exception as e:
-        log_error(f"獲取 JSON 錯誤：{e}")
-    
-def n8n_create_workflow(payloads) -> List[str]:
-    """
-    發送創建 workflow 的請求，回傳 workflow_id
-    """
-    try:
-        workflow_ids = []
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "X-N8N-API-KEY": N8N_API_KEY
-        }
-
-        for payload in payloads:
-            workflow_content = payload["json_payload"]
-
-            response = requests.post(N8N_API_URL, json=workflow_content, headers=headers)
-            if response.status_code == 200:
-                logging.info("✅ 創建 workflow 成功")
-                data = response.json()
-                workflow_id = data.get("id")
-                workflow_ids.append(workflow_id)
-
-                # active workflow
-                activate_url = f"{N8N_API_URL}/{workflow_id}/activate"
-                activate_response = requests.post(activate_url, headers=headers)
-                if activate_response.status_code == 200:
-                    logging.info("✅ active workflow 成功")
-                else:
-                    log_error(f"⚠️ active workflow workflow_id = {workflow_id} 失敗")
-            else:
-                log_error(f"⚠️ 創建 workflow 失敗")
-        
-        return workflow_ids
-
-    except Exception as e:
-        log_error(f"創建 workflow 錯誤：{e}")
-
 
 # ────────────────── dify ──────────────────
 def dify_setup_owner():
@@ -619,31 +449,6 @@ def init_db(file_ids, token) -> str:
 
 
 # ────────────────── 主要步驟封裝成函式 ──────────────────
-def step_n8n():
-    def step_n8n_setup_container():
-        run_shell_script("remove_n8n.sh")
-        run_shell_script("run_n8n.sh")
-        wait_for_container_ready(["n8n"], timeout=50, require_healthy=False)
-
-    def step_n8n_get_api_key():
-        n8n_setup_owner()
-        session = n8n_login()
-        global N8N_API_KEY
-        N8N_API_KEY = n8n_get_api_key(session)
-
-    def step_n8n_init_workflow():
-        payloads = json_to_payload()
-        n8n_create_workflow(payloads)
-
-    with step_timer("step_n8n_setup_container"):
-        _run_with_retry(step_n8n_setup_container)
-
-    with step_timer("step_n8n_get_api_key"):
-        _run_with_retry(step_n8n_get_api_key)
-
-    with step_timer("step_n8n_init_workflow"):
-        _run_with_retry(step_n8n_init_workflow)
-
 def step_dify():
     def step_dify_setup_container():
         run_shell_script("remove_dify.sh")
@@ -691,7 +496,6 @@ def step_backend():
         run_shell_script("run_backend.sh")
         wait_for_container_ready(BACKEND_CONTAINERS, timeout=50, require_healthy=False)
         
-
 def step_dashboard():
     with step_timer("dashboard_init"):
         run_shell_script("run_dashboard.sh")
@@ -700,9 +504,7 @@ def step_dashboard():
 
 # ────────────────── 主程式 ──────────────────
 if __name__ == "__main__":
-    with ThreadPoolExecutor(max_workers=2) as pool:
-        futs = [pool.submit(step_dify), pool.submit(step_n8n)]
-        for f in as_completed(futs): f.result()
+    step_dify()
 
     ensure_docker_network()
     with ThreadPoolExecutor(max_workers=2) as pool:
