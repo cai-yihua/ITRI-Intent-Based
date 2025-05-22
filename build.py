@@ -155,7 +155,15 @@ def wait_for_container_ready(containers: List[str], timeout: int = 50, require_h
 
 def ensure_docker_network(network_name: str = "itri-net"):
     try:
-        # 建立新的 network
+        exists = subprocess.run(
+            ["docker", "network", "inspect", network_name],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        ).returncode == 0
+
+        if exists:
+            print(f"ℹ️  network 已存在，略過 create")
+            return
+
         subprocess.run(["docker", "network", "create", network_name], check=True)
         print(f"✅ 建立 network 成功")
 
@@ -473,7 +481,11 @@ def step_dify():
                 "langgenius/openai:0.0.19@6b2b2e115b1b9d34a63eb26fadcc33d74330fd2ec06071bb30b8a24b1fab107a"
             ]
         }
-        add_model_vendor(payload, DIFY_TOKEN)
+        try:
+            add_model_vendor(payload, DIFY_TOKEN)
+        except Exception as e:
+            logging.warning(f"⚠️ add_model_vendor 失敗，跳過 DB 初始化：{e}")
+            return            # 直接結束本函式，主程式照常執行
         with step_timer("dify_set_openai_api_key"):
             _run_with_retry(set_openai_api_key, DIFY_TOKEN)
         file_ids = upload_file(DIFY_TOKEN)
@@ -489,7 +501,7 @@ def step_dify():
         _run_with_retry(step_dify_init_workflow)
 
     with step_timer("dify_init_db"):
-        _run_with_retry(step_dify_init_db)
+        step_dify_init_db()
 
 def step_backend():
     with step_timer("backend_init"):
