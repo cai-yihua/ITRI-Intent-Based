@@ -1,0 +1,2207 @@
+app:
+  description: v1.0
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: '[Demo] 20250416'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.0.16@28da32a1a4b2856e28b27f78f12c841c73d585f8aa832288b110e79db371dc6e
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables:
+  - description: ''
+    id: 2dfeb785-9b24-42f0-9c8c-c041a7756c55
+    name: conversation_uid
+    selector:
+    - conversation
+    - conversation_uid
+    value: ''
+    value_type: string
+  environment_variables:
+  - description: ''
+    id: 0cafe3ba-baf3-47e2-8189-d3e075df1d34
+    name: Interference_UE_Execute_PATH
+    selector:
+    - env
+    - Interference_UE_Execute_PATH
+    value: 71279998-7aa1-4819-b2d6-3287b435fa5f
+    value_type: string
+  - description: ''
+    id: 342203c4-3f69-47ba-91c0-87e2d6ff24d0
+    name: Interference_UE_Predict_PATH
+    selector:
+    - env
+    - Interference_UE_Predict_PATH
+    value: d4f93f32-a552-41ae-a7d4-56e1907b41a5
+    value_type: string
+  - description: ''
+    id: e6be9088-dfb7-49f8-9a66-d14ebaa82da4
+    name: Query_UE_Throughput_PATH
+    selector:
+    - env
+    - Query_UE_Throughput_PATH
+    value: d9c7c32d-5147-4c09-8c20-0762307b1e3b
+    value_type: string
+  - description: ''
+    id: 66e62211-c56f-463e-8b23-0a7dcef15e34
+    name: SINR_PATH
+    selector:
+    - env
+    - SINR_PATH
+    value: 1f7d9e8a-ebe1-4cf0-93dc-d4b9f54ea3b1
+    value_type: string
+  - description: ''
+    id: 6060580f-cbbd-4f6d-8158-deaf07342542
+    name: MITLAB_BACKEND
+    selector:
+    - env
+    - MITLAB_BACKEND
+    value: http://172.24.20.17:30000/api/v1.0/
+    value_type: string
+  - description: ''
+    id: df6b16f3-b5d7-4738-a409-8f58fd95c46d
+    name: N8N_ACTIVE_BASE_URL
+    selector:
+    - env
+    - N8N_ACTIVE_BASE_URL
+    value: http://172.24.16.1:30000/webhook/
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions: []
+      allowed_file_types:
+      - video
+      - audio
+      - image
+      - document
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: true
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 1
+    opening_statement: 你好，我是ITRI SMO虛擬助理
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742448090528-source-1742448389805-target
+      selected: false
+      source: '1742448090528'
+      sourceHandle: source
+      target: '1742448389805'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1742448389805-false-1742442828989-target
+      selected: false
+      source: '1742448389805'
+      sourceHandle: 'false'
+      target: '1742442828989'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742445883218-source-1742446926046-target
+      selected: false
+      source: '1742445883218'
+      sourceHandle: source
+      target: '1742446926046'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742447067053-source-1742447332580-target
+      selected: false
+      source: '1742447067053'
+      sourceHandle: source
+      target: '1742447332580'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: knowledge-retrieval
+      id: 1742447332580-true-1742442861275-target
+      selected: false
+      source: '1742447332580'
+      sourceHandle: 'true'
+      target: '1742442861275'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: parameter-extractor
+      id: 1742472808495-source-1742472982494-target
+      selected: false
+      source: '1742472808495'
+      sourceHandle: source
+      target: '1742472982494'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1742446926046-f84ddd9c-2ec2-4c9a-982f-dbf050004c96-1743501210955-target
+      selected: false
+      source: '1742446926046'
+      sourceHandle: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+      target: '1743501210955'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 1743509989605-source-1742448090528-target
+      selected: false
+      source: '1743509989605'
+      sourceHandle: source
+      target: '1742448090528'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1742448389805-true-17435117558650-target
+      selected: false
+      source: '1742448389805'
+      sourceHandle: 'true'
+      target: '17435117558650'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 17435117512250-source-1742447067053-target
+      selected: false
+      source: '17435117512250'
+      sourceHandle: source
+      target: '1742447067053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 1743501210955-source-17435128925960-target
+      selected: false
+      source: '1743501210955'
+      sourceHandle: source
+      target: '17435128925960'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435128925960-source-1743509989605-target
+      selected: false
+      source: '17435128925960'
+      sourceHandle: source
+      target: '1743509989605'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 17435117558650-source-17435131894560-target
+      selected: false
+      source: '17435117558650'
+      sourceHandle: source
+      target: '17435131894560'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435131894560-source-17435117512250-target
+      selected: false
+      source: '17435131894560'
+      sourceHandle: source
+      target: '17435117512250'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 1742442730885-source-17435132396410-target
+      selected: false
+      source: '1742442730885'
+      sourceHandle: source
+      target: '17435132396410'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 1742442828989-source-17435138487230-target
+      selected: false
+      source: '1742442828989'
+      sourceHandle: source
+      target: '17435138487230'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 17435142956850-source-17435143717210-target
+      selected: false
+      source: '17435142956850'
+      sourceHandle: source
+      target: '17435143717210'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1742442861275-source-17435142956850-target
+      selected: false
+      source: '1742442861275'
+      sourceHandle: source
+      target: '17435142956850'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435143717210-source-17435145116790-target
+      selected: false
+      source: '17435143717210'
+      sourceHandle: source
+      target: '17435145116790'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435146281790-source-17435146350620-target
+      selected: false
+      source: '17435146281790'
+      sourceHandle: source
+      target: '17435146350620'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 17435145116790-source-1742472808495-target
+      selected: false
+      source: '17435145116790'
+      sourceHandle: source
+      target: '1742472808495'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1742447332580-false-17435146281790-target
+      selected: false
+      source: '1742447332580'
+      sourceHandle: 'false'
+      target: '17435146281790'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 1742442590290-source-1743511206372-target
+      selected: false
+      source: '1742442590290'
+      sourceHandle: source
+      target: '1743511206372'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: code
+      id: 1742472982494-source-1744297062468-target
+      selected: false
+      source: '1742472982494'
+      sourceHandle: source
+      target: '1744297062468'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1743511206372-source-1744353564080-target
+      selected: false
+      source: '1743511206372'
+      sourceHandle: source
+      target: '1744353564080'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1744353564080-false-1742445883218-target
+      selected: false
+      source: '1744353564080'
+      sourceHandle: 'false'
+      target: '1742445883218'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1744353564080-44611379-5777-4b80-8577-0a4d9cede932-1744353668299-target
+      selected: false
+      source: '1744353564080'
+      sourceHandle: 44611379-5777-4b80-8577-0a4d9cede932
+      target: '1744353668299'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1744353564080-845df0f6-b64f-4dcd-b94d-15a9c512a370-17443649198400-target
+      selected: false
+      source: '1744353564080'
+      sourceHandle: 845df0f6-b64f-4dcd-b94d-15a9c512a370
+      target: '17443649198400'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1744353564080-305c1bb1-2b94-4b24-a5d1-b63bc079e475-17443652347490-target
+      selected: false
+      source: '1744353564080'
+      sourceHandle: 305c1bb1-2b94-4b24-a5d1-b63bc079e475
+      target: '17443652347490'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1744353564080-true-17443724787310-target
+      selected: false
+      source: '1744353564080'
+      sourceHandle: 'true'
+      target: '17443724787310'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: if-else
+      id: 1742446926046-false-1744785597981-target
+      source: '1742446926046'
+      sourceHandle: 'false'
+      target: '1744785597981'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1744785597981-true-1742442730885-target
+      source: '1744785597981'
+      sourceHandle: 'true'
+      target: '1742442730885'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1744785597981-false-17447856803140-target
+      source: '1744785597981'
+      sourceHandle: 'false'
+      target: '17447856803140'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: 17447856803140-source-17447856854490-target
+      source: '17447856803140'
+      sourceHandle: source
+      target: '17447856854490'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 開始
+        type: start
+        variables:
+        - label: conversation_uid
+          max_length: 48
+          options: []
+          required: false
+          type: text-input
+          variable: conversation_uid
+      height: 88
+      id: '1742442590290'
+      position:
+        x: -1382.7323634116287
+        y: 270
+      positionAbsolute:
+        x: -1382.7323634116287
+        y: 270
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 你好，我是SMO助理，希望我為你做什麼嗎？
+        desc: ''
+        selected: false
+        title: '[回覆] Error意圖識別階段'
+        type: answer
+        variables: []
+      height: 116
+      id: '1742442730885'
+      position:
+        x: 1035.7134607181292
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 1035.7134607181292
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '[ Warning ] 目前系統僅支援單一意圖類型的操作，請重新描述您的單一需求'
+        desc: ''
+        selected: false
+        title: '[回覆] 複雜意圖階段'
+        type: answer
+        variables: []
+      height: 132
+      id: '1742442828989'
+      position:
+        x: 2476.959105308413
+        y: 470.45141161560025
+      positionAbsolute:
+        x: 2476.959105308413
+        y: 470.45141161560025
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        dataset_ids:
+        - J5omBnGfRGfatlbht8Ap55WewFrAJIgjvwnoNUnJprE6wcsxnRqVQgukzzFc6eE4
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: weighted_score
+          reranking_model:
+            model: rerank-english-v2.0
+            provider: langgenius/cohere/cohere
+          score_threshold: null
+          top_k: 1
+          weights:
+            keyword_setting:
+              keyword_weight: 0
+            vector_setting:
+              embedding_model_name: text-embedding-3-small
+              embedding_provider_name: langgenius/openai/openai
+              vector_weight: 1
+        query_variable_selector:
+        - '1742447067053'
+        - text
+        retrieval_mode: multiple
+        selected: false
+        title: '[RAG 處理] 意圖轉Scenario轉換器'
+        type: knowledge-retrieval
+      height: 90
+      id: '1742442861275'
+      position:
+        x: 3825.405232068553
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 3825.405232068553
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        author: test
+        desc: ''
+        height: 598
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"意圖識別階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 3117
+      height: 598
+      id: '1742442983144'
+      position:
+        x: 46.139042077851855
+        y: 148.86618199238637
+      positionAbsolute:
+        x: 46.139042077851855
+        y: 148.86618199238637
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 3117
+    - data:
+        author: test
+        desc: ''
+        height: 558
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"意圖處理階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ' (1)'
+        type: ''
+        width: 2092
+      height: 558
+      id: '17424430040480'
+      position:
+        x: 3339.1509074528703
+        y: 177.84161104139008
+      positionAbsolute:
+        x: 3339.1509074528703
+        y: 177.84161104139008
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 2092
+    - data:
+        author: test
+        desc: ''
+        height: 553
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"參數補充階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: '  (2)'
+        type: ''
+        width: 1060
+      height: 553
+      id: '17424431355940'
+      position:
+        x: 5358.289606332841
+        y: 166.8733612444438
+      positionAbsolute:
+        x: 5358.289606332841
+        y: 166.8733612444438
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 1060
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: cc5a2610-c9fc-43f8-9bca-3f3f5281fde3
+          role: system
+          text: "請閱讀以下文本，並判斷其是否與網管 SMO（Service Management and Orchestration）相關：\n\
+            文本:\n\n{{#sys.query#}}\n\n若相關，請在「reason」欄位中列出與 SMO 相關的關鍵字或核心概念，並簡要說明原因；\n\
+            若不相關，請在「reason」欄位中簡要說明不相關的原因。\n\n請以 JSON 格式輸出分析結果，結構如下：\n\n{\n  \"result\"\
+            : \"TRUE\" 或 \"FALSE\",\n  \"reason\": \"說明原因 (若為 TRUE，請列出 SMO 相關關鍵字並簡要說明；若為\
+            \ FALSE，則說明不相關原因)\"\n}\n\n目前 SMO 可支援的意圖包括：\n- 「抑制單一場域訊號干擾」\n- 「查詢單一場域基站資訊」\n\
+            - 「干擾抑制演算法預測」\n\n（由於「取得 UE 資訊（連線狀態、訊號品質、SINR Map 等）」也屬於網管層級的查詢行為，因此視為\
+            \ SMO 相關領域。）\n\n請依上述需求給出最終結果。\n"
+        selected: false
+        title: '[LLM 處理] 網管SMO內容分別器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1742445883218'
+      position:
+        x: 84.61126818553225
+        y: 262
+      positionAbsolute:
+        x: 84.61126818553225
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+          conditions:
+          - comparison_operator: contains
+            id: 2b9bc372-6143-4bb9-81d4-63963c848bd4
+            value: 'TRUE'
+            varType: string
+            variable_selector:
+            - '1742445883218'
+            - text
+          id: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[決策] 網管SMO內容分別器'
+        type: if-else
+      height: 124
+      id: '1742446926046'
+      position:
+        x: 406.2471599541362
+        y: 262
+      positionAbsolute:
+        x: 406.2471599541362
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 09ddf340-a502-4a03-89b5-b69469d3d650
+          role: system
+          text: "請閱讀以下文本：\n\n{{#sys.query#}}\n\n以下為目前「意圖列表」與其範圍：\n\n1. 「查看UE的Throughput」：\n\
+            \   透過下列 API 查詢並過濾回傳資料，以檢視特定 UE（或一群 UE）的連線狀態、訊號品質、Throughput 等相關統計資訊。\n\
+            \   例如：取得並篩選特定 UE 的吞吐量、連線狀態與訊號品質等。\n\n2. 「查詢 Cell 裡面的 SINR Map」：\n   針對指定之\
+            \ Cell，查詢該 Cell 中的 SINR（Signal-to-Interference-plus-Noise Ratio）指標，\n\
+            \   並可擴及 SINR 的分佈情形或視覺化資訊（如 SINR Map）。\n   例如：想了解特定 Cell 或範圍內的 SINR 分佈、請求提供或檢視某\
+            \ Cell 中 SINR Map 的詳細資訊等。\n\n3. 「Interference Algo Predict」：\n   透過干擾抑制或相關演算法，針對指定場域或環境進行效能增進預測、評估或建議。\n\
+            \   例如：預測如何降低干擾並提升特定場域的整體 Throughput、請求使用或調整干擾抑制演算法以優化網路效能等。\n\n4. 「Interference\
+            \ Algo Execute」：\n   直接執行或套用干擾抑制演算法，以進行實際的干擾降低或網路效能優化動作。\n   例如：請求執行某演算法來壓制干擾、啟用既定的參數設定以落實干擾抑制策略等。\n\
+            \n請根據上述定義，判斷文本是否符合任一意圖：\n\n若符合任一意圖，請以 JSON 格式回傳，包含以下欄位：\n{\n  \"intent\"\
+            : \"對應的意圖名稱\",\n  \"reason\": \"判斷該意圖的原因\"\n}\n\n若文本與列表中所有意圖皆不符合，請回傳：\n\
+            {\n  \"intent\": \"NONE\",\n  \"reason\": \"無法對應至任何已知意圖\"\n}\n\n請勿包含任何其他文字或解釋。\n"
+        selected: false
+        title: '[LLM 處理] 文本轉單一意圖器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1742447067053'
+      position:
+        x: 3249.7247111887123
+        y: 292.74373086275045
+      positionAbsolute:
+        x: 3249.7247111887123
+        y: 292.74373086275045
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not contains
+            id: bf0d6b33-24ef-423f-9ba1-50fbe2f5191b
+            value: NONE
+            varType: string
+            variable_selector:
+            - '1742447067053'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[決策] 單一意圖提取器'
+        type: if-else
+      height: 124
+      id: '1742447332580'
+      position:
+        x: 3516.287474197739
+        y: 292.74373086275045
+      positionAbsolute:
+        x: 3516.287474197739
+        y: 292.74373086275045
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 60043e91-9fda-43bc-941a-8d0e748d9b53
+          role: system
+          text: "請判斷以下文本是否只包含單一意圖。若是單一意圖，請輸出：\n{\n  \"intent\": \"single_intent\"\
+            ,\n  \"reason\": \"此處填入判斷該文本為單一意圖的原因\"\n}\n若包含多個意圖，請輸出：\n{\n  \"intent\"\
+            : \"multi_intent\",\n  \"reason\": \"此處填入判斷該文本包含多個意圖的原因\"\n}\n請勿輸出任何其他文字或解釋。\n\
+            \n文本：\n\"\"\"\n{{#sys.query#}}\n\"\"\"\n"
+        selected: false
+        title: '[LLM 處理] 單一意圖辨識器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1742448090528'
+      position:
+        x: 1581.826896483987
+        y: 262
+      positionAbsolute:
+        x: 1581.826896483987
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 581b06eb-cb6f-4bfb-a796-b26475c573e1
+            value: single_intent
+            varType: string
+            variable_selector:
+            - '1742448090528'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[決策] 單一意圖決策'
+        type: if-else
+      height: 124
+      id: '1742448389805'
+      position:
+        x: 1866.46040477732
+        y: 262
+      positionAbsolute:
+        x: 1866.46040477732
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1742442861275'
+          - result
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 3e94dad6-489b-4699-83fb-61de468de245
+          role: system
+          text: 你是一個專業的工作流管理檢查員，會請執行一系列的檢查。
+        - id: fa92de14-f33b-41f9-b720-be442a1cac8d
+          role: user
+          text: '請確認以下的內容是否為 n8n 的 workflow 格式，並且解釋這段 workflow 是否有扣緊有關於，如果我沒有 path
+            就幫我設為 None，如果有請把 path 給找出來。
+
+            提供的意圖：
+
+            {{#1742447067053.text#}}
+
+            {{#context#}}'
+        - id: 70f5b694-49c1-44b2-afc6-3e6acc2eaf55
+          role: assistant
+          text: "請輸出為 JSON 格式，格式如下：\njson\n{\n  \"path\": \"XXX\",\n  \"reason\":\
+            \ \"這裡填寫檢查或解釋的原因\"\n}"
+        selected: false
+        title: '[LLM 處理] 確認PATH參數存在'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1742472808495'
+      position:
+        x: 5439.710829265763
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 5439.710829265763
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: ''
+        instruction: 請提取出 {{#1742472808495.text#}}內的path參數
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        parameters:
+        - description: path
+          name: path
+          required: false
+          type: string
+        query:
+        - '1742472808495'
+        - text
+        reasoning_mode: prompt
+        selected: false
+        title: Workflow API路徑提取器
+        type: parameter-extractor
+        variables: []
+        vision:
+          configs:
+            detail: high
+            variable_selector:
+            - sys
+            - files
+          enabled: false
+      height: 88
+      id: '1742472982494'
+      position:
+        x: 5749.778654987333
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 5749.778654987333
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據下列資訊，以一句話回覆使用者。請在句子開頭加上「[ Info ]」。
+
+            情境：你現在是 SMO 網管意圖的判別器，請根據下方的使用者問題及先前的結果回覆，組織一句話進行回應。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1742445883218.text#}}
+
+            '
+        selected: false
+        title: '[LLM 回覆] 網管SMO內容分別器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1743501210955'
+      position:
+        x: 757.8806889418556
+        y: 262
+      positionAbsolute:
+        x: 757.8806889418556
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-4
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#1743501210955.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 網管SMO內容分別器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 127
+      id: '1743509989605'
+      position:
+        x: 1307.0429525171987
+        y: 262
+      positionAbsolute:
+        x: 1307.0429525171987
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1742442590290'
+          - conversation_uid
+          variable_selector:
+          - conversation
+          - conversation_uid
+          write_mode: over-write
+        selected: false
+        title: 儲存conversation_uid
+        type: assigner
+        version: '2'
+      height: 86
+      id: '1743511206372'
+      position:
+        x: -1037.431645678755
+        y: 270
+      positionAbsolute:
+        x: -1037.431645678755
+        y: 270
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        author: test
+        desc: ''
+        height: 541
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"確定聊天UID","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 663
+      height: 541
+      id: '1743511256837'
+      position:
+        x: -1058.1082160687015
+        y: 166.8733612444438
+      positionAbsolute:
+        x: -1058.1082160687015
+        y: 166.8733612444438
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 663
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-5
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#17435117558650.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 單一意圖辨識器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 127
+      id: '17435117512250'
+      position:
+        x: 2818.2725725404694
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2818.2725725404694
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據以下資訊，以一句話回覆使用者，並在句首加上「[ Info ]」。
+
+            情境：你是一個 SMO 網管意圖的判別器，負責解釋使用者需求是否屬於單一意圖。
+
+            請整合使用者問題與先前的結果回覆，組織出一句話答覆。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1742445883218.text#}}'
+        selected: false
+        title: '[LLM 回覆] 單一意圖辨識器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '17435117558650'
+      position:
+        x: 2167.246725870651
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2167.246725870651
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1743501210955.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆] 網管SMO內容分別器'
+        type: answer
+        variables: []
+      height: 103
+      id: '17435128925960'
+      position:
+        x: 1035.7134607181292
+        y: 262
+      positionAbsolute:
+        x: 1035.7134607181292
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17435117558650.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆] 單一意圖辨識器'
+        type: answer
+        variables: []
+      height: 103
+      id: '17435131894560'
+      position:
+        x: 2486.0199611249927
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2486.0199611249927
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-7
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"你好，我是SMO助理，希望我為你做什麼嗎？\"\n        }\n \
+              \   ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] Error意圖識別階段'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 127
+      id: '17435132396410'
+      position:
+        x: 1307.0429525171987
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 1307.0429525171987
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-6
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"[ Warning ] 目前系統僅支援單一意圖類型的操作，請重新描述您的單一需求。\"\n    }\n\
+              \  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 複雜意圖階段'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 127
+      id: '17435138487230'
+      position:
+        x: 2818.2725725404694
+        y: 470.45141161560025
+      positionAbsolute:
+        x: 2818.2725725404694
+        y: 470.45141161560025
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據下列資訊，以一句話回覆使用者，並在句首加上「[ Info ]」。
+
+            你是一個 SMO 網管意圖的判別器，需說明目前使用者對應到何種意圖。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1742447067053.text#}}'
+        selected: false
+        title: '[LLM 回覆] 文本轉單一意圖器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '17435142956850'
+      position:
+        x: 4142.827661495694
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 4142.827661495694
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17435142956850.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆] 文本轉單一意圖器'
+        type: answer
+        variables: []
+      height: 103
+      id: '17435143717210'
+      position:
+        x: 4456.870544259646
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 4456.870544259646
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-1
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#17435142956850.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 文本轉單一意圖器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 127
+      id: '17435145116790'
+      position:
+        x: 4818.415711811417
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 4818.415711811417
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '[ Error ] 無法對應到任何已提供的意圖'
+        desc: ''
+        selected: false
+        title: '[回覆] Error文本轉單一意圖器'
+        type: answer
+        variables: []
+      height: 100
+      id: '17435146281790'
+      position:
+        x: 4456.870544259646
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 4456.870544259646
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"[ Error ] 無法對應到任何已提供的意圖\"\n        }\n\
+              \    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] Error文本轉單一意圖器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 127
+      id: '17435146350620'
+      position:
+        x: 4818.415711811417
+        y: 482.74918599968714
+      positionAbsolute:
+        x: 4818.415711811417
+        y: 482.74918599968714
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import requests\nfrom typing import Any, Dict, List, Union\n\ndef parse_chain(chain_data:\
+          \ List[Dict[str, Any]]) -> List[Dict[str, Any]]:\n    \"\"\"\n    解析 n8n\
+          \ 回傳的 chain，依 type 做不同處理。\n    - message: 直接回傳 content（文字）\n    - image:\
+          \   不再 fetch，假設內容已經是 base64 或物件，直接保留\n    - table:   將 columns/data 封裝為一個\
+          \ content 物件\n    - 其他:    當未知型別，回傳提示文字\n    \"\"\"\n    parsed_list = []\n\
+          \    for item in chain_data:\n        item_type = item.get(\"type\", \"\"\
+          ).lower()\n        content = item.get(\"content\")\n\n        if item_type\
+          \ == \"message\":\n            # 純文字\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": content\n\
+          \            })\n\n        elif item_type == \"image\":\n            data_dict\
+          \ = content.get(\"data\", {})\n            base64_data = data_dict.get(\"\
+          data\")\n            # 直接信任 n8n 已經回傳了完整資訊 (例如 base64 或 data物件)\n       \
+          \     # 可以依你實際狀況決定要不要再做進一步判斷\n            parsed_list.append({\n       \
+          \         \"type\": \"image\",\n                \"content\": base64_data\n\
+          \            })\n\n        elif item_type == \"table\":\n            # 假設\
+          \ n8n 直接在 item 裡提供 columns / data\n            columns = content.get(\"\
+          columns\", [])\n            data = content.get(\"data\", [])\n         \
+          \   parsed_list.append({\n                \"type\": \"table\",\n       \
+          \         \"content\": {\n                    \"columns\": columns,\n  \
+          \                  \"data\": data\n                }\n            })\n\n\
+          \        else:\n            # 未知型別 → 以文字顯示\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": f\"\
+          [未知 type={item_type}] {content}\"\n            })\n\n    return parsed_list\n\
+          \ndef send_to_human_in_the_loop(\n    backend_url: str,\n    conversation_uid:\
+          \ str,\n    item: Dict[str, Any]\n) -> requests.Response:\n    \"\"\"\n\
+          \    將「單一 item」送到 human_in_the_loop API。\n    text_content 傳一個 list，裡面只有此\
+          \ item。\n    \"\"\"\n    api_endpoint = f\"{backend_url}workflow_mgt/WorkflowManager/human_in_the_loop\"\
+          \n    payload = {\n        \"conversation_uid\": conversation_uid,\n   \
+          \     \"text_content\": [item]  # 僅傳一個 item\n    }\n    return requests.post(api_endpoint,\
+          \ json=payload)\n\ndef main(\n    n8n_url: str,\n    n8n_path: str,\n  \
+          \  backend_url: str = \"http://YOUR_BACKEND_SERVER_URL\",\n    conversation_uid:\
+          \ str = \"測試UID-12345\"\n) -> Dict[str, Any]:\n    \"\"\"\n    Dify Code\
+          \ Node 進入點:\n      1) 向 n8n 發送 GET/POST 請求 (視你的 n8n 設定) 以取得 { \"chain\"\
+          : [...] }\n      2) parse_chain → 解析 chain\n      3) 逐一把每個 item 傳給 human_in_the_loop\n\
+          \      4) 回傳所有呼叫結果\n\n    參數:\n      n8n_url:  n8n 主機或網域\n      n8n_path:\
+          \ 具體 API 路徑 (可能含 /webhook/...)\n      backend_url: human_in_the_loop 的後端位址\
+          \ (前半段)\n      conversation_uid: 用於識別對話的 ID\n    \"\"\"\n\n    # 1) 取得 n8n\
+          \ 結果\n    n8n_endpoint = f\"{n8n_url}{n8n_path}\"\n\n    try:\n        response\
+          \ = requests.get(n8n_endpoint, timeout=300)\n        response.raise_for_status()\n\
+          \    except Exception as e:\n        return {\n            \"result\": \"\
+          n8n fetch data error\"\n        }\n\n    # 預期 n8n 返回的 JSON 結構: { \"chain\"\
+          : [...] }\n    try:\n        n8n_result = response.json()\n    except Exception\
+          \ as e:\n        return {\n            \"result\": \"error\"\n        }\n\
+          \n    if \"chain\" not in n8n_result[0]:\n        return {\n           \
+          \ \"result\": \"no data error\"\n        }\n\n    # 2) parse_chain\n   \
+          \ chain_parsed = parse_chain(n8n_result[0][\"chain\"])\n\n    # 3) 每個 item\
+          \ 逐一打 API\n    results = []\n    for item in chain_parsed:\n        try:\n\
+          \            resp = send_to_human_in_the_loop(backend_url, conversation_uid,\
+          \ item)\n            results.append({\n                \"type\": item[\"\
+          type\"],\n                \"status_code\": resp.status_code,\n         \
+          \       \"response_text\": resp.text\n            })\n        except Exception\
+          \ as e:\n            results.append({\n                \"result\": \"parsed\
+          \ error\"\n            })\n\n    # 4) 回傳所有呼叫結果\n    return {\n        \"\
+          result\": \"API Success\"\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 執行含有呼叫API的Code
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - MITLAB_BACKEND
+          variable: backend_url
+        - value_selector:
+          - conversation
+          - conversation_uid
+          variable: conversation_uid
+        - value_selector:
+          - env
+          - N8N_ACTIVE_BASE_URL
+          variable: n8n_url
+        - value_selector:
+          - '1742472982494'
+          - path
+          variable: n8n_path
+      height: 52
+      id: '1744297062468'
+      position:
+        x: 6090.264257102447
+        y: 321.70006837147537
+      positionAbsolute:
+        x: 6090.264257102447
+        y: 321.70006837147537
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: 958022b7-11ec-4056-84c9-0fddede9210b
+            value: OK
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 'true'
+          logical_operator: and
+        - case_id: 44611379-5777-4b80-8577-0a4d9cede932
+          conditions:
+          - comparison_operator: is
+            id: 12b7d751-6bcf-4a1b-be3a-5fe9622e3e9e
+            value: 目前整體網路的訊號品質狀況如何?
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 44611379-5777-4b80-8577-0a4d9cede932
+          logical_operator: and
+        - case_id: 305c1bb1-2b94-4b24-a5d1-b63bc079e475
+          conditions:
+          - comparison_operator: is
+            id: 0cfca859-a38d-4dbb-9ab5-927162584f58
+            value: 能否告訴我這些UE的throughput?
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 305c1bb1-2b94-4b24-a5d1-b63bc079e475
+          logical_operator: and
+        - case_id: 845df0f6-b64f-4dcd-b94d-15a9c512a370
+          conditions:
+          - comparison_operator: contains
+            id: 59c60491-c37b-47c7-8dc8-4b9f271decf3
+            value: 預測
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 845df0f6-b64f-4dcd-b94d-15a9c512a370
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 條件分支 4
+        type: if-else
+      height: 268
+      id: '1744353564080'
+      position:
+        x: -747.431645678755
+        y: 270
+      positionAbsolute:
+        x: -747.431645678755
+        y: 270
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import requests\nfrom typing import Any, Dict, List, Union\n\ndef parse_chain(chain_data:\
+          \ List[Dict[str, Any]]) -> List[Dict[str, Any]]:\n    \"\"\"\n    解析 n8n\
+          \ 回傳的 chain，依 type 做不同處理。\n    - message: 直接回傳 content（文字）\n    - image:\
+          \   不再 fetch，假設內容已經是 base64 或物件，直接保留\n    - table:   將 columns/data 封裝為一個\
+          \ content 物件\n    - 其他:    當未知型別，回傳提示文字\n    \"\"\"\n    parsed_list = []\n\
+          \    for item in chain_data:\n        item_type = item.get(\"type\", \"\"\
+          ).lower()\n        content = item.get(\"content\")\n\n        if item_type\
+          \ == \"message\":\n            # 純文字\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": content\n\
+          \            })\n\n        elif item_type == \"image\":\n            data_dict\
+          \ = content.get(\"data\", {})\n            base64_data = data_dict.get(\"\
+          data\")\n            # 直接信任 n8n 已經回傳了完整資訊 (例如 base64 或 data物件)\n       \
+          \     # 可以依你實際狀況決定要不要再做進一步判斷\n            parsed_list.append({\n       \
+          \         \"type\": \"image\",\n                \"content\": base64_data\n\
+          \            })\n\n        elif item_type == \"table\":\n            # 假設\
+          \ n8n 直接在 item 裡提供 columns / data\n            columns = content.get(\"\
+          columns\", [])\n            data = content.get(\"data\", [])\n         \
+          \   parsed_list.append({\n                \"type\": \"table\",\n       \
+          \         \"content\": {\n                    \"columns\": columns,\n  \
+          \                  \"data\": data\n                }\n            })\n\n\
+          \        else:\n            # 未知型別 → 以文字顯示\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": f\"\
+          [未知 type={item_type}] {content}\"\n            })\n\n    return parsed_list\n\
+          \ndef send_to_human_in_the_loop(\n    backend_url: str,\n    conversation_uid:\
+          \ str,\n    item: Dict[str, Any]\n) -> requests.Response:\n    \"\"\"\n\
+          \    將「單一 item」送到 human_in_the_loop API。\n    text_content 傳一個 list，裡面只有此\
+          \ item。\n    \"\"\"\n    api_endpoint = f\"{backend_url}workflow_mgt/WorkflowManager/human_in_the_loop\"\
+          \n    payload = {\n        \"conversation_uid\": conversation_uid,\n   \
+          \     \"text_content\": [item]  # 僅傳一個 item\n    }\n    return requests.post(api_endpoint,\
+          \ json=payload)\n\ndef main(\n    n8n_url: str,\n    n8n_path: str,\n  \
+          \  backend_url: str = \"http://YOUR_BACKEND_SERVER_URL\",\n    conversation_uid:\
+          \ str = \"測試UID-12345\"\n) -> Dict[str, Any]:\n    \"\"\"\n    Dify Code\
+          \ Node 進入點:\n      1) 向 n8n 發送 GET/POST 請求 (視你的 n8n 設定) 以取得 { \"chain\"\
+          : [...] }\n      2) parse_chain → 解析 chain\n      3) 逐一把每個 item 傳給 human_in_the_loop\n\
+          \      4) 回傳所有呼叫結果\n\n    參數:\n      n8n_url:  n8n 主機或網域\n      n8n_path:\
+          \ 具體 API 路徑 (可能含 /webhook/...)\n      backend_url: human_in_the_loop 的後端位址\
+          \ (前半段)\n      conversation_uid: 用於識別對話的 ID\n    \"\"\"\n\n    # 1) 取得 n8n\
+          \ 結果\n    n8n_endpoint = f\"{n8n_url}{n8n_path}\"\n\n    try:\n        response\
+          \ = requests.get(n8n_endpoint, timeout=300)\n        response.raise_for_status()\n\
+          \    except Exception as e:\n        return {\n            \"result\": \"\
+          n8n fetch data error\"\n        }\n\n    # 預期 n8n 返回的 JSON 結構: { \"chain\"\
+          : [...] }\n    try:\n        n8n_result = response.json()\n    except Exception\
+          \ as e:\n        return {\n            \"result\": \"error\"\n        }\n\
+          \n    if \"chain\" not in n8n_result[0]:\n        return {\n           \
+          \ \"result\": \"no data error\"\n        }\n\n    # 2) parse_chain\n   \
+          \ chain_parsed = parse_chain(n8n_result[0][\"chain\"])\n\n    # 3) 每個 item\
+          \ 逐一打 API\n    results = []\n    for item in chain_parsed:\n        try:\n\
+          \            resp = send_to_human_in_the_loop(backend_url, conversation_uid,\
+          \ item)\n            results.append({\n                \"type\": item[\"\
+          type\"],\n                \"status_code\": resp.status_code,\n         \
+          \       \"response_text\": resp.text\n            })\n        except Exception\
+          \ as e:\n            results.append({\n                \"result\": \"parsed\
+          \ error\"\n            })\n\n    # 4) 回傳所有呼叫結果\n    return {\n        \"\
+          result\": \"API Success\"\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: SINR MAP
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - N8N_ACTIVE_BASE_URL
+          variable: n8n_url
+        - value_selector:
+          - env
+          - SINR_PATH
+          variable: n8n_path
+        - value_selector:
+          - env
+          - MITLAB_BACKEND
+          variable: backend_url
+        - value_selector:
+          - conversation
+          - conversation_uid
+          variable: conversation_uid
+      height: 52
+      id: '1744353668299'
+      position:
+        x: -204.8755823925727
+        y: -524.9086894992872
+      positionAbsolute:
+        x: -204.8755823925727
+        y: -524.9086894992872
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import requests\nfrom typing import Any, Dict, List, Union\n\ndef parse_chain(chain_data:\
+          \ List[Dict[str, Any]]) -> List[Dict[str, Any]]:\n    \"\"\"\n    解析 n8n\
+          \ 回傳的 chain，依 type 做不同處理。\n    - message: 直接回傳 content（文字）\n    - image:\
+          \   不再 fetch，假設內容已經是 base64 或物件，直接保留\n    - table:   將 columns/data 封裝為一個\
+          \ content 物件\n    - 其他:    當未知型別，回傳提示文字\n    \"\"\"\n    parsed_list = []\n\
+          \    for item in chain_data:\n        item_type = item.get(\"type\", \"\"\
+          ).lower()\n        content = item.get(\"content\")\n\n        if item_type\
+          \ == \"message\":\n            # 純文字\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": content\n\
+          \            })\n\n        elif item_type == \"image\":\n            data_dict\
+          \ = content.get(\"data\", {})\n            base64_data = data_dict.get(\"\
+          data\")\n            # 直接信任 n8n 已經回傳了完整資訊 (例如 base64 或 data物件)\n       \
+          \     # 可以依你實際狀況決定要不要再做進一步判斷\n            parsed_list.append({\n       \
+          \         \"type\": \"image\",\n                \"content\": base64_data\n\
+          \            })\n\n        elif item_type == \"table\":\n            # 假設\
+          \ n8n 直接在 item 裡提供 columns / data\n            columns = content.get(\"\
+          columns\", [])\n            data = content.get(\"data\", [])\n         \
+          \   parsed_list.append({\n                \"type\": \"table\",\n       \
+          \         \"content\": {\n                    \"columns\": columns,\n  \
+          \                  \"data\": data\n                }\n            })\n\n\
+          \        else:\n            # 未知型別 → 以文字顯示\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": f\"\
+          [未知 type={item_type}] {content}\"\n            })\n\n    return parsed_list\n\
+          \ndef send_to_human_in_the_loop(\n    backend_url: str,\n    conversation_uid:\
+          \ str,\n    item: Dict[str, Any]\n) -> requests.Response:\n    \"\"\"\n\
+          \    將「單一 item」送到 human_in_the_loop API。\n    text_content 傳一個 list，裡面只有此\
+          \ item。\n    \"\"\"\n    api_endpoint = f\"{backend_url}workflow_mgt/WorkflowManager/human_in_the_loop\"\
+          \n    payload = {\n        \"conversation_uid\": conversation_uid,\n   \
+          \     \"text_content\": [item]  # 僅傳一個 item\n    }\n    return requests.post(api_endpoint,\
+          \ json=payload)\n\ndef main(\n    n8n_url: str,\n    n8n_path: str,\n  \
+          \  backend_url: str = \"http://YOUR_BACKEND_SERVER_URL\",\n    conversation_uid:\
+          \ str = \"測試UID-12345\"\n) -> Dict[str, Any]:\n    \"\"\"\n    Dify Code\
+          \ Node 進入點:\n      1) 向 n8n 發送 GET/POST 請求 (視你的 n8n 設定) 以取得 { \"chain\"\
+          : [...] }\n      2) parse_chain → 解析 chain\n      3) 逐一把每個 item 傳給 human_in_the_loop\n\
+          \      4) 回傳所有呼叫結果\n\n    參數:\n      n8n_url:  n8n 主機或網域\n      n8n_path:\
+          \ 具體 API 路徑 (可能含 /webhook/...)\n      backend_url: human_in_the_loop 的後端位址\
+          \ (前半段)\n      conversation_uid: 用於識別對話的 ID\n    \"\"\"\n\n    # 1) 取得 n8n\
+          \ 結果\n    n8n_endpoint = f\"{n8n_url}{n8n_path}\"\n\n    try:\n        response\
+          \ = requests.get(n8n_endpoint, timeout=300)\n        response.raise_for_status()\n\
+          \    except Exception as e:\n        return {\n            \"result\": \"\
+          n8n fetch data error\"\n        }\n\n    # 預期 n8n 返回的 JSON 結構: { \"chain\"\
+          : [...] }\n    try:\n        n8n_result = response.json()\n    except Exception\
+          \ as e:\n        return {\n            \"result\": \"error\"\n        }\n\
+          \n    if \"chain\" not in n8n_result[0]:\n        return {\n           \
+          \ \"result\": \"no data error\"\n        }\n\n    # 2) parse_chain\n   \
+          \ chain_parsed = parse_chain(n8n_result[0][\"chain\"])\n\n    # 3) 每個 item\
+          \ 逐一打 API\n    results = []\n    for item in chain_parsed:\n        try:\n\
+          \            resp = send_to_human_in_the_loop(backend_url, conversation_uid,\
+          \ item)\n            results.append({\n                \"type\": item[\"\
+          type\"],\n                \"status_code\": resp.status_code,\n         \
+          \       \"response_text\": resp.text\n            })\n        except Exception\
+          \ as e:\n            results.append({\n                \"result\": \"parsed\
+          \ error\"\n            })\n\n    # 4) 回傳所有呼叫結果\n    return {\n        \"\
+          result\": \"API Success\"\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: Interference UE Predict
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - N8N_ACTIVE_BASE_URL
+          variable: n8n_url
+        - value_selector:
+          - env
+          - Interference_UE_Predict_PATH
+          variable: n8n_path
+        - value_selector:
+          - env
+          - MITLAB_BACKEND
+          variable: backend_url
+        - value_selector:
+          - conversation
+          - conversation_uid
+          variable: conversation_uid
+      height: 52
+      id: '17443649198400'
+      position:
+        x: -195.78128299351033
+        y: -269.7666671478289
+      positionAbsolute:
+        x: -195.78128299351033
+        y: -269.7666671478289
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import requests\nfrom typing import Any, Dict, List, Union\n\ndef parse_chain(chain_data:\
+          \ List[Dict[str, Any]]) -> List[Dict[str, Any]]:\n    \"\"\"\n    解析 n8n\
+          \ 回傳的 chain，依 type 做不同處理。\n    - message: 直接回傳 content（文字）\n    - image:\
+          \   不再 fetch，假設內容已經是 base64 或物件，直接保留\n    - table:   將 columns/data 封裝為一個\
+          \ content 物件\n    - 其他:    當未知型別，回傳提示文字\n    \"\"\"\n    parsed_list = []\n\
+          \    for item in chain_data:\n        item_type = item.get(\"type\", \"\"\
+          ).lower()\n        content = item.get(\"content\")\n\n        if item_type\
+          \ == \"message\":\n            # 純文字\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": content\n\
+          \            })\n\n        elif item_type == \"image\":\n            data_dict\
+          \ = content.get(\"data\", {})\n            base64_data = data_dict.get(\"\
+          data\")\n            # 直接信任 n8n 已經回傳了完整資訊 (例如 base64 或 data物件)\n       \
+          \     # 可以依你實際狀況決定要不要再做進一步判斷\n            parsed_list.append({\n       \
+          \         \"type\": \"image\",\n                \"content\": base64_data\n\
+          \            })\n\n        elif item_type == \"table\":\n            # 假設\
+          \ n8n 直接在 item 裡提供 columns / data\n            columns = content.get(\"\
+          columns\", [])\n            data = content.get(\"data\", [])\n         \
+          \   parsed_list.append({\n                \"type\": \"table\",\n       \
+          \         \"content\": {\n                    \"columns\": columns,\n  \
+          \                  \"data\": data\n                }\n            })\n\n\
+          \        else:\n            # 未知型別 → 以文字顯示\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": f\"\
+          [未知 type={item_type}] {content}\"\n            })\n\n    return parsed_list\n\
+          \ndef send_to_human_in_the_loop(\n    backend_url: str,\n    conversation_uid:\
+          \ str,\n    item: Dict[str, Any]\n) -> requests.Response:\n    \"\"\"\n\
+          \    將「單一 item」送到 human_in_the_loop API。\n    text_content 傳一個 list，裡面只有此\
+          \ item。\n    \"\"\"\n    api_endpoint = f\"{backend_url}workflow_mgt/WorkflowManager/human_in_the_loop\"\
+          \n    payload = {\n        \"conversation_uid\": conversation_uid,\n   \
+          \     \"text_content\": [item]  # 僅傳一個 item\n    }\n    return requests.post(api_endpoint,\
+          \ json=payload)\n\ndef main(\n    n8n_url: str,\n    n8n_path: str,\n  \
+          \  backend_url: str = \"http://YOUR_BACKEND_SERVER_URL\",\n    conversation_uid:\
+          \ str = \"測試UID-12345\"\n) -> Dict[str, Any]:\n    \"\"\"\n    Dify Code\
+          \ Node 進入點:\n      1) 向 n8n 發送 GET/POST 請求 (視你的 n8n 設定) 以取得 { \"chain\"\
+          : [...] }\n      2) parse_chain → 解析 chain\n      3) 逐一把每個 item 傳給 human_in_the_loop\n\
+          \      4) 回傳所有呼叫結果\n\n    參數:\n      n8n_url:  n8n 主機或網域\n      n8n_path:\
+          \ 具體 API 路徑 (可能含 /webhook/...)\n      backend_url: human_in_the_loop 的後端位址\
+          \ (前半段)\n      conversation_uid: 用於識別對話的 ID\n    \"\"\"\n\n    # 1) 取得 n8n\
+          \ 結果\n    n8n_endpoint = f\"{n8n_url}{n8n_path}\"\n\n    try:\n        response\
+          \ = requests.get(n8n_endpoint, timeout=300)\n        response.raise_for_status()\n\
+          \    except Exception as e:\n        return {\n            \"result\": \"\
+          n8n fetch data error\"\n        }\n\n    # 預期 n8n 返回的 JSON 結構: { \"chain\"\
+          : [...] }\n    try:\n        n8n_result = response.json()\n    except Exception\
+          \ as e:\n        return {\n            \"result\": \"error\"\n        }\n\
+          \n    if \"chain\" not in n8n_result[0]:\n        return {\n           \
+          \ \"result\": \"no data error\"\n        }\n\n    # 2) parse_chain\n   \
+          \ chain_parsed = parse_chain(n8n_result[0][\"chain\"])\n\n    # 3) 每個 item\
+          \ 逐一打 API\n    results = []\n    for item in chain_parsed:\n        try:\n\
+          \            resp = send_to_human_in_the_loop(backend_url, conversation_uid,\
+          \ item)\n            results.append({\n                \"type\": item[\"\
+          type\"],\n                \"status_code\": resp.status_code,\n         \
+          \       \"response_text\": resp.text\n            })\n        except Exception\
+          \ as e:\n            results.append({\n                \"result\": \"parsed\
+          \ error\"\n            })\n\n    # 4) 回傳所有呼叫結果\n    return {\n        \"\
+          result\": \"API Success\"\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: Query UE Throughput
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - N8N_ACTIVE_BASE_URL
+          variable: n8n_url
+        - value_selector:
+          - env
+          - Query_UE_Throughput_PATH
+          variable: n8n_path
+        - value_selector:
+          - env
+          - MITLAB_BACKEND
+          variable: backend_url
+        - value_selector:
+          - conversation
+          - conversation_uid
+          variable: conversation_uid
+      height: 52
+      id: '17443652347490'
+      position:
+        x: -204.8755823925727
+        y: -415.8539010058092
+      positionAbsolute:
+        x: -204.8755823925727
+        y: -415.8539010058092
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import requests\nfrom typing import Any, Dict, List, Union\n\ndef parse_chain(chain_data:\
+          \ List[Dict[str, Any]]) -> List[Dict[str, Any]]:\n    \"\"\"\n    解析 n8n\
+          \ 回傳的 chain，依 type 做不同處理。\n    - message: 直接回傳 content（文字）\n    - image:\
+          \   不再 fetch，假設內容已經是 base64 或物件，直接保留\n    - table:   將 columns/data 封裝為一個\
+          \ content 物件\n    - 其他:    當未知型別，回傳提示文字\n    \"\"\"\n    parsed_list = []\n\
+          \    for item in chain_data:\n        item_type = item.get(\"type\", \"\"\
+          ).lower()\n        content = item.get(\"content\")\n\n        if item_type\
+          \ == \"message\":\n            # 純文字\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": content\n\
+          \            })\n\n        elif item_type == \"image\":\n            data_dict\
+          \ = content.get(\"data\", {})\n            base64_data = data_dict.get(\"\
+          data\")\n            # 直接信任 n8n 已經回傳了完整資訊 (例如 base64 或 data物件)\n       \
+          \     # 可以依你實際狀況決定要不要再做進一步判斷\n            parsed_list.append({\n       \
+          \         \"type\": \"image\",\n                \"content\": base64_data\n\
+          \            })\n\n        elif item_type == \"table\":\n            # 假設\
+          \ n8n 直接在 item 裡提供 columns / data\n            columns = content.get(\"\
+          columns\", [])\n            data = content.get(\"data\", [])\n         \
+          \   parsed_list.append({\n                \"type\": \"table\",\n       \
+          \         \"content\": {\n                    \"columns\": columns,\n  \
+          \                  \"data\": data\n                }\n            })\n\n\
+          \        else:\n            # 未知型別 → 以文字顯示\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": f\"\
+          [未知 type={item_type}] {content}\"\n            })\n\n    return parsed_list\n\
+          \ndef send_to_human_in_the_loop(\n    backend_url: str,\n    conversation_uid:\
+          \ str,\n    item: Dict[str, Any]\n) -> requests.Response:\n    \"\"\"\n\
+          \    將「單一 item」送到 human_in_the_loop API。\n    text_content 傳一個 list，裡面只有此\
+          \ item。\n    \"\"\"\n    api_endpoint = f\"{backend_url}workflow_mgt/WorkflowManager/human_in_the_loop\"\
+          \n    payload = {\n        \"conversation_uid\": conversation_uid,\n   \
+          \     \"text_content\": [item]  # 僅傳一個 item\n    }\n    return requests.post(api_endpoint,\
+          \ json=payload)\n\ndef main(\n    n8n_url: str,\n    n8n_path: str,\n  \
+          \  backend_url: str = \"http://YOUR_BACKEND_SERVER_URL\",\n    conversation_uid:\
+          \ str = \"測試UID-12345\"\n) -> Dict[str, Any]:\n    \"\"\"\n    Dify Code\
+          \ Node 進入點:\n      1) 向 n8n 發送 GET/POST 請求 (視你的 n8n 設定) 以取得 { \"chain\"\
+          : [...] }\n      2) parse_chain → 解析 chain\n      3) 逐一把每個 item 傳給 human_in_the_loop\n\
+          \      4) 回傳所有呼叫結果\n\n    參數:\n      n8n_url:  n8n 主機或網域\n      n8n_path:\
+          \ 具體 API 路徑 (可能含 /webhook/...)\n      backend_url: human_in_the_loop 的後端位址\
+          \ (前半段)\n      conversation_uid: 用於識別對話的 ID\n    \"\"\"\n\n    # 1) 取得 n8n\
+          \ 結果\n    n8n_endpoint = f\"{n8n_url}{n8n_path}\"\n\n    try:\n        response\
+          \ = requests.get(n8n_endpoint, timeout=300)\n        response.raise_for_status()\n\
+          \    except Exception as e:\n        return {\n            \"result\": \"\
+          n8n fetch data error\"\n        }\n\n    # 預期 n8n 返回的 JSON 結構: { \"chain\"\
+          : [...] }\n    try:\n        n8n_result = response.json()\n    except Exception\
+          \ as e:\n        return {\n            \"result\": \"error\"\n        }\n\
+          \n    if \"chain\" not in n8n_result[0]:\n        return {\n           \
+          \ \"result\": \"no data error\"\n        }\n\n    # 2) parse_chain\n   \
+          \ chain_parsed = parse_chain(n8n_result[0][\"chain\"])\n\n    # 3) 每個 item\
+          \ 逐一打 API\n    results = []\n    for item in chain_parsed:\n        try:\n\
+          \            resp = send_to_human_in_the_loop(backend_url, conversation_uid,\
+          \ item)\n            results.append({\n                \"type\": item[\"\
+          type\"],\n                \"status_code\": resp.status_code,\n         \
+          \       \"response_text\": resp.text\n            })\n        except Exception\
+          \ as e:\n            results.append({\n                \"result\": \"parsed\
+          \ error\"\n            })\n\n    # 4) 回傳所有呼叫結果\n    return {\n        \"\
+          result\": \"API Success\"\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: Interference UE Execute
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - N8N_ACTIVE_BASE_URL
+          variable: n8n_url
+        - value_selector:
+          - env
+          - Interference_UE_Execute_PATH
+          variable: n8n_path
+        - value_selector:
+          - env
+          - MITLAB_BACKEND
+          variable: backend_url
+        - value_selector:
+          - conversation
+          - conversation_uid
+          variable: conversation_uid
+      height: 52
+      id: '17443724787310'
+      position:
+        x: -195.78128299351033
+        y: -178.34871307113704
+      positionAbsolute:
+        x: -195.78128299351033
+        y: -178.34871307113704
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        author: test
+        desc: ''
+        height: 723
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Overfitting","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 587
+      height: 723
+      id: '1744703182241'
+      position:
+        x: -318.388859860009
+        y: -717.6952983003679
+      positionAbsolute:
+        x: -318.388859860009
+        y: -717.6952983003679
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 587
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 0ef56352-bbc7-4598-a873-4a075c260960
+            value: hi
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          - comparison_operator: contains
+            id: 69336ed7-55a8-482e-b77c-8e3a2d53c0b8
+            value: Hi
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          - comparison_operator: contains
+            id: efd410e7-d1a1-4c0d-8f6f-eda5a88200b6
+            value: HI
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 'true'
+          logical_operator: or
+        desc: ''
+        selected: false
+        title: 條件分支 5
+        type: if-else
+      height: 176
+      id: '1744785597981'
+      position:
+        x: 735.5246313952741
+        y: 445.6331139436679
+      positionAbsolute:
+        x: 735.5246313952741
+        y: 445.6331139436679
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 你好，我是SMO助理，您提供的文本並非我們可以處理內容，請重新輸入。
+        desc: ''
+        selected: false
+        title: '[回覆] Error意圖識別階段 (1)'
+        type: answer
+        variables: []
+      height: 132
+      id: '17447856803140'
+      position:
+        x: 1043.5246313952734
+        y: 619.6331139436677
+      positionAbsolute:
+        x: 1043.5246313952734
+        y: 619.6331139436677
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-7
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"你好，我是SMO助理，您提供的文本並非我們可以處理內容，請重新輸入。\"\n\
+              \        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] Error意圖識別階段 (1)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 127
+      id: '17447856854490'
+      position:
+        x: 1336.524631395273
+        y: 624.6331139436677
+      positionAbsolute:
+        x: 1336.524631395273
+        y: 624.6331139436677
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 305.8520642634227
+      y: 46.45625196306557
+      zoom: 0.8312378961427858

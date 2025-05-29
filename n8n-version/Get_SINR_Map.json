@@ -1,0 +1,111 @@
+{
+  "name": "Get SINR Map",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// --------------------------------------\n// 來源1：OpenAI 文字\n// 來源2：Enable / Disable IM SINR Map 圖片 (binary)\n// --------------------------------------\n\n// 文字訊息\nconst openAiItems = \"如下圖所示為 ITRI 51 館 5 樓的 SINR Map\";\n\n// 儲存圖片 binary\nlet imageBinary = null;\n\n/* ---------- 先試 Enable ---------- */\ntry {\n  const enableBundle = $('HTTP Request').first();   // 靜態名字 OK\n  if (enableBundle?.binary?.data) {\n    imageBinary = enableBundle.binary;\n  }\n} catch (_) { /* 這個節點沒跑，忽略 */ }\n\n/* ---------- 再試 Disable ---------- */\nif (!imageBinary) {\n  try {\n    const disableBundle = $('Disable IM SINR Map').first();\n    if (disableBundle?.binary?.data) {\n      imageBinary = disableBundle.binary;\n    }\n  } catch (_) { /* 同上 */ }\n}\n\n/* ---------- 組裝輸出 ---------- */\nconst chainOutput = [\n  {\n    type: \"message\",\n    content: openAiItems\n  }\n];\n\nif (imageBinary) {\n  chainOutput.push({\n    type: \"image\",\n    content: {\n      data: imageBinary.data,\n      mimeType: imageBinary.mimeType,\n      fileName: imageBinary.fileName\n    }\n  });\n}\n\nreturn [{ chain: chainOutput }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ],
+      "id": "1c9d6946-2fce-418e-8a6c-328a97570f5b",
+      "name": "woody_code"
+    },
+    {
+      "parameters": {
+        "path": "1f7d9e8a-ebe1-4cf0-93dc-d4b9f54ea3b1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        0
+      ],
+      "id": "7ee5e026-9323-4413-ac65-539224674035",
+      "name": "Webhook",
+      "webhookId": "1f7d9e8a-ebe1-4cf0-93dc-d4b9f54ea3b1"
+    },
+    {
+      "parameters": {
+        "url": "https://ntustiac.com/freelancer/img/portfolio/person17.jpg",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        0
+      ],
+      "id": "23b54360-e05d-4c7b-be3b-aabdc0114d5e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200,
+          "responseKey": ""
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "ca752461-3beb-4e02-bc82-26b6fd7119d3",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "woody_code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "woody_code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d5be5721-3416-4d27-b49e-b2b12bf128f4",
+  "meta": {
+    "instanceId": "b033b76c67216ed6d6fe50f57f10325283b7c537ad565cd7ed6a16c3b19002da"
+  },
+  "id": "AT7gGQzdvYvYYBoc",
+  "tags": []
+}
