@@ -1,0 +1,102 @@
+Adjust Interference Function
+{
+  "nodes": [
+    {
+      "parameters": {
+        "path": "71279998-7aa1-4819-b2d6-3287b435fa5f",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1560,
+        1040
+      ],
+      "id": "f7a3b088-880a-40fe-bdee-35415f02dd26",
+      "name": "Webhook",
+      "webhookId": "71279998-7aa1-4819-b2d6-3287b435fa5f"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -800,
+        1040
+      ],
+      "id": "3380e813-a738-48a1-a8d0-4573f54f34b4",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "url": "https://bucket-image.inkmaginecms.com/version/hd/1/image/2024/07/a756da77-9d16-4f71-8861-8adc5e546953.jpg",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1300,
+        1040
+      ],
+      "id": "362a7ee8-1dd0-4e87-ac01-0cdc5f614de1",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --------------------------------------\n// 來源1：OpenAI 文字\n// 來源2：Enable / Disable IM SINR Map 圖片 (binary)\n// --------------------------------------\n\n// 文字訊息\nconst openAiItems = \"如下圖所示為 ITRI 51 館 5 樓的 SINR Map\";\n\n// 儲存圖片 binary\nlet imageBinary = null;\n\n/* ---------- 先試 Enable ---------- */\ntry {\n  const enableBundle = $('HTTP Request').first();   // 靜態名字 OK\n  if (enableBundle?.binary?.data) {\n    imageBinary = enableBundle.binary;\n  }\n} catch (_) { /* 這個節點沒跑，忽略 */ }\n\n/* ---------- 再試 Disable ---------- */\nif (!imageBinary) {\n  try {\n    const disableBundle = $('Disable IM SINR Map').first();\n    if (disableBundle?.binary?.data) {\n      imageBinary = disableBundle.binary;\n    }\n  } catch (_) { /* 同上 */ }\n}\n\n/* ---------- 組裝輸出 ---------- */\nconst chainOutput = [\n  {\n    type: \"message\",\n    content: openAiItems\n  }\n];\n\nif (imageBinary) {\n  chainOutput.push({\n    type: \"image\",\n    content: {\n      data: imageBinary.data,\n      mimeType: imageBinary.mimeType,\n      fileName: imageBinary.fileName\n    }\n  });\n}\n\nreturn [{ chain: chainOutput }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1060,
+        1040
+      ],
+      "id": "e6ab4fa3-e787-4b49-8a3f-fcde76b0b695",
+      "name": "woody_code"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "woody_code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "woody_code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b033b76c67216ed6d6fe50f57f10325283b7c537ad565cd7ed6a16c3b19002da"
+  }
+}

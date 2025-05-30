@@ -1,0 +1,100 @@
+Interference Algo Predict
+{
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "/******************************************\n * 0) 原始 UE 基本 Throughput（當作 After）\n ******************************************/\nconst ueData = [\n  { ue_no: \"248\",  throughput_after: 39.45 },\n  { ue_no: \"253\",  throughput_after:  0.00 },\n  { ue_no: \"255\",  throughput_after:  0.00 },\n  { ue_no: \"228\",  throughput_after: 31.56 },\n  { ue_no: \"239\",  throughput_after: 31.56 },\n  { ue_no: \"242\",  throughput_after:  5.45 }\n];\n\n/******************************************\n * 1) 轉成 createTwoTables 需要的 ues 陣列\n *    這裡示範：\n *      - 前 2 隻算 Center (interfered = 0)\n *      - 其餘算 Edge   (interfered = 1)\n *    - Before throughput / RB 比例都設 0\n *    - After RB 比例：給幾個示範值\n ******************************************/\nconst ues = ueData.map((item, idx) => ({\n  ue_id:            item.ue_no,\n  interfered:       idx < 2 ? 0 : 1,                // 0=Center, 1=Edge\n  /* Throughput (Mbps) */\n  before_tp:        0.00,\n  after_tp:         item.throughput_after,\n  /* RB Ratio (%) 0~100 */\n  before_rb_ratio:  0.00,\n  after_rb_ratio:   [0, 100, 0, 18.32, 7.33, 18.32][idx] || 0\n}));\n\n/******************************************\n * 2) 包成期望輸入格式\n ******************************************/\nconst jsonData = {\n  cells: [ { ues } ],\n  message: {\n    content: `ITRI 51館 5F 共 ${ues.length} 隻 UE，測試前後 throughput / RB 使用率如下：`\n  }\n};\n\n/******************************************\n * 3) n8n Code Node 回傳陣列\n ******************************************/\nreturn [jsonData];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "name": "Code",
+      "id": "8063af77-4f99-477d-9c8c-a8a7e7fba068"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        0
+      ],
+      "id": "a0d96d38-94f0-4d50-9d6d-e451424ca461",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "/*********************************************************\n * createTwoTables - 產出 Summary & Detail 兩張表\n *********************************************************/\nfunction createTwoTables (jsonData) {\n\n  /* ===== 1. 累加統計用變數 ===== */\n  let centerCnt = 0, edgeCnt = 0;\n  let centerBefore = 0, centerAfter = 0;\n  let edgeBefore   = 0, edgeAfter   = 0;\n\n  const ueDetails = [];   // Detail 表 source\n\n  /* ===== 2. 走訪 cells → ues ===== */\n  (jsonData.cells || []).forEach(cell => {\n    (cell.ues || []).forEach(ue => {\n\n      // 基本欄位\n      const isCenter = ue.interfered === 0;\n      const beforeTp = Number(ue.before_tp  || 0);\n      const afterTp  = Number(ue.after_tp   || 0);\n      const beforeRb = Number(ue.before_rb_ratio || 0);\n      const afterRb  = Number(ue.after_rb_ratio  || 0);\n\n      /* ---- 累加到總表 ---- */\n      if (isCenter) {\n        centerCnt     += 1;\n        centerBefore  += beforeTp;\n        centerAfter   += afterTp;\n      } else {\n        edgeCnt       += 1;\n        edgeBefore    += beforeTp;\n        edgeAfter     += afterTp;\n      }\n\n      /* ---- 存進明細陣列 ---- */\n      const improveUE = beforeTp > 0 ? ((afterTp - beforeTp) / beforeTp) * 100 : 0;\n      ueDetails.push([\n        ue.ue_id,\n        `${beforeRb.toFixed(2)}%`,\n        beforeTp.toFixed(2),\n        `${afterRb.toFixed(2)}%`,\n        afterTp.toFixed(2),\n        improveUE.toFixed(2)\n      ]);\n    });\n  });\n\n  /* ===== 3. Summary 計算 ===== */\n  const centerImpro = centerBefore > 0 ? ((centerAfter - centerBefore) / centerBefore) * 100 : 0;\n  const edgeImpro   = edgeBefore   > 0 ? ((edgeAfter   - edgeBefore)   / edgeBefore)   * 100 : 0;\n  const totalBefore = centerBefore + edgeBefore;\n  const totalAfter  = centerAfter  + edgeAfter;\n  const totalCnt    = centerCnt    + edgeCnt;\n  const totalImpro  = totalBefore  > 0 ? ((totalAfter - totalBefore) / totalBefore) * 100 : 0;\n\n  /* ===== 4. Summary / Detail 表資料 ===== */\n  const summaryColumns = [\n    `C:E = ${centerCnt} : ${edgeCnt}`,\n    \"Before - Throughput (Mbps)\",\n    \"After - Throughput (Mbps)\",\n    \"Improvement (%)\"\n  ];\n\n  const summaryData = [\n    [\"Center UE (Total)\",      centerBefore.toFixed(2), centerAfter.toFixed(2), centerImpro.toFixed(2)],\n    [\"Edge UE (Total)\",        edgeBefore.toFixed(2),   edgeAfter.toFixed(2),   edgeImpro.toFixed(2)],\n    [\"Center + Edge (Total)\",  totalBefore.toFixed(2),  totalAfter.toFixed(2),  totalImpro.toFixed(2)],\n    [\"Center UE (Avg.)\",       (centerCnt ? centerBefore/centerCnt : 0).toFixed(4),\n                               (centerCnt ? centerAfter/centerCnt  : 0).toFixed(4), centerImpro.toFixed(2)],\n    [\"Edge UE (Avg.)\",         (edgeCnt ? edgeBefore/edgeCnt : 0).toFixed(4),\n                               (edgeCnt ? edgeAfter/edgeCnt  : 0).toFixed(4), edgeImpro.toFixed(2)],\n    [\"Center + Edge (Avg.)\",   (totalCnt ? totalBefore/totalCnt : 0).toFixed(4),\n                               (totalCnt ? totalAfter/totalCnt  : 0).toFixed(4), totalImpro.toFixed(2)]\n  ];\n\n  const detailColumns = [\n    \"UE no.\",\n    \"Before - RB Ratio\",\n    \"Before - Throughput (Mbps)\",\n    \"After - RB Ratio\",\n    \"After - Throughput (Mbps)\",\n    \"Improvement (%)\"\n  ];\n\n  /* ===== 5. 組 chainOutput ===== */\n  const chainOutput = [\n    {\n      type: \"message\",\n      content: $input.first().json.message.content\n    },\n    {\n      type: \"table\",\n      content: {\n        columns: summaryColumns,\n        data:    summaryData\n      }\n    },\n    {\n      type: \"table\",\n      content: {\n        columns: detailColumns,\n        data:    ueDetails\n      }\n    }\n  ];\n\n  return [{ chain: chainOutput }];\n}\n\n/* =========================================================\n * 主程式區：讀 Mock 節點的第一筆資料 → 呼叫 createTwoTables\n * =======================================================*/\nconst inputData = $('Code').first().json;\nreturn createTwoTables(inputData);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        0
+      ],
+      "id": "29a26163-8107-4a2a-8f2d-871dc25913a7",
+      "name": "woody_code"
+    },
+    {
+      "parameters": {
+        "path": "d4f93f32-a552-41ae-a7d4-56e1907b41a5",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ea2c97ca-ae1c-4063-bd1c-9a79aba4a2e8",
+      "name": "Webhook1",
+      "webhookId": "d4f93f32-a552-41ae-a7d4-56e1907b41a5"
+    }
+  ],
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "woody_code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "woody_code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "b033b76c67216ed6d6fe50f57f10325283b7c537ad565cd7ed6a16c3b19002da"
+  }
+}

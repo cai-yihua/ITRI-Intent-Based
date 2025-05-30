@@ -673,7 +673,7 @@ def step_dify():
     def step_dify_init_db():
         payload = {
             "plugin_unique_identifiers": [
-                "langgenius/openai:0.0.19@6b2b2e115b1b9d34a63eb26fadcc33d74330fd2ec06071bb30b8a24b1fab107a"
+                "langgenius/openai:0.0.26@c1e643ac6a7732f6333a783320b4d3026fa5e31d8e7026375b98d44418d33f26"
             ]
         }
         try:
