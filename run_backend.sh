@@ -24,7 +24,7 @@ source Backend/.env
 docker run --network $NETWORK --name intent-postgres-db \
     -e POSTGRES_PASSWORD=$HTTP_POSTGRES_DATABASE_PASSWORD \
     -e POSTGRES_USER=$HTTP_POSTGRES_DATABASE_HOST_USER \
-    -p $HTTP_POSTGRES_DATABASE_HOST_PORT:$HTTP_POSTGRES_DATABASE_HOST_PORT \
+    -p $HTTP_POSTGRES_DATABASE_HOST_PORT:5432 \
     -v ~/postgres_data:/var/lib/postgresql/data \
     -d postgres:latest
 
@@ -47,7 +47,7 @@ docker run --network $NETWORK --name intent-pgadmin \
 docker run --network $NETWORK --name intent-redis-db \
   -e REDIS_USER=$HTTP_REDIS_DATABASE_HOST_USER \
   -e REDIS_PASSWORD=$HTTP_REDIS_DATABASE_PASSWORD \
-  -p $HTTP_REDIS_DATABASE_HOST_PORT:$HTTP_REDIS_DATABASE_HOST_PORT \
+  -p $HTTP_REDIS_DATABASE_HOST_PORT:6379 \
   -d redis \
   sh -c 'echo "databases 16" > /tmp/redis.conf && \
          echo "user $REDIS_USER on >$REDIS_PASSWORD ~* +@all" >> /tmp/redis.conf && \

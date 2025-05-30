@@ -1,5 +1,5 @@
 from __future__ import annotations
-import os, sys, time, requests, logging
+import os, sys, time, requests, logging, mimetypes
 from pathlib import Path
 from datetime import datetime
 from contextlib import contextmanager
@@ -126,27 +126,30 @@ def set_openai_api_key(token) -> bool:
     except Exception as e:
         log_error(f"設定 OPENAI API KEY 錯誤：{e}")
 
-def upload_file(token) -> List[str]:
+def upload_file(token, vectorDB) -> List[str]:
     try:
-        vector_dir = Path(f"dify-version/{DIFY_TAG}/vectorDB")
+        vector_dir = Path(f"dify-version/{DIFY_TAG}/{vectorDB}")
         if not vector_dir.exists():
             raise FileNotFoundError(vector_dir)
 
-        txt_files = sorted(vector_dir.glob("*.txt"))
-        if not txt_files:
-            log_error("⚠️ 找不到任何 .txt")
+        files_to_upload = sorted(
+            list(vector_dir.glob("*.txt")) + list(vector_dir.glob("*.xlsx"))
+        )
+        if not files_to_upload:
+            log_error("⚠️ 找不到任何 .txt / .xlsx 檔")
 
         uploaded_ids = []
         headers = {
             "Authorization": f"Bearer {token}"
         }
 
-        for fp in txt_files:
+        for fp in files_to_upload :
+            mime_type = mimetypes.guess_type(fp.name)[0] or "application/octet-stream"
             try:
                 with fp.open("rb") as f:
-                    files = {"file": (fp.stem, f, "text/plain")}
+                    files = {"file": (fp.name, f, mime_type)}
                     response = requests.post(DIFY_UPLOAD_TXT, files=files, headers=headers)
-
+                    
                 if response.status_code == 201:
                     logging.info("✅ 上傳 file 成功")
                     file_id = response.json()["id"]
@@ -161,7 +164,7 @@ def upload_file(token) -> List[str]:
     except Exception as e:
         log_error(f"上傳 file 錯誤：{e}")
 
-def init_db(file_ids, token) -> str:
+def init_db(file_ids, token, vectorDB_name) -> str:
     try:
         payload = {
             "data_source":{
@@ -178,7 +181,7 @@ def init_db(file_ids, token) -> str:
                         "id":"remove_extra_spaces","enabled":"true"},
                         {"id":"remove_urls_emails","enabled":"false"}
                     ],
-                    "segmentation":{"separator":"\n\n","max_tokens":4000,"chunk_overlap":50}
+                    "segmentation":{"separator":"\n\n\n","max_tokens":4000,"chunk_overlap":50}
                 },
                 "mode":"custom"},
                 "doc_form":"text_model",
@@ -214,12 +217,12 @@ def init_db(file_ids, token) -> str:
         logging.info("✅ 設定資料庫成功")
 
         # ---------- rename ----------
-        rename_body = {"name": DIFY_TAG}
+        rename_body = {"name": vectorDB_name}
         rename_url  = f"{DIFY_BASE}/datasets/{ds_id}"
         rp = requests.patch(rename_url, json=rename_body, headers=headers)
 
         if rp.status_code == 200:
-            logging.info(f"✅ 名稱已改為 {DIFY_TAG}")
+            logging.info(f"✅ 名稱已改為 {vectorDB_name}")
         else:
             log_error("⚠️ 資料庫改名失敗")
 
@@ -236,8 +239,12 @@ def step_dify():
         DIFY_TOKEN = dify_login_and_get_token()
         with step_timer("dify_set_openai_api_key"):
             _run_with_retry(set_openai_api_key, DIFY_TOKEN)
-        file_ids = upload_file(DIFY_TOKEN)
-        init_db(file_ids, DIFY_TOKEN)
+
+        file_ids = upload_file(DIFY_TOKEN, vectorDB="vectorDB1")
+        init_db(file_ids, DIFY_TOKEN, vectorDB_name="scenario template")
+
+        file_ids = upload_file(DIFY_TOKEN, vectorDB="vectorDB2")
+        init_db(file_ids, DIFY_TOKEN, vectorDB_name="intent template")
 
     with step_timer("dify_init_db"):
         step_dify_init_db()

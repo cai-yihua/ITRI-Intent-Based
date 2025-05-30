@@ -1,0 +1,3668 @@
+app:
+  description: v2.0
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: '[Demo] 20250528'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.0.19@6b2b2e115b1b9d34a63eb26fadcc33d74330fd2ec06071bb30b8a24b1fab107a
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables:
+  - description: json格式的字串
+    id: 06ad3c5c-ea71-458b-940c-ece5e196a95d
+    name: scenario_payload
+    selector:
+    - conversation
+    - scenario_payload
+    value: '{}'
+    value_type: string
+  - description: ''
+    id: 743e3748-fc65-4dc4-82f6-f9f40a8739ad
+    name: confirmation_prompt
+    selector:
+    - conversation
+    - confirmation_prompt
+    value: ''
+    value_type: string
+  - description: ''
+    id: e486e7f0-3a39-42ca-845d-a5c220ad3680
+    name: scenario_template
+    selector:
+    - conversation
+    - scenario_template
+    value: ''
+    value_type: string
+  - description: ''
+    id: ba452efd-3daa-4f54-a5c2-1b6e7dc3e4da
+    name: api_path
+    selector:
+    - conversation
+    - api_path
+    value: http://null/api/v1
+    value_type: string
+  - description: ''
+    id: 801d88b9-e81f-4cdc-95cb-8bcfa3536dec
+    name: is_completed
+    selector:
+    - conversation
+    - is_completed
+    value: 'false'
+    value_type: string
+  - description: 使用者剛詢問的狀態
+    id: 837b757b-c89c-4312-81a4-477d33296b64
+    name: status
+    selector:
+    - conversation
+    - status
+    value: init
+    value_type: string
+  - description: ''
+    id: 2dfeb785-9b24-42f0-9c8c-c041a7756c55
+    name: conversation_uid
+    selector:
+    - conversation
+    - conversation_uid
+    value: ''
+    value_type: string
+  environment_variables:
+  - description: ''
+    id: 0cafe3ba-baf3-47e2-8189-d3e075df1d34
+    name: Interference_UE_Execute_PATH
+    selector:
+    - env
+    - Interference_UE_Execute_PATH
+    value: 71279998-7aa1-4819-b2d6-3287b435fa5f
+    value_type: string
+  - description: ''
+    id: 342203c4-3f69-47ba-91c0-87e2d6ff24d0
+    name: Interference_UE_Predict_PATH
+    selector:
+    - env
+    - Interference_UE_Predict_PATH
+    value: d4f93f32-a552-41ae-a7d4-56e1907b41a5
+    value_type: string
+  - description: ''
+    id: e6be9088-dfb7-49f8-9a66-d14ebaa82da4
+    name: Query_UE_Throughput_PATH
+    selector:
+    - env
+    - Query_UE_Throughput_PATH
+    value: d9c7c32d-5147-4c09-8c20-0762307b1e3b
+    value_type: string
+  - description: ''
+    id: 66e62211-c56f-463e-8b23-0a7dcef15e34
+    name: SINR_PATH
+    selector:
+    - env
+    - SINR_PATH
+    value: 1f7d9e8a-ebe1-4cf0-93dc-d4b9f54ea3b1
+    value_type: string
+  - description: ''
+    id: 6060580f-cbbd-4f6d-8158-deaf07342542
+    name: MITLAB_BACKEND
+    selector:
+    - env
+    - MITLAB_BACKEND
+    value: http://172.24.20.17:30000/api/v1.0/
+    value_type: string
+  - description: ''
+    id: df6b16f3-b5d7-4738-a409-8f58fd95c46d
+    name: N8N_ACTIVE_BASE_URL
+    selector:
+    - env
+    - N8N_ACTIVE_BASE_URL
+    value: http://172.24.16.1:30000/webhook/
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions: []
+      allowed_file_types:
+      - video
+      - audio
+      - image
+      - document
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: true
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 1
+    opening_statement: 你好，我是ITRI SMO虛擬助理
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742448090528-source-1742448389805-target
+      selected: false
+      source: '1742448090528'
+      sourceHandle: source
+      target: '1742448389805'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1742448389805-false-1742442828989-target
+      selected: false
+      source: '1742448389805'
+      sourceHandle: 'false'
+      target: '1742442828989'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: if-else
+      id: 1742447067053-source-1742447332580-target
+      selected: false
+      source: '1742447067053'
+      sourceHandle: source
+      target: '1742447332580'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1742446926046-f84ddd9c-2ec2-4c9a-982f-dbf050004c96-1743501210955-target
+      selected: false
+      source: '1742446926046'
+      sourceHandle: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+      target: '1743501210955'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1742448389805-true-17435117558650-target
+      selected: false
+      source: '1742448389805'
+      sourceHandle: 'true'
+      target: '17435117558650'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 1743501210955-source-17435128925960-target
+      selected: false
+      source: '1743501210955'
+      sourceHandle: source
+      target: '17435128925960'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 17435117558650-source-17435131894560-target
+      selected: false
+      source: '17435117558650'
+      sourceHandle: source
+      target: '17435131894560'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: 1742447332580-false-17435146281790-target
+      selected: false
+      source: '1742447332580'
+      sourceHandle: 'false'
+      target: '17435146281790'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: if-else
+      id: 1742446926046-false-1744785597981-target
+      selected: false
+      source: '1742446926046'
+      sourceHandle: 'false'
+      target: '1744785597981'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1744785597981-true-1742442730885-target
+      selected: false
+      source: '1744785597981'
+      sourceHandle: 'true'
+      target: '1742442730885'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1744785597981-false-17447856803140-target
+      selected: false
+      source: '1744785597981'
+      sourceHandle: 'false'
+      target: '17447856803140'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1747806238325-source-1742446926046-target
+      selected: false
+      source: '1747806238325'
+      sourceHandle: source
+      target: '1742446926046'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1747810658255-source-1747810822495-target
+      selected: false
+      source: '1747810658255'
+      sourceHandle: source
+      target: '1747810822495'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747810822495-true-1747811265733-target
+      selected: false
+      source: '1747810822495'
+      sourceHandle: 'true'
+      target: '1747811265733'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1747811265733-source-1747811441753-target
+      selected: false
+      source: '1747811265733'
+      sourceHandle: source
+      target: '1747811441753'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747811441753-true-1747806238325-target
+      selected: false
+      source: '1747811441753'
+      sourceHandle: 'true'
+      target: '1747806238325'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1747811265733-source-1747811590429-target
+      selected: false
+      source: '1747811265733'
+      sourceHandle: source
+      target: '1747811590429'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747810822495-a946eec2-6d24-45bb-a21f-93402f046df2-1747811265733-target
+      selected: false
+      source: '1747810822495'
+      sourceHandle: a946eec2-6d24-45bb-a21f-93402f046df2
+      target: '1747811265733'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747810822495-14abe583-a4b8-4017-aa5b-d2a8f3dd3ccb-1747811265733-target
+      selected: false
+      source: '1747810822495'
+      sourceHandle: 14abe583-a4b8-4017-aa5b-d2a8f3dd3ccb
+      target: '1747811265733'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747810822495-dc5dc520-ea0a-41ee-a69a-1472e0436c20-1747811265733-target
+      selected: false
+      source: '1747810822495'
+      sourceHandle: dc5dc520-ea0a-41ee-a69a-1472e0436c20
+      target: '1747811265733'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747810822495-05f441c0-069f-4dad-99b4-7e266d83329b-1747811265733-target
+      selected: false
+      source: '1747810822495'
+      sourceHandle: 05f441c0-069f-4dad-99b4-7e266d83329b
+      target: '1747811265733'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747811441753-a5093993-c497-4ded-838a-c49c51ce2dc3-1747806238325-target
+      selected: false
+      source: '1747811441753'
+      sourceHandle: a5093993-c497-4ded-838a-c49c51ce2dc3
+      target: '1747806238325'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747811441753-38e9fd31-43a5-465e-903d-f6dc0abc7164-1747806238325-target
+      selected: false
+      source: '1747811441753'
+      sourceHandle: 38e9fd31-43a5-465e-903d-f6dc0abc7164
+      target: '1747806238325'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747811441753-66af9874-1988-4863-8231-3359bea69bc2-1747806238325-target
+      selected: false
+      source: '1747811441753'
+      sourceHandle: 66af9874-1988-4863-8231-3359bea69bc2
+      target: '1747806238325'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: knowledge-retrieval
+      id: 1742447332580-true-1742442861275-target
+      selected: false
+      source: '1742447332580'
+      sourceHandle: 'true'
+      target: '1742442861275'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1747829742913-true-1747810658255-target
+      selected: false
+      source: '1747829742913'
+      sourceHandle: 'true'
+      target: '1747810658255'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: assigner
+      id: 1742447332580-true-1747830482885-target
+      selected: false
+      source: '1742447332580'
+      sourceHandle: 'true'
+      target: '1747830482885'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: knowledge-retrieval
+      id: 1742442861275-source-1747831616147-target
+      selected: false
+      source: '1742442861275'
+      sourceHandle: source
+      target: '1747831616147'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: 1747831742018-source-1747832098636-target
+      selected: false
+      source: '1747831742018'
+      sourceHandle: source
+      target: '1747832098636'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: parameter-extractor
+      id: 1747832098636-source-1747832329592-target
+      selected: false
+      source: '1747832098636'
+      sourceHandle: source
+      target: '1747832329592'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: assigner
+      id: 1747832329592-source-1747832920622-target
+      selected: false
+      source: '1747832329592'
+      sourceHandle: source
+      target: '1747832920622'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1747829742913-989d8a40-210f-4f63-8bf4-1ca2261cd904-1747831742018-target
+      selected: false
+      source: '1747829742913'
+      sourceHandle: 989d8a40-210f-4f63-8bf4-1ca2261cd904
+      target: '1747831742018'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: answer
+      id: 1747832920622-source-1747833460007-target
+      selected: false
+      source: '1747832920622'
+      sourceHandle: source
+      target: '1747833460007'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: assigner
+      id: 1742442590290-source-1743511206372-target
+      selected: false
+      source: '1742442590290'
+      sourceHandle: source
+      target: '1743511206372'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1743511206372-source-1747829742913-target
+      selected: false
+      source: '1743511206372'
+      sourceHandle: source
+      target: '1747829742913'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: 1742442730885-source-17435132396410-target
+      selected: false
+      source: '1742442730885'
+      sourceHandle: source
+      target: '17435132396410'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: 17447856803140-source-17447856854490-target
+      selected: false
+      source: '17447856803140'
+      sourceHandle: source
+      target: '17447856854490'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435128925960-source-1743509989605-target
+      selected: false
+      source: '17435128925960'
+      sourceHandle: source
+      target: '1743509989605'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1743509989605-source-1742448090528-target
+      selected: false
+      source: '1743509989605'
+      sourceHandle: source
+      target: '1742448090528'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435131894560-source-17435117512250-target
+      selected: false
+      source: '17435131894560'
+      sourceHandle: source
+      target: '17435117512250'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 17435117512250-source-1742447067053-target
+      selected: false
+      source: '17435117512250'
+      sourceHandle: source
+      target: '1742447067053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: 1742442828989-source-17435138487230-target
+      selected: false
+      source: '1742442828989'
+      sourceHandle: source
+      target: '17435138487230'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: answer
+        targetType: http-request
+      id: 17435146281790-source-17435146350620-target
+      selected: false
+      source: '17435146281790'
+      sourceHandle: source
+      target: '17435146350620'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: answer
+        targetType: if-else
+      id: 1747833460007-source-1747838949163-target
+      selected: false
+      source: '1747833460007'
+      sourceHandle: source
+      target: '1747838949163'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: assigner
+      id: 1747838949163-true-1747839031101-target
+      selected: false
+      source: '1747838949163'
+      sourceHandle: 'true'
+      target: '1747839031101'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: assigner
+      id: 1747838949163-d7412361-4f82-459d-a25d-60104a990eb0-17478390872770-target
+      selected: false
+      source: '1747838949163'
+      sourceHandle: d7412361-4f82-459d-a25d-60104a990eb0
+      target: '17478390872770'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1747831616147-source-1747984552657-target
+      selected: false
+      source: '1747831616147'
+      sourceHandle: source
+      target: '1747984552657'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: http-request
+      id: 1747984552657-source-17479843913150-target
+      selected: false
+      source: '1747984552657'
+      sourceHandle: source
+      target: '17479843913150'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 17479843913150-source-1747831742018-target
+      selected: false
+      source: '17479843913150'
+      sourceHandle: source
+      target: '1747831742018'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: code
+      id: 17478390872770-source-1747987702090-target
+      selected: false
+      source: '17478390872770'
+      sourceHandle: source
+      target: '1747987702090'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: parameter-extractor
+      id: 1747987702090-source-1747988261914-target
+      selected: false
+      source: '1747987702090'
+      sourceHandle: source
+      target: '1747988261914'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: 17479898049120-source-17479848446040-target
+      selected: false
+      source: '17479898049120'
+      sourceHandle: source
+      target: '17479848446040'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: if-else
+      id: 1747829742913-99d28b8b-cf84-4242-ad8a-b7e07772d6c4-1747990842053-target
+      selected: false
+      source: '1747829742913'
+      sourceHandle: 99d28b8b-cf84-4242-ad8a-b7e07772d6c4
+      target: '1747990842053'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1747990842053-true-17479908826710-target
+      selected: false
+      source: '1747990842053'
+      sourceHandle: 'true'
+      target: '17479908826710'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 17479908826710-source-17478340188330-target
+      selected: false
+      source: '17479908826710'
+      sourceHandle: source
+      target: '17478340188330'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1747990842053-89ba0132-a4ff-4c34-88ca-eafb768a1494-17479909154640-target
+      selected: false
+      source: '1747990842053'
+      sourceHandle: 89ba0132-a4ff-4c34-88ca-eafb768a1494
+      target: '17479909154640'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: 17479912651100-source-17479906916690-target
+      selected: false
+      source: '17479912651100'
+      sourceHandle: source
+      target: '17479906916690'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: http-request
+      id: 17479914772300-source-17479912651100-target
+      selected: false
+      source: '17479914772300'
+      sourceHandle: source
+      target: '17479912651100'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 17479912596970-source-17479914826570-target
+      selected: false
+      source: '17479912596970'
+      sourceHandle: source
+      target: '17479914826570'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: parameter-extractor
+      id: 17479914826570-source-17479914772300-target
+      selected: false
+      source: '17479914826570'
+      sourceHandle: source
+      target: '17479914772300'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: http-request
+      id: 1747839031101-source-17479924729840-target
+      selected: false
+      source: '1747839031101'
+      sourceHandle: source
+      target: '17479924729840'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: 17479924729840-source-17479912596970-target
+      selected: false
+      source: '17479924729840'
+      sourceHandle: source
+      target: '17479912596970'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: http-request
+      id: 1747988261914-source-17479925676070-target
+      selected: false
+      source: '1747988261914'
+      sourceHandle: source
+      target: '17479925676070'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: http-request
+      id: 17479925676070-source-17479898049120-target
+      selected: false
+      source: '17479925676070'
+      sourceHandle: source
+      target: '17479898049120'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 17478340188330-source-17479931487170-target
+      selected: false
+      source: '17478340188330'
+      sourceHandle: source
+      target: '17479931487170'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: assigner
+      id: 17479909154640-source-17479931487170-target
+      source: '17479909154640'
+      sourceHandle: source
+      target: '17479931487170'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: answer
+        targetType: code
+      id: 1747811590429-source-1748431211528-target
+      source: '1747811590429'
+      sourceHandle: source
+      target: '1748431211528'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 開始
+        type: start
+        variables:
+        - label: conversation_uid
+          max_length: 48
+          options: []
+          required: false
+          type: text-input
+          variable: conversation_uid
+      height: 90
+      id: '1742442590290'
+      position:
+        x: -3353.7374502637426
+        y: -54
+      positionAbsolute:
+        x: -3353.7374502637426
+        y: -54
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: 你好，我是SMO助理，您提供的文本並非我們可以處理內容，請重新輸入。
+        desc: ''
+        selected: false
+        title: '[回覆] Error意圖識別階段'
+        type: answer
+        variables: []
+      height: 118
+      id: '1742442730885'
+      position:
+        x: 1014.6013341457631
+        y: 477.52588261991036
+      positionAbsolute:
+        x: 1014.6013341457631
+        y: 477.52588261991036
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '[ Warning ] 目前系統僅支援單一意圖類型的操作，請重新描述您的單一需求'
+        desc: ''
+        selected: false
+        title: '[回覆] 複雜意圖階段'
+        type: answer
+        variables: []
+      height: 118
+      id: '1742442828989'
+      position:
+        x: 2476.959105308413
+        y: 470.45141161560025
+      positionAbsolute:
+        x: 2476.959105308413
+        y: 470.45141161560025
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        dataset_ids: []
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: weighted_score
+          reranking_model:
+            model: rerank-english-v2.0
+            provider: langgenius/cohere/cohere
+          score_threshold: null
+          top_k: 1
+          weights:
+            keyword_setting:
+              keyword_weight: 0
+            vector_setting:
+              embedding_model_name: text-embedding-3-small
+              embedding_provider_name: langgenius/openai/openai
+              vector_weight: 1
+        query_variable_selector:
+        - sys
+        - query
+        retrieval_mode: multiple
+        selected: false
+        title: '[RAG] 意圖資訊'
+        type: knowledge-retrieval
+      height: 54
+      id: '1742442861275'
+      position:
+        x: 3849.6610177716448
+        y: 64.44723841624108
+      positionAbsolute:
+        x: 3849.6610177716448
+        y: 64.44723841624108
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        author: test
+        desc: ''
+        height: 598
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"意圖識別階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 3117
+      height: 598
+      id: '1742442983144'
+      position:
+        x: 2.449444798709351
+        y: 161.7411590976156
+      positionAbsolute:
+        x: 2.449444798709351
+        y: 161.7411590976156
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 3117
+    - data:
+        author: test
+        desc: ''
+        height: 726
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"意圖處理階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ' (1)'
+        type: ''
+        width: 1734
+      height: 726
+      id: '17424430040480'
+      position:
+        x: 3243.6618449226708
+        y: -233.26816819075475
+      positionAbsolute:
+        x: 3243.6618449226708
+        y: -233.26816819075475
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 1734
+    - data:
+        author: test
+        desc: ''
+        height: 415
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"參數補充階段","type":"text","version":1}],"direction":"ltr","format":"left","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: '  (2)'
+        type: ''
+        width: 3796
+      height: 415
+      id: '17424431355940'
+      position:
+        x: 5344.168453624344
+        y: -205.34628881428142
+      positionAbsolute:
+        x: 5344.168453624344
+        y: -205.34628881428142
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 3796
+    - data:
+        cases:
+        - case_id: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+          conditions:
+          - comparison_operator: contains
+            id: 2b9bc372-6143-4bb9-81d4-63963c848bd4
+            value: 'TRUE'
+            varType: string
+            variable_selector:
+            - '1747806238325'
+            - text
+          id: f84ddd9c-2ec2-4c9a-982f-dbf050004c96
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[決策] 網管SMO內容分別器'
+        type: if-else
+      height: 126
+      id: '1742446926046'
+      position:
+        x: 406.2471599541362
+        y: 262
+      positionAbsolute:
+        x: 406.2471599541362
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4.1
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 09ddf340-a502-4a03-89b5-b69469d3d650
+          role: system
+          text: "\U0001F539角色 (Role)\n你是一名 「網管意圖分類員」，負責判定使用者指令屬於哪一個既定意圖，或判為 None。\n\
+            \n\U0001F539任務 (Task)\n對單一「輸入文本」進行分類：\n從四項意圖中選出唯一最符合者；如全不符合，回傳 \"None\"\
+            。\n輸出必須嚴格遵守指定 JSON，且不得添加任何額外文字。\n\n\U0001F539測試狀況大類定義 (Test Category Definitions\
+            \ = Intent Definitions)\n-查看 UE 的吞吐量\n 關鍵行為／需求描述：查詢或篩選 UE 的連線狀態、訊號品質、吞吐量統計\n\
+            \ 典型關鍵詞：UE throughput、UE 狀態、UE 速率\n-查詢 Cell 裡面的 SINR 熱圖\n 關鍵行為／需求描述：取得\
+            \ Cell 內 SINR 數值、分布或視覺化（SINR Map／Heat-map）\n 典型關鍵詞：SINR Map、熱圖、分布圖\n-干擾演算法預測\n\
+            \ 關鍵行為／需求描述：使用干擾抑制／優化演算法進行預測、評估或建議\n 典型關鍵詞：干擾預測、演算法結果、推估\n-干擾演算法執行\n 關鍵行為／需求描述：直接執行干擾抑制／優化演算法，進行調整\n\
+            \ 典型關鍵詞：啟動干擾抑制、執行演算法\n\n\U0001F539指導原則 (Classification Guidelines for\
+            \ Ensuring Mutual Exclusivity)\n單一最佳匹配：若文本同時提及多項意圖，依「最主要可執行行動」選擇唯一分類。\n\
+            動詞導向：先鎖定動作動詞（查詢／顯示／預測／執行等），再比對名詞（UE、SINR 等）。\n語境優先：僅出現關鍵詞但缺乏對應行為語境時，不應強行歸類。\n\
+            排除條件：若完全無法對應四類意圖，則標為 \"None\"。\n\n\U0001F539思路步驟 (Thinking Steps — 僅內部思考，勿輸出)\n\
+            動作與對象抽取：擷取動詞＋客體（例如「查詢 UE 吞吐量」）。\n比對定義：將抽取結果與四類意圖關鍵行為／關鍵詞對照。\n決定唯一意圖：若多重匹配，選擇「最核心且可直接執行」者。\n\
+            生成原因：用簡潔片語說明關鍵動詞／名詞如何支持此分類。\n\n\U0001F539輸入 (Input)\n{{#sys.query#}}\n\
+            \n\n\U0001F539期望輸出 (Output Format)\n嚴格僅回傳下列其中一種 JSON，不得夾帶解釋文字或換行外內容。\n\
+            若符合四大意圖其一\n{\n  \"intent\": \"<意圖名稱>\",\n  \"reason\": \"<歸類依據，例如：包含『查詢\
+            \ UE 吞吐量』字樣>\"\n}\n\n若全不符合\n{\n  \"intent\": \"None\",\n  \"reason\":\
+            \ \"<說明為何無法對應四大意圖>\"\n}\n\n\n▶︎ 現在開始：請依上述規範判定「輸入文本」並輸出 JSON。"
+        selected: false
+        title: '[LLM 處理] 文本轉單一意圖器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1742447067053'
+      position:
+        x: 3243.6618449226708
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 3243.6618449226708
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not contains
+            id: bf0d6b33-24ef-423f-9ba1-50fbe2f5191b
+            value: NONE
+            varType: string
+            variable_selector:
+            - '1742447067053'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[決策] 單一意圖提取器'
+        type: if-else
+      height: 126
+      id: '1742447332580'
+      position:
+        x: 3529.9289232963324
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 3529.9289232963324
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 60043e91-9fda-43bc-941a-8d0e748d9b53
+          role: system
+          text: "\U0001F539角色 (Role)\n你是一名 「意圖數量檢測員」。你的專長是迅速、準確地判斷一段文字是否僅含 單一核心意圖，或同時蘊含\
+            \ 多個獨立意圖。\n\n\U0001F539任務 (Task)\n讀取「待判斷文本」，依下列二元規則輸出結果：\nintent 值定義\n\
+            single_intent\n文字只要求 一個 可執行的核心行動或詢問，其他內容僅為輔助說明。\nmulti_intent\n文字同時包含\
+            \ 兩個以上 彼此獨立、可分開執行的核心行動或詢問。\n\n\U0001F539測試狀況大類定義 (Test Category Definitions)\n\
+            類別關鍵特徵範例\n單一意圖 (Single Intent)\n• 只有一項明確請求或指令\n• 可能附帶多個條件／參數，但不影響「只有一件事要做」的本質\n\
+            「幫我查一下 51 館的 UE 狀態」\n「請把目標 SINR 設定為 –3 dB」\n「我希望 ITRI 51 館 5 樓干擾抑制演算法啟動時，Cell\
+            \ Center UEs 的流量至少要維持 75%」\n多重意圖 (Multiple Intents)\n• 同句或多句中出現兩件（含）以上獨立行動\n\
+            • 條件句導向不同後續動作，或要求並行處理多件事\n「先顯示 SINR Map，再匯出 CSV」\n「如果 SINR 低於 –5 dB 就重啟基站，否則回報狀態」\n\
+            \n\U0001F539指導原則 (Classification Guidelines for Ensuring Mutual Exclusivity)\n\
+            動詞粒度：以「可被單獨下達並執行」的動作為判定單位。\n條件≠多意圖：若條件僅限制同一動作的觸發時機/參數，仍屬單一意圖。\nAND / THEN\
+            \ / ALSO 觸發警示：同句出現多個並列或連續動作，傾向多意圖。\n排他性：每段文本只能標記為 single_intent 或 multi_intent\
+            \ 其中之一。\n\n\U0001F539思路步驟 (Thinking Steps — 僅內部思考，勿輸出)\n動作提取：掃描動詞與動作短語（如「查詢」「顯示」「匯出」）。\n\
+            聚合比對：合併同義或僅參數差異的動作。\n數量判定：\n若最終核心動作 = 1 → single_intent\n若 ≥ 2 → multi_intent\n\
+            生成原因：列舉關鍵動作詞，或說明為何只有／超過一個意圖。\n\n\U0001F539輸入 (Input)\n{{#sys.query#}}\n\
+            \n\n\U0001F539期望輸出 (Output Format)\n僅輸出以下 JSON，不得新增任何說明文字：\n{\n  \"intent\"\
+            : \"single_intent\",\n  \"reason\": \"說明為何判定僅有一個核心意圖，列舉關鍵動作詞\"\n}\n\n\
+            或\n{\n  \"intent\": \"multi_intent\",\n  \"reason\": \"說明為何判定存在多個核心意圖，列舉各自的關鍵動作詞\"\
+            \n}\n\n\n▶︎ 現在開始判斷「待判斷文本」並輸出 JSON。"
+        selected: false
+        title: '[LLM 處理] 單一意圖辨識器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1742448090528'
+      position:
+        x: 1581.826896483987
+        y: 262
+      positionAbsolute:
+        x: 1581.826896483987
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 581b06eb-cb6f-4bfb-a796-b26475c573e1
+            value: single_intent
+            varType: string
+            variable_selector:
+            - '1742448090528'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[決策] 單一意圖決策'
+        type: if-else
+      height: 126
+      id: '1742448389805'
+      position:
+        x: 1864.46040477732
+        y: 262
+      positionAbsolute:
+        x: 1864.46040477732
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據下列資訊，以一句話回覆使用者。請在句子開頭加上「[ Info ]」。
+
+            情境：你現在是 SMO 網管意圖的判別器，請根據下方的使用者問題及先前的結果回覆，組織一句話進行回應。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1747806238325.text#}}
+
+            '
+        selected: false
+        title: '[LLM 回覆] 網管SMO內容分別器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1743501210955'
+      position:
+        x: 735.5246313952741
+        y: 256.7219683569084
+      positionAbsolute:
+        x: 735.5246313952741
+        y: 256.7219683569084
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-4
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#1743501210955.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 網管SMO內容分別器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '1743509989605'
+      position:
+        x: 1290.400918146286
+        y: 262
+      positionAbsolute:
+        x: 1290.400918146286
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1742442590290'
+          - conversation_uid
+          variable_selector:
+          - conversation
+          - conversation_uid
+          write_mode: over-write
+        selected: false
+        title: 儲存conversation_uid
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1743511206372'
+      position:
+        x: -2465.7779480214044
+        y: -54
+      positionAbsolute:
+        x: -2465.7779480214044
+        y: -54
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        author: test
+        desc: ''
+        height: 482
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"確定聊天UID","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 639
+      height: 482
+      id: '1743511256837'
+      position:
+        x: -2660.17324807174
+        y: -249.92663875555468
+      positionAbsolute:
+        x: -2660.17324807174
+        y: -249.92663875555468
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 639
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-5
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"{{#17435117558650.text#}}\"\n    }\n  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 單一意圖辨識器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435117512250'
+      position:
+        x: 2812.209706274428
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2812.209706274428
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: f43cc2ef-8d3b-4e5d-838b-425975a4664e
+          role: system
+          text: '請根據以下資訊，以一句話回覆使用者，並在句首加上「[ Info ]」。
+
+            情境：你是一個 SMO 網管意圖的判別器，負責解釋使用者需求是否屬於單一意圖。
+
+            請整合使用者問題與先前的結果回覆，組織出一句話答覆。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的結果回覆：
+
+            {{#1742448090528.text#}}'
+        selected: false
+        title: '[LLM 回覆] 單一意圖辨識器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '17435117558650'
+      position:
+        x: 2167.246725870651
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2167.246725870651
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1743501210955.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆] 網管SMO內容分別器'
+        type: answer
+        variables: []
+      height: 105
+      id: '17435128925960'
+      position:
+        x: 1014.6013341457631
+        y: 256.7219683569084
+      positionAbsolute:
+        x: 1014.6013341457631
+        y: 256.7219683569084
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#17435117558650.text#}}'
+        desc: ''
+        selected: false
+        title: '[回覆] 單一意圖辨識器'
+        type: answer
+        variables: []
+      height: 105
+      id: '17435131894560'
+      position:
+        x: 2486.0199611249927
+        y: 224.5194643120497
+      positionAbsolute:
+        x: 2486.0199611249927
+        y: 224.5194643120497
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-7
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"你好，我是SMO助理，希望我為你做什麼嗎？\"\n        }\n \
+              \   ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] Error意圖識別階段'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435132396410'
+      position:
+        x: 1339.2473170799228
+        y: 477.52588261991036
+      positionAbsolute:
+        x: 1339.2473170799228
+        y: 477.52588261991036
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-6
+            key: ''
+            type: text
+            value: "{\n  \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n  \"text_content\": [\n    {\n      \"type\": \"message\",\n    \
+              \  \"content\": \"[ Warning ] 目前系統僅支援單一意圖類型的操作，請重新描述您的單一需求。\"\n    }\n\
+              \  ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 複雜意圖階段'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435138487230'
+      position:
+        x: 2812.209706274428
+        y: 470.45141161560025
+      positionAbsolute:
+        x: 2812.209706274428
+        y: 470.45141161560025
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '[ Error ] 無法對應到任何已提供的意圖'
+        desc: ''
+        selected: false
+        title: '[回覆] Error文本轉單一意圖器'
+        type: answer
+        variables: []
+      height: 102
+      id: '17435146281790'
+      position:
+        x: 3891.2649175225115
+        y: 370.9791896542712
+      positionAbsolute:
+        x: 3891.2649175225115
+        y: 370.9791896542712
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"[ Error ] 無法對應到任何已提供的意圖\"\n        }\n\
+              \    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] Error文本轉單一意圖器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17435146350620'
+      position:
+        x: 4215.662334841373
+        y: 370.9791896542712
+      positionAbsolute:
+        x: 4215.662334841373
+        y: 370.9791896542712
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 0ef56352-bbc7-4598-a873-4a075c260960
+            value: hi
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          - comparison_operator: contains
+            id: 69336ed7-55a8-482e-b77c-8e3a2d53c0b8
+            value: Hi
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          - comparison_operator: contains
+            id: efd410e7-d1a1-4c0d-8f6f-eda5a88200b6
+            value: HI
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 'true'
+          logical_operator: or
+        desc: ''
+        selected: false
+        title: 條件分支 5
+        type: if-else
+      height: 178
+      id: '1744785597981'
+      position:
+        x: 735.5246313952741
+        y: 445.6331139436679
+      positionAbsolute:
+        x: 735.5246313952741
+        y: 445.6331139436679
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: 你好，我是SMO助理，您提供的文本並非我們可以處理內容，請重新輸入。
+        desc: ''
+        selected: false
+        title: '[回覆] Error意圖識別階段 (1)'
+        type: answer
+        variables: []
+      height: 118
+      id: '17447856803140'
+      position:
+        x: 1014.6013341457631
+        y: 607.445406057522
+      positionAbsolute:
+        x: 1014.6013341457631
+        y: 607.445406057522
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-7
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"你好，我是SMO助理，您提供的文本並非我們可以處理內容，請重新輸入。\"\n\
+              \        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] Error意圖識別階段 (1)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17447856854490'
+      position:
+        x: 1345.4160000398592
+        y: 607.445406057522
+      positionAbsolute:
+        x: 1345.4160000398592
+        y: 607.445406057522
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: a5f03a92-b5c2-4e98-aecb-c6503908c548
+          role: system
+          text: "\U0001F539角色 (Role)\n你是一名 「SMO (Service Management & Orchestration)\
+            \ 相關性分類員」，具備網管領域知識，負責判斷輸入文本是否屬於 SMO 範疇。\n\U0001F539任務 (Task)\n對給定文本進行二元分類：\n\
+            TRUE → 與 SMO 相關\nFALSE → 與 SMO 無關\n並在「reason」欄位說明判斷依據。\n\U0001F539測試狀況大類定義\
+            \ (Test Category Definitions)\n視為 SMO 相關 (TRUE) 的情境包含但不限於：\n抑制單一場域訊號干擾\n\
+            查詢單一場域基站資訊\n干擾抑制演算法預測\n取得 UE 資訊（如連線狀態、訊號品質、SINR Map 等）\n未落入上述四類，或純屬其他領域（如商業策略、行銷、財務、人資等），則判定為\
+            \ FALSE。\n\U0001F539指導原則 (Classification Guidelines for Ensuring Mutual\
+            \ Exclusivity)\n排他性：每則文本只能落入 TRUE 或 FALSE 之一，不得同時標記兩者。\n關鍵詞 ≠ 唯一依據：若僅看到字面關鍵詞卻無網管語境，須綜合語意決定。\n\
+            模糊敘述：若內容含糊但明顯指向網路監控／管控，應偏向 TRUE；若完全無佐證，偏向 FALSE。\n一步到位，不留灰區：若仍有疑慮，應回到測試大類定義重新比對，做出最終決策。\n\
+            \U0001F539思路步驟 (Thinking Steps)\n⚠️ 請在內部思考以下步驟即可，僅輸出最終 JSON，不要洩漏思考過程。\n\
+            逐句掃描：找出與網管、電信、干擾、基站、UE 等相關詞。\n語境判讀：判斷這些詞是否用於「管理 / 編排 / 監控」語意，而非僅作比喻或非技術討論。\n\
+            比對測試大類：確認是否符合 1–4 任一情境。\n得出結論：標記 TRUE / FALSE，並整理關鍵依據寫入「reason」。\n\U0001F539\
+            輸入 (Input)\narduino\n複製編輯{{#sys.query#}}\n\n\U0001F539期望輸出格式 (Expected\
+            \ Output Format)\n以 JSON 回傳，欄位與說明如下：\njson\n複製編輯{\n  \"result\": \"TRUE\"\
+            ,            // 或 \"FALSE\"\n  \"reason\": \"簡要說明原因；若為 TRUE，列出 SMO 關鍵字並說明；若為\
+            \ FALSE，說明不相關原因\"\n}\n\n\n▶︎ 現在開始判斷：\n請依上述規範，僅輸出最終 JSON。"
+        selected: false
+        title: '[ LLM ] 網管意圖分類器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1747806238325'
+      position:
+        x: 31.765494294837367
+        y: 262
+      positionAbsolute:
+        x: 31.765494294837367
+        y: 262
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        author: test
+        desc: ''
+        height: 987
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":1,"mode":"normal","style":"font-size:
+          16px;","text":"文本輸入分類器","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":"font-size:
+          16px;"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 1847
+      height: 987
+      id: '1747810565154'
+      position:
+        x: -1882.3745874950266
+        y: -233.26816819075475
+      positionAbsolute:
+        x: -1882.3745874950266
+        y: -233.26816819075475
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 1847
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: dc2d8106-2e65-46e2-b47b-be337a538f6e
+          role: system
+          text: "# 模組化文本分類器 Prompt\n\n## 1. 角色 (Role)\n請你扮演一個精確的文本分類器。\n\n## 2. 任務\
+            \ (Task)\n你的任務是根據以下「測試狀況大類定義」將「待分類文本」分配到最合適的類別中，並按照指定的 JSON 格式輸出結果。在分類時，請優先識別文本中是否存在一個或多個清晰、可執行的核心指令，**並判斷其分類的主要挑戰點。**\n\
+            \n## 3. 測試狀況大類定義 (Test Category Definitions)\n請仔細理解以下每個類別的側重點，以輔助您進行具有區分度的分類：\n\
+            \n1.  **基本清晰指令及其表述變異 (Basic Clear Instructions and common expression variations)**\n\
+            \    * 核心特徵：文本的核心意圖是一個**清晰、單一的行動或查詢**。指令的主要挑戰**並非源於參數的複雜性或條件邏輯的深度，而是來自於語言表述的細微變化**（如同義詞、語序、口語化表達、輕微錯漏等）或對此單一行動的**直接、易於理解的限定**（例如，指定單一地點、時間或簡單模式）。即使存在條件，這些條件也是直接修飾此單一行動的執行方式，且**不涉及對複雜數據結構的解析或多重、相互依賴的參數配置**。\n\
+            \    * 判斷關鍵：指令是否圍繞一個易於識別的單一核心行動？其複雜性是否主要體現為語言層面的變異，而非參數本身的結構或條件邏輯的嵌套深度？**如果指令的主要部分是一個直接的動作，附加的條件/參數相對簡單且不構成主要的理解或執行瓶頸，則歸於此類。**\n\
+            \    * 典型範例：\n        * \"我想查看所有 UE 的連線狀態\"\n        * \"顯示目前的 SINR 分布圖，並標註低於-5dB的區域。\"\
+            \ (單一行動「顯示」，附加簡單標註要求)\n        * \"請幫我規劃 ITRI 51 館五樓的 UE 位置，優先考慮覆蓋範圍。\"\
+            \ (單一行動「規劃」，附加簡單優先級)\n        * \"我希望ITRI 51 館 5 樓的干擾抑制演算法啟動。\" (單一行動和地點)\n\
+            \        * \"當干擾抑制啟動時，確保Cell Center UE的流量不低於70%。\" (若「干擾抑制」是當前上下文的單一主要行動，此為對該行動的執行標準的簡單限定)\n\
+            \n2.  **自然語言固有複雜性 (Inherent Natural Language Complexity)**\n    * 核心特徵：文本的主要挑戰源於**自然語言本身的模糊性、冗餘性、非結構化閒聊或不連貫的表達，這些嚴重阻礙了對任何清晰核心意圖（無論簡單或複雜）的有效提取**。\n\
+            \    * 判斷關鍵：是否由於語言的混亂、冗餘或模糊，導致難以或無法確信地識別出一個或多個可執行的核心指令？**如果文本的主要問題是「不知道用戶到底想幹什麼」，則歸於此類。**\n\
+            \    * 典型範例：\n        * \"哦對了，我剛才在看那個51館五樓的網路，就是想了解一下整體的狀況，嗯... 你能幫我顯示一下\
+            \ ITRI 51 館五樓所有 UE 的訊號品質資訊嗎？因為最近感覺好像有些用戶反應訊號不太穩定，所以想確認一下，麻煩了啊。\"\n   \
+            \     * \"我記得之前好像有提到一個功能，就是那個...呃...跟干擾有關的，對，干擾抑制演算法的預測結果，能不能幫我現在看一下？我想大概了解一下情況，因為下午開會可能會用到，謝謝。\"\
+            \n\n3.  **結構化信息與特定參數的處理 (Handling of Structured Information and Specific\
+            \ Parameters)**\n    * 核心特徵：文本的核心意圖（可能在概念上是單一的，如「執行某操作」）的正確執行**高度依賴於準確識別、提取並處理一組具有特定結構、多個相互關聯、或技術性強的數據點、參數值或專有術語。指令的主要挑戰點在於這些參數的正確解析、驗證和應用，而非僅僅是理解高層次的行動意圖。**\n\
+            \    * 判斷關鍵：指令的執行是否**強烈依賴於一個「參數列表」或「配置集」的正確填充和理解**？這些參數本身是否技術性強、數量較多、或需要遵循特定格式或相互約束？**如果指令的核心內容更像是在填寫一個詳細的技術表單或API請求體，則歸於此類。**\n\
+            \    * 典型範例：\n        * \"請在 ITRI 51 館五樓執行干擾抑制，設定Center/Edge UEs 比例為0.6，最小RB數為8，且演算法模式為'模式A'。\"\
+            \ (多個特定技術參數的組合配置)\n        * \"針對 ID 為 'UE-001' 至 'UE-010' 的設備，應用策略 'Policy-X'，並記錄詳細日誌等級為\
+            \ 'DEBUG'。\"\n        * \"我希望ITRI 51 館 5 樓干擾抑制演算法啟動時，當 Cell Edge UEs 個數比較多的時候，Cell\
+            \ Center UEs 的流量至少要維持 75%。\" (此例由於包含了地點、演算法、對UE數量的條件判斷、以及對另一組UE流量的具體要求，其主要挑戰更偏向於正確解析和應用這組相互關聯的參數和條件，因此更適合歸於此類\
+            \ Category 3)\n\n4.  **複雜意圖結構與推理需求 (Complex Intent Structures and Reasoning\
+            \ Demands)**\n    * 核心特徵：文本的主要挑戰在於其內部包含了**多個獨立的核心意圖/行動需要被協同處理，或者包含需要系統基於條件評估在不同核心行動路徑之間做出選擇的真正決策分支邏輯。**\
+            \ 這不僅僅是為單一行動配置參數，而是涉及管理多個行動或決定採取哪個行動。\n    * 判斷關鍵：文本是否要求系統執行**多於一個的、各自可被視為主要行動的任務**？條件語句的結果是否會導致系統執行**完全不同的核心行動或進入不同的主要業務流程**，而不僅僅是調整當前單一核心行動的參數？\n\
+            \    * 典型範例：\n        * \"顯示 SINR Map，如果平均 SINR 低於閾值，則啟動干擾抑制，然後重新生成 UE\
+            \ 位置規劃。\" (三個獨立的核心行動序列，其中一個有條件觸發)\n        * \"列出 ITRI 51 館五樓所有 UE 的訊號品質，並且執行\
+            \ UE 部署位置規劃，看看能不能改善整體SINR。\"\n        * \"我想同時查看 SINR 分布圖和各 UE 的連線狀態，地點在\
+            \ ITRI 51 館五樓，並將結果匯出。\"\n\n5.  **其他特殊與邊界條件測試 (Other Special and Boundary\
+            \ Condition Tests)**\n    * 核心特徵：文本的主要挑戰在於它代表了一些在邏輯上較為特殊（例如，明確的否定指令）或在形式上處於系統處理能力邊緣的情況（例如，極端簡短、缺乏上下文的輸入，或格式異常的請求）。這些通常不完全屬於上述四個類別的典型特徵，而是用於測試系統的完備性和特殊情況處理能力。\n\
+            \    * 判斷關鍵：指令是否不符合前四類的典型特徵，而是代表一種邏輯上的例外（如否定）、形式上的邊界情況（如極度簡潔或格式錯誤）或無法歸類的特殊請求？\n\
+            \    * 典型範例：\n        * \"不要在 ITRI 51 館五樓執行干擾抑制。\"\n        * \"SINR Map?\"\
+            \n        * \"停止目前的 UE 部屬位置規劃。\"\n        * \"51館五樓UE狀態\"\n\n## 4. 待分類文本\
+            \ (Text to Classify)\n{{#sys.query#}}\n\n\n## 5. 輸出要求 (Output Requirements)\n\
+            你必須嚴格按照以下 JSON 格式輸出結果，並且不包含任何額外的解釋或文字：\n\n```json\n{\n  \"category_id\"\
+            : <分類ID>,\n  \"category_name\": \"<分類名稱>\",\n  \"reason\": \"<解釋為何將文本歸類於此的原因，需具體說明判斷依據>\"\
+            \n}\n請開始分類「待分類文本」。"
+        selected: false
+        title: 文本分類器
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1747810658255'
+      position:
+        x: -1490.2821683120958
+        y: 270
+      positionAbsolute:
+        x: -1490.2821683120958
+        y: 270
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 38b1682f-b81b-4942-abcc-c45554ab793c
+            value: 其他特殊與邊界條件測試
+            varType: string
+            variable_selector:
+            - '1747810658255'
+            - text
+          id: 'true'
+          logical_operator: and
+        - case_id: a946eec2-6d24-45bb-a21f-93402f046df2
+          conditions:
+          - comparison_operator: contains
+            id: e98b3c24-87de-4521-b69d-ebcab8558c5b
+            value: 複雜意圖結構與推理需求
+            varType: string
+            variable_selector:
+            - '1747810658255'
+            - text
+          id: a946eec2-6d24-45bb-a21f-93402f046df2
+          logical_operator: and
+        - case_id: 14abe583-a4b8-4017-aa5b-d2a8f3dd3ccb
+          conditions:
+          - comparison_operator: contains
+            id: 121d5d6f-13ce-4d28-83c6-362ecc42e939
+            value: 自然語言固有複雜性
+            varType: string
+            variable_selector:
+            - '1747810658255'
+            - text
+          id: 14abe583-a4b8-4017-aa5b-d2a8f3dd3ccb
+          logical_operator: and
+        - case_id: dc5dc520-ea0a-41ee-a69a-1472e0436c20
+          conditions:
+          - comparison_operator: contains
+            id: b4d683d3-9694-4b57-a0d5-eda914535cfb
+            value: 結構化信息與特定參數的處理
+            varType: string
+            variable_selector:
+            - '1747810658255'
+            - text
+          id: dc5dc520-ea0a-41ee-a69a-1472e0436c20
+          logical_operator: and
+        - case_id: 05f441c0-069f-4dad-99b4-7e266d83329b
+          conditions:
+          - comparison_operator: contains
+            id: f37d28e7-f173-4798-8400-1b0a259f10a4
+            value: 基本清晰指令及其表述變異
+            varType: string
+            variable_selector:
+            - '1747810658255'
+            - text
+          id: 05f441c0-069f-4dad-99b4-7e266d83329b
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[ 條件分支 ] 文本分類'
+        type: if-else
+      height: 318
+      id: '1747810822495'
+      position:
+        x: -1213.565066509283
+        y: 270
+      positionAbsolute:
+        x: -1213.565066509283
+        y: 270
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - edition_type: basic
+          id: 0cf5c036-3d85-45ab-b8f3-44f20b874825
+          role: system
+          text: "**Prompt: 分類引導式應答器 (模組化版本)**\n\n**第一部分：角色定義與目標**\n你的角色是作為一個樂於助人的AI助理，即「分類引導式應答器」，能自然地與使用者溝通，並清晰地解釋系統如何理解與處理他們的指令，以及系統的能力範圍。目標是引導使用者提出系統能有效處理的清晰指令，並在指令已足夠清晰時給予直接肯定。\n\
+            \n**第二部分：輸入變數**\n系統會將一段 JSON 文本（來自變數 {{#1747810658255.text#}}）提供給你。此 JSON\
+            \ 文本中必定包含 \"category_name\" (類別名稱) 和 \"reason\" (原因描述) 這兩個欄位。\n同時，系統也會提供使用者原始的輸入文本（來自變數\
+            \ {{#sys.query#}}）。\n\n**第三部分：核心回應邏輯與規則**\n請嚴格遵循以下規則進行回應：\n\n**3.1. 主要分類判斷：**\n\
+            \    系統將依據 {{#1747810658255.text#}} 中的 \"category_name\" 值，選擇並執行以下相應的「處理模組」。\n\
+            \n**3.2. 處理模組 A：適用於「特殊」、「複雜」或「表達變異」的指令類別**\n    此模組適用於當 {{#1747810658255.text#}}\
+            \ 中的 \"category_name\" 是以下任一值時：\n    * \"其他特殊與邊界條件測試\"\n    * \"複雜意圖結構與推理需求\"\
+            \n    * \"基本清晰指令及其表述變異 (Basic Clear Instructions and common expression\
+            \ variations)\"\n\n    **3.2.1. 內部指令分析階段 (LLM內部步驟1):**\n        [LLM請先仔細分析\
+            \ {{#sys.query#}} 的內容。目標是提取使用者完整的、可操作的核心意圖，包括所有相關的對象、參數、條件（**包括所有嵌套或並列的條件**）和修飾詞（如地點、時間、“至少”、“最多”等閾值或範圍、觸發條件等）。將此完整意圖轉換成一個自身就能完整表達該意圖的、結構清晰、無歧義的指令敘述。我們將此稱為「建議指令」。這個「建議指令」應力求完整反映原始指令中的所有關鍵規範，而不僅僅是最簡化的核心動作。\n\
+            \        範例A: 若 {{#sys.query#}} 是 “天氣好像不錯，我下午有個會，幫我看看三點到四點A會議室有沒有空，然後訂一下”，則「建議指令」可能是\
+            \ “查詢A會議室今天下午3點到4點的預訂情況，並預訂該時段”。\n        範例B: 若 {{#sys.query#}} 是 「可不可以顯示一下所有UE的狀況？」、「能給我看一下所有UE的狀況嗎？」、「我想多喝杯茶，不過在此之前，你可以告訴我我們的UE狀態嗎？」、「先等等，我電腦有点卡，能麻煩你跑下干擾抑制演算法嗎？」、「最近有點疲倦，不過對了，請問所有UE的狀態都正常嗎？」或類似的包含附加情境但核心意圖明確的語句，則「建議指令」應為其核心請求的簡化形式，如\
+            \ 「顯示所有UE的狀況」或「運行干擾抑制演算法」。\n        範例C: 若 {{#sys.query#}} 意圖不明顯或過於含糊，請生成一個基於常見相關任務的合理猜測的「建議指令」。\n\
+            \        範例D: 針對包含多重或嵌套條件的複雜指令，力求將所有條件和目標清晰納入「建議指令」。\n            若 {{#sys.query#}}\
+            \ 是 \"我希望ITRI 51 館 5 樓干擾抑制演算法啟動時，Cell Center UEs 的流量至少要維持 75%\"，則「建議指令」可為：「設定規則：當ITRI\
+            \ 51館5樓的干擾抑制演算法啟動時，Cell Center UEs的流量需至少維持在75%」。\n            若 {{#sys.query#}}\
+            \ 是 \"我希望ITRI 51 館 5 樓干擾抑制演算法啟動時，當 Cell Edge UEs 個數比較多的時候，Cell Center\
+            \ UEs 的流量至少要維持 75%\"，則「建議指令」可為：「設定規則：當ITRI 51館5樓的干擾抑制演算法啟動 且 同時Cell Edge\
+            \ UEs個數較多（或達到某種定義的“較多”狀態）時，Cell Center UEs的流量需至少維持在75%」。 (LLM註：對於“比較多”這類模糊條件，若系統無法直接設定，建議指令可如實反映，或在後續澄清。)\n\
+            \            若 {{#sys.query#}} 是 \"我希望ITRI 51 館 5 樓干擾抑制演算法啟動時，當 Cell Edge\
+            \ UEs 個數占比大於等於 65% 的時候，Cell Center UEs 的流量至少要維持 75%\"，則「建議指令」可為：「設定規則：當ITRI\
+            \ 51館5樓的干擾抑制演算法啟動 且 同時Cell Edge UEs個數占比大於或等於65%時，Cell Center UEs的流量需至少維持在75%」。]\n\
+            \n    **3.2.2. 清晰度判斷与回應分支階段 (LLM內部步驟2):**\n        [LLM請比較使用者原始指令 {{#sys.query#}}\
+            \ 與在[LLM內部步驟1]中生成的（力求完整的）「建議指令」。LLM 應進行以下判斷：\n            a. 「建議指令」是否準確且完整地捕獲了\
+            \ {{#sys.query#}} 中最主要、可操作的核心意圖及其所有關鍵的參數、條件（包括所有嵌套和並列條件）和修飾詞？\n      \
+            \      b. 在 {{#sys.query#}} 中，除了可明確對應到「建議指令」的核心請求部分外，是否存在任何其他語句，這些語句會造成以下任一情況：\n\
+            \                i.  與核心請求（即「建議指令」）的意圖或其執行參數產生直接的邏輯矛盾？\n             \
+            \   ii. 為核心請求的執行設定了一個明確的、尚未被滿足的、需要AI或使用者先完成其他動作才能解除的硬性前置條件（例如，一個清晰的依賴關係：“等X完成後，你再去做Y”）？\n\
+            \                iii. 或使得核心請求的意圖、對象或必要參數（相較於已力求完整的「建議指令」所呈現的清晰度而言）變得無法確定或顯著更加模糊？\n\
+            \            (LLM請注意：如果 {{#sys.query#}} 中的附加語句僅為常見的開場白如“對了”、“我想請問一下”、“我希望”、無關緊要的個人評論如“我最近有點累”、無實質阻礙性的情境描述如“我電腦有点卡”、或不影響核心指令理解與執行的輕微對話性延遲如“先等等”，則這些附加語句本身不應被視為滿足上述\
+            \ i, ii, 或 iii 中任何一條的阻礙性因素，因為「建議指令」已努力包含所有重要信息。)\n            c. 「建議指令」自身是否已經包含了執行該指令所需的所有明確參數和條件，達到了可直接執行的程度（或者，如果「建議指令」是一個目標設定，那麼它是否包含了所有設定該目標所需的明確條件）？\n\
+            \        ]\n\n        * **分支 A.1: 若原始指令（經由「建議指令」的完整轉述後）已被判斷為實質清晰且可直接執行或設定**\n\
+            \            如果 [LLM在內部步驟2中判斷條件 a 和 c 均為真，且根據條件 b 的評估，{{#sys.query#}}\
+            \ 中相對於完整的「建議指令」而言，其餘的附加語句中「不存在」上述 i, ii, iii 所描述的任何阻礙性情況]：\n         \
+            \   你 **必須** 輸出：\n            「好的，您的指令「{{#sys.query#}}」中的核心意圖非常清晰。我已理解為：「[此處填寫LLM內部步驟1生成的、力求完整的「建議指令」]」。我將為您處理。」\n\
+            \            (LLM請注意：此回應旨在肯定使用者指令核心意圖的清晰性，並通過複述力求完整的「建議指令」來確認理解。通常不需要在此贅述\
+            \ {{#1747810658255.text#}} 中的 \"reason\"。)\n\n        * **分支 A.2: 若原始指令需進一步澄清或引導**\n\
+            \            否則（即LLM在內部步驟2中判斷條件a或c不為真，或「建議指令」未能完整捕獲所有關鍵信息，或根據條件b的評估，附加語句中「存在」i,\
+            \ ii, iii所描述的任一阻礙性情況時，表明 {{#sys.query#}} 的核心請求及其條件仍不夠清晰，或AI生成的「建議指令」不夠完善，需要澄清）：\n\
+            \            你 **必須** 繼續使用以下詳細回應模板，並使用在[LLM內部步驟1]中生成的（可能仍需完善的）「建議指令」來填充模板中的建議部分：\n\
+            \n            「您好，關於您的指令「{{#sys.query#}}」，其中似乎包含了一些較為間接或混合的表述。\n     \
+            \       我們的分析（此分析基於 {{#1747810658255.text#}} 中 \"reason\" 欄位的描述：[LLM請根據\
+            \ \"reason\" 欄位內容，用一到兩句自然、口語化的方式，簡要說明該指令的關鍵特性或為何它被認為是特殊/複雜/或如此範例中表達上的變異，避免直接複製技術性描述，例如：“它可能夾雜了閒聊，或主要請求不夠具體”或“它的主要挑戰在於語言表達的變異，這讓我們較難直接理解您的確切需求。”]）指出，直接完整執行您原始描述中的所有部分，可能超出了我們目前的處理能力，或者我們可以透過確認核心意圖來更好地服務您。\n\
+            \n            我們系統能最好地回應明確且直接的指令。\n\n            針對您提到的內容，我們嘗試理解您的核心意圖。您是不是主要想執行像這樣的指令：「[此處填寫LLM內部步驟1生成的「建議指令」]」？\n\
+            \n            如果這個簡化後的指令確實是您想執行的主要操作，或者您希望基於此進行修改，請您直接輸入該指令或修改後的版本，我會盡力為您處理。非常感謝您的理解與合作！」\n\
+            \n**3.3. 處理模組 B：適用於所有其他未被模組A捕獲的指令類別**\n    此模組適用於當 {{#1747810658255.text#}}\
+            \ 中的 \"category_name\" 不符合「處理模組 A」(3.2) 中列出的任何條件時：\n    你 **必須** 直接輸出以下這段文字。將文字中的\
+            \ \"[此處填寫JSON中的reason內容]\" 替換為實際從 {{#1747810658255.text#}} 中提取到的 \"reason\"\
+            \ 欄位的值（此回應不提及 \"category_name\"）：\n    「好的，瞭解。關於：[此處填寫JSON中的reason內容]。我將為您處理。」\n\
+            \n**第四部分：統一輸出要求**\n* 你的**唯一輸出**必須是上述幾種情況中符合條件的指定格式文字，不要跳行且整體風格保持自然、簡潔、直接、友善。\n\
+            * **絕對不要**輸出任何 Python 代碼、任何關於你如何解析 JSON 或做決策的描述、任何原始 JSON 內容、或任何除了指定回應格式之外的文字。\n\
+            * 有要幫使用者執行的話，記得附上\"我將為您處理\"的字眼。"
+        selected: false
+        title: '[ LLM ] 分類引導式應答器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1747811265733'
+      position:
+        x: -935.3322481399596
+        y: 300.74373086275045
+      positionAbsolute:
+        x: -935.3322481399596
+        y: 300.74373086275045
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 097d66bb-c3ea-431e-a100-51ae53a70fd0
+            value: 我將幫你執行
+            varType: string
+            variable_selector:
+            - '1747811265733'
+            - text
+          id: 'true'
+          logical_operator: and
+        - case_id: a5093993-c497-4ded-838a-c49c51ce2dc3
+          conditions:
+          - comparison_operator: contains
+            id: de4e766e-55c1-46bf-b29b-bec692e8bca5
+            value: 我將為您處理
+            varType: string
+            variable_selector:
+            - '1747811265733'
+            - text
+          id: a5093993-c497-4ded-838a-c49c51ce2dc3
+          logical_operator: and
+        - case_id: 38e9fd31-43a5-465e-903d-f6dc0abc7164
+          conditions:
+          - comparison_operator: contains
+            id: 4a29d366-6d8a-4aef-bc80-66e4517a7cf6
+            value: 我們將為您處理
+            varType: string
+            variable_selector:
+            - '1747811265733'
+            - text
+          id: 38e9fd31-43a5-465e-903d-f6dc0abc7164
+          logical_operator: and
+        - case_id: 66af9874-1988-4863-8231-3359bea69bc2
+          conditions:
+          - comparison_operator: contains
+            id: 034cc4c5-16cc-4c3d-ac24-c61d722ce0e7
+            value: 我們將幫你執行
+            varType: string
+            variable_selector:
+            - '1747811265733'
+            - text
+          id: 66af9874-1988-4863-8231-3359bea69bc2
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[ 條件分支] 分類引導式應答器'
+        type: if-else
+      height: 270
+      id: '1747811441753'
+      position:
+        x: -631.3322481399596
+        y: 300.74373086275045
+      positionAbsolute:
+        x: -631.3322481399596
+        y: 300.74373086275045
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '
+
+          {{#1747811265733.text#}}'
+        desc: ''
+        selected: false
+        title: '[ 回復 ] 分類引導式應答器'
+        type: answer
+        variables: []
+      height: 105
+      id: '1747811590429'
+      position:
+        x: -631.3322481399596
+        y: 607.445406057522
+      positionAbsolute:
+        x: -631.3322481399596
+        y: 607.445406057522
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: 4cfe9e6f-54d7-4005-a2db-facae8904314
+            value: init
+            varType: string
+            variable_selector:
+            - conversation
+            - status
+          id: 'true'
+          logical_operator: and
+        - case_id: 99d28b8b-cf84-4242-ad8a-b7e07772d6c4
+          conditions:
+          - comparison_operator: is
+            id: 5a8ceeb3-e7d1-4b1f-823c-0a123985346f
+            value: fill_parameter_done
+            varType: string
+            variable_selector:
+            - conversation
+            - status
+          id: 99d28b8b-cf84-4242-ad8a-b7e07772d6c4
+          logical_operator: and
+        - case_id: 989d8a40-210f-4f63-8bf4-1ca2261cd904
+          conditions:
+          - comparison_operator: contains
+            id: 2d2965d0-0e31-4d0d-8ada-014bfa289d3f
+            value: fill_parameter
+            varType: string
+            variable_selector:
+            - conversation
+            - status
+          id: 989d8a40-210f-4f63-8bf4-1ca2261cd904
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: '[ 條件分支 ] 工作流狀態判斷'
+        type: if-else
+      height: 222
+      id: '1747829742913'
+      position:
+        x: -1821.9642473189176
+        y: -47.9182230300415
+      positionAbsolute:
+        x: -1821.9642473189176
+        y: -47.9182230300415
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: constant
+          operation: set
+          value: fill_parameter
+          variable_selector:
+          - conversation
+          - status
+          write_mode: over-write
+        selected: false
+        title: 變數分配器 2
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1747830482885'
+      position:
+        x: 3859.405232068553
+        y: -171.91822303004153
+      positionAbsolute:
+        x: 3859.405232068553
+        y: -171.91822303004153
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        dataset_ids: []
+        desc: ''
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: weighted_score
+          top_k: 4
+          weights:
+            keyword_setting:
+              keyword_weight: 0
+            vector_setting:
+              embedding_model_name: text-embedding-3-small
+              embedding_provider_name: langgenius/openai/openai
+              vector_weight: 1
+        query_variable_selector:
+        - '1742442590290'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: '[RAG] 情境模板'
+        type: knowledge-retrieval
+      height: 54
+      id: '1747831616147'
+      position:
+        x: 4108.498311650139
+        y: 64.44723841624108
+      positionAbsolute:
+        x: 4108.498311650139
+        y: 64.44723841624108
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "import json\nfrom typing import Any, Dict, List\n\ndef _collect_contents(node:\
+          \ Any) -> List[str]:\n    \"\"\"將輸入轉成『content』字串陣列；允許 node 為 dict / list\
+          \ / scalar。\"\"\"\n    contents: List[str] = []\n    data = node.get(\"\
+          result\", node) if isinstance(node, dict) else node\n    if not isinstance(data,\
+          \ list):\n        data = [data]\n    for item in data:\n        if isinstance(item,\
+          \ dict) and \"content\" in item:\n            contents.append(item[\"content\"\
+          ])\n    return contents\n\ndef _is_empty(obj: Any) -> bool:\n    \"\"\"\
+          判斷 None、空字串、空 list/dict 都算『空』。\"\"\"\n    return obj is None or (isinstance(obj,\
+          \ (str, list, dict)) and len(obj) == 0)\n\ndef main(arg1: Any = None, arg2:\
+          \ Any = None, arg3: Any = None, **kwargs) -> Dict[str, str]:\n    # 若 arg2\
+          \ / arg3 為空 → 用 [] 取代，避免 _collect_contents 出錯\n    if _is_empty(arg2):\n\
+          \        arg2 = []\n    if _is_empty(arg3):\n        arg3 = []\n\n    intent_info\
+          \ = _collect_contents(arg1) + _collect_contents(arg2)\n    result_payload\
+          \ = {\n        \"intent_info\": intent_info,\n        \"scenario_template\"\
+          : _collect_contents(arg3)\n    }\n    return {\"result\": json.dumps(result_payload,\
+          \ ensure_ascii=False)}\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: '[Code]參數聚合器'
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - query
+          variable: arg1
+        - value_selector:
+          - '1742442861275'
+          - result
+          variable: arg2
+        - value_selector:
+          - '1747831616147'
+          - result
+          variable: arg3
+      height: 54
+      id: '1747831742018'
+      position:
+        x: 5047.405232068553
+        y: -46.29993162852463
+      positionAbsolute:
+        x: 5047.405232068553
+        y: -46.29993162852463
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - conversation
+          - scenario_template
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4.1
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: ff9070b7-8c96-497d-a8f5-c43a06eb5072
+          role: system
+          text: "##角色##\n你是專注於語意理解參數提取與結構化輸出的智慧代理。你能解析「情境模板」與「使用者輸入」與「意圖描述」，自動補齊 API\
+            \ 所需的參數，並產生機器可直接呼叫的完整 payload。\n\n##任務##\n1. 讀取 情境模板（含全域限制、共用參數、策略相關設定）。\n\
+            2. 從 user_text 中擷取或推斷每一項參數的值。\n\t    a.若 validation_rules 存在，先驗證格式／數值區間。\n\
+            \t    b.若 default_value 非 null 且 user_prompt 未給值 → 採用預設。\n\t    c.若仍為\
+            \ null 且 required: true → 視為「待確認」。\n\t    d.若user_text不夠完正，從intent_description中抓取更詳細的配置細節，具體會到策略層級\n\
+            4. 依下列邏輯決定 is_completed：\n      a.true：所有 required: true 的欄位皆已具備合法值。\n\
+            \      b.false：仍有 required: true、值為 null 的欄位。\n5. 產生 confirmation_prompt：\n\
+            \      a.若 is_completed=true → 套用 confirmation_prompt_template，插入已完成的參數摘要，供使用者最終確認。\n\
+            \      b.若 is_completed=false → 依參數的 ask_prompt 與缺值列表，合成明確的追問句。\n6. 組裝輸出：\n\
+            \      a.api_path 直接取自 api_endpoint.path。\n      b.payload 保留情境模板原順序，將每個參數對應的\
+            \ name 與最終值填入；缺值維持 null。\n      c.嵌套結構（如 strategies 內部參數）亦同樣補值或保留 null。\n\
+            \      d.如果有指定策略則輸出的參數子集合配置直接採策略配置\n    \n##模板範例##\n{\n  # ===== 基本資訊\
+            \ =====\n  scenario_id:       <string>,        # Scenario 唯一識別\n  scenario_name:\
+            \     <string>,        # 中文顯示名稱\n  description:       <string>,      \
+            \  # 功能描述\n  example_utterances:[<string>, ...], # 代表性觸發語句陣列\n\n  # =====\
+            \ API 端點 =====\n  api_endpoint: {\n    path:   <string>,  # REST 路徑\n\
+            \    method: <string>   # HTTP 動詞：GET | POST | PUT | DELETE ...\n  },\n\
+            \n  # ===== 全域限制條件 =====\n  time_constraints: {\n\t  required:       \
+            \ <boolean>,          # true | false\n    start_time:    <string|null>,\
+            \  # ISO-8601 | relative | null\n    end_time:      <string|null>,  #\
+            \ ISO-8601 | relative | null\n    default_value: <any|null>,     # 預設時間；無則\
+            \ null\n    ask_prompt:    <string|null>   # 缺值時的提問句\n  },\n  location_constraints:\
+            \ {\n\t  required:        <boolean>,          # true | false\n    default_value:\
+            \ <string|null>,  # 預設地點文字\n    coordinates:   <string|null>,  # \"lat,lng\"\
+            \ 或 null\n    scope: {\n      type:         <string>,      # single |\
+            \ radius | bounding_box | floor_range | custom\n      value:        <any>,\
+            \         # 半徑、公尺、樓層範圍等\n      unit:         <string|null>, # meter |\
+            \ kilometer | floor | null\n      default_value:<any|null>     # 範圍預設；無則\
+            \ null\n    },\n    ask_prompt:  <string|null>,    # 缺值時的提問句\n    entity_type:\
+            \ <string|null>     # LOCATION 等\n  },\n  \n   # ===== 所有參數（先不考慮策略，配置參數預設值，有策略再覆蓋）=====\n\
+            \  common_parameters: [\n    {\n      name:            <string>,     \
+            \      # 參數鍵名\n      type:            <string>,           # number | integer\
+            \ | string | boolean | enum\n      required:        <boolean>,       \
+            \   # true | false\n      default_value:   <any|null>,         # 系統預設，無則\
+            \ null\n      ask_prompt:      <string|null>,      # 缺值時的提問句\n      validation_rules:<object|null>,\
+            \      # { min_value, max_value, regex } 或 null\n      entity_type:  \
+            \   <string|null>       # NER／分類用實體類型\n    },\n    ...\n  ],\n\n  # =====\
+            \ 策略選擇器（不存在可省略）=====\n  strategy_selector: {\n    name:          <string>,\
+            \        # 主參數鍵名\n    type:          <string>,        # enum\n    required:\
+            \      <boolean>,       # true | false\n    default_value: <any|null>,\
+            \      # 預設策略；\n    ask_prompt:    <string|null>,   # 缺值時的提問句\n    value_mappings:{\
+            \                # 使用者字串 → internal_key\n      <string>: <string>,\n \
+            \     ...\n    },\n    entity_type:   <string|null>    # OPTIMIZATION_STRATEGY\
+            \ 等\n  },\n\n  # ===== 策略專屬參數（有strategy才需填寫，每個 internal_key 一組）=====\n\
+            \  strategies: {\n    <internal_key>: {\n      display_name: <string>,\
+            \       # 人類描述名稱\n      ask_prompt:      <string|null>,   # 缺值時的提問句\n\
+            \      parameters: [\n        {\n          name:            <string>,\n\
+            \          type:            <string>,        # number | integer | string\
+            \ | boolean | enum\n          required:        <boolean>,       # true\
+            \ | false\n          value:   <any>,\n          validation_rules:<object|null>,\
+            \   # { min_value, max_value, regex } 或 null\n          entity_type: \
+            \    <string|null>    # NER／分類用\n        },\n        ...\n      ]\n  \
+            \  },\n    ...\n  },\n\n  # ===== 執行前確認 =====\n  confirmation_prompt_template:\
+            \ <string>,   # 透過 {{變數}} 插槽直接插入執行時值，並用 {[if]}/{[elif]}/{[else]}/{[end_if]}\
+            \ 區塊按條件動態顯示文字。LLM 在渲染時先判斷條件、再替換變數，就能用一份模板覆蓋多種策略與參數組合，產生清晰且彈性的最終確認訊息。\n\
+            \t\n  # ===== 回覆模態 =====\n  output_modalities: [<string>, ...]       \
+            \ # Text | Image | Structured ...\n}\n      \n##輸出格式##\n{\n  \"is_completed\"\
+            : <boolean>,\n  \"confirmation_prompt\": \"<string>\",\n  \"scenario_template\"\
+            : { /* 根據已知資訊更新value後情境模板的巢狀 JSON 物件 */ }\"\n  \"api_path\": \"<string>\"\
+            ,\n  \"payload\": { /* 與情境模板相符的巢狀 JSON 物件 */ }\n}"
+        - id: b9ebe34b-154a-4226-833c-b2bb7c2ea8c0
+          role: user
+          text: '####使用者輸入、intent_info、scenario template####
+
+            {{#1747831742018.result#}}
+
+            ####上下文####
+
+            {{#context#}}'
+        selected: false
+        title: 情境轉換器
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1747832098636'
+      position:
+        x: 5351.405232068553
+        y: -46.29993162852463
+      positionAbsolute:
+        x: 5351.405232068553
+        y: -46.29993162852463
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        parameters:
+        - description: is_completed是輸出的其中一個布林變數
+          name: is_completed
+          required: true
+          type: string
+        - description: confirmation_prompt
+          name: confirmation_prompt
+          required: true
+          type: string
+        - description: workflow webhook的URL
+          name: api_path
+          required: true
+          type: string
+        - description: 提供webhook所需的完整payload
+          name: payload
+          required: true
+          type: string
+        - description: 根據使用者需求更新參數後的scenario_template
+          name: scenario_template
+          required: true
+          type: string
+        query:
+        - '1747832098636'
+        - text
+        reasoning_mode: prompt
+        selected: false
+        title: '[提取]模板變數'
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1747832329592'
+      position:
+        x: 5657.239084952011
+        y: -46.29993162852463
+      positionAbsolute:
+        x: 5657.239084952011
+        y: -46.29993162852463
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1747832329592'
+          - confirmation_prompt
+          variable_selector:
+          - conversation
+          - confirmation_prompt
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1747832329592'
+          - scenario_template
+          variable_selector:
+          - conversation
+          - scenario_template
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1747832329592'
+          - api_path
+          variable_selector:
+          - conversation
+          - api_path
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1747832329592'
+          - payload
+          variable_selector:
+          - conversation
+          - scenario_payload
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1747832329592'
+          - is_completed
+          variable_selector:
+          - conversation
+          - is_completed
+          write_mode: over-write
+        selected: false
+        title: 變數分配器 3
+        type: assigner
+        version: '2'
+      height: 200
+      id: '1747832920622'
+      position:
+        x: 5959.405232068553
+        y: -46.29993162852463
+      positionAbsolute:
+        x: 5959.405232068553
+        y: -46.29993162852463
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#conversation.confirmation_prompt#}}
+
+          目前的情境執行參數為
+
+          {{#conversation.scenario_payload#}}'
+        desc: ''
+        selected: false
+        title: 直接回覆 10
+        type: answer
+        variables: []
+      height: 124
+      id: '1747833460007'
+      position:
+        x: 6263.405232068553
+        y: -46.29993162852463
+      positionAbsolute:
+        x: 6263.405232068553
+        y: -46.29993162852463
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "import requests\nfrom typing import Any, Dict, List, Union\n\ndef parse_chain(chain_data:\
+          \ List[Dict[str, Any]]) -> List[Dict[str, Any]]:\n    \"\"\"\n    解析 n8n\
+          \ 回傳的 chain，依 type 做不同處理。\n    - message: 直接回傳 content（文字）\n    - image:\
+          \   不再 fetch，假設內容已經是 base64 或物件，直接保留\n    - table:   將 columns/data 封裝為一個\
+          \ content 物件\n    - 其他:    當未知型別，回傳提示文字\n    \"\"\"\n    parsed_list = []\n\
+          \    for item in chain_data:\n        item_type = item.get(\"type\", \"\"\
+          ).lower()\n        content = item.get(\"content\")\n\n        if item_type\
+          \ == \"message\":\n            # 純文字\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": content\n\
+          \            })\n\n        elif item_type == \"image\":\n            data_dict\
+          \ = content.get(\"data\", {})\n            base64_data = data_dict.get(\"\
+          data\")\n            # 直接信任 n8n 已經回傳了完整資訊 (例如 base64 或 data物件)\n       \
+          \     # 可以依你實際狀況決定要不要再做進一步判斷\n            parsed_list.append({\n       \
+          \         \"type\": \"image\",\n                \"content\": base64_data\n\
+          \            })\n\n        elif item_type == \"table\":\n            # 假設\
+          \ n8n 直接在 item 裡提供 columns / data\n            columns = content.get(\"\
+          columns\", [])\n            data = content.get(\"data\", [])\n         \
+          \   parsed_list.append({\n                \"type\": \"table\",\n       \
+          \         \"content\": {\n                    \"columns\": columns,\n  \
+          \                  \"data\": data\n                }\n            })\n\n\
+          \        else:\n            # 未知型別 → 以文字顯示\n            parsed_list.append({\n\
+          \                \"type\": \"message\",\n                \"content\": f\"\
+          [未知 type={item_type}] {content}\"\n            })\n\n    return parsed_list\n\
+          \ndef send_to_human_in_the_loop(\n    backend_url: str,\n    conversation_uid:\
+          \ str,\n    item: Dict[str, Any]\n) -> requests.Response:\n    \"\"\"\n\
+          \    將「單一 item」送到 human_in_the_loop API。\n    text_content 傳一個 list，裡面只有此\
+          \ item。\n    \"\"\"\n    api_endpoint = f\"{backend_url}workflow_mgt/WorkflowManager/human_in_the_loop\"\
+          \n    payload = {\n        \"conversation_uid\": conversation_uid,\n   \
+          \     \"text_content\": [item]  # 僅傳一個 item\n    }\n    return requests.post(api_endpoint,\
+          \ json=payload)\n\ndef main(\n    n8n_url: str,\n    n8n_path: str,\n  \
+          \  backend_url: str = \"http://YOUR_BACKEND_SERVER_URL\",\n    conversation_uid:\
+          \ str = \"測試UID-12345\",\n    payload: str = \"\"  \n) -> Dict[str, Any]:\n\
+          \    \"\"\"\n    Dify Code Node 進入點:\n      1) 向 n8n 發送 GET/POST 請求 (視你的\
+          \ n8n 設定) 以取得 { \"chain\": [...] }\n      2) parse_chain → 解析 chain\n  \
+          \    3) 逐一把每個 item 傳給 human_in_the_loop\n      4) 回傳所有呼叫結果\n\n    參數:\n\
+          \      n8n_url:  n8n 主機或網域\n      n8n_path: 具體 API 路徑 (可能含 /webhook/...)\n\
+          \      backend_url: human_in_the_loop 的後端位址 (前半段)\n      conversation_uid:\
+          \ 用於識別對話的 ID\n    \"\"\"\n\n    # --- 1) 將字串 payload 轉成 JSON dict --------------------------\n\
+          \    try:\n        payload_dict = json.loads(payload)            # ③ 轉成\
+          \ dict   ### <--- 變動\n    except json.JSONDecodeError:\n        return {\"\
+          result\": \"payload format error\"}\n\n    # --- 2) 透過 POST 把 payload_dict\
+          \ 打到 n8n ----------------------\n    n8n_endpoint = f\"{n8n_url}{n8n_path}\"\
+          \n\n    try:\n        # 改成 POST，並用 json 參數傳遞                           ###\
+          \ <--- 變動\n        response = requests.post(n8n_endpoint, json=payload_dict,\
+          \ timeout=300)\n        response.raise_for_status()\n    except Exception:\n\
+          \        return {\"result\": \"n8n fetch data error\"}\n\n    # 預期 n8n 返回的\
+          \ JSON 結構: { \"chain\": [...] }\n    try:\n        n8n_result = response.json()\n\
+          \    except Exception as e:\n        return {\n            \"result\": \"\
+          error\"\n        }\n\n    if \"chain\" not in n8n_result[0]:\n        return\
+          \ {\n            \"result\": \"no data error\"\n        }\n\n    # 2) parse_chain\n\
+          \    chain_parsed = parse_chain(n8n_result[0][\"chain\"])\n\n    # 3) 每個\
+          \ item 逐一打 API\n    results = []\n    for item in chain_parsed:\n      \
+          \  try:\n            resp = send_to_human_in_the_loop(backend_url, conversation_uid,\
+          \ item)\n            results.append({\n                \"type\": item[\"\
+          type\"],\n                \"status_code\": resp.status_code,\n         \
+          \       \"response_text\": resp.text\n            })\n        except Exception\
+          \ as e:\n            results.append({\n                \"result\": \"parsed\
+          \ error\"\n            })\n\n    # 4) 回傳所有呼叫結果\n    return {\n        \"\
+          result\": \"API Success\"\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 執行含有呼叫API的Code (1)
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - MITLAB_BACKEND
+          variable: backend_url
+        - value_selector:
+          - conversation
+          - conversation_uid
+          variable: conversation_uid
+        - value_selector:
+          - env
+          - N8N_ACTIVE_BASE_URL
+          variable: n8n_url
+        - value_selector:
+          - conversation
+          - api_path
+          variable: n8n_path
+        - value_selector:
+          - conversation
+          - scenario_payload
+          variable: payload
+      height: 54
+      id: '17478340188330'
+      position:
+        x: -809.4588580897446
+        y: -171.91822303004153
+      positionAbsolute:
+        x: -809.4588580897446
+        y: -171.91822303004153
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 8df973ed-cd22-4212-acce-342e6b6a0992
+            value: 'true'
+            varType: string
+            variable_selector:
+            - conversation
+            - is_completed
+          id: 'true'
+          logical_operator: and
+        - case_id: d7412361-4f82-459d-a25d-60104a990eb0
+          conditions:
+          - comparison_operator: contains
+            id: d9f928c6-2e5c-4133-9399-c2ba695e00f0
+            value: 'false'
+            varType: string
+            variable_selector:
+            - conversation
+            - is_completed
+          id: d7412361-4f82-459d-a25d-60104a990eb0
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 條件分支 8
+        type: if-else
+      height: 174
+      id: '1747838949163'
+      position:
+        x: 6566.405232068553
+        y: -46.29993162852463
+      positionAbsolute:
+        x: 6566.405232068553
+        y: -46.29993162852463
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: constant
+          operation: set
+          value: fill_parameter_done
+          variable_selector:
+          - conversation
+          - status
+          write_mode: over-write
+        selected: false
+        title: 變數分配器 4
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1747839031101'
+      position:
+        x: 6869.405232068553
+        y: -46.29993162852463
+      positionAbsolute:
+        x: 6869.405232068553
+        y: -46.29993162852463
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: constant
+          operation: set
+          value: fill_parameter
+          variable_selector:
+          - conversation
+          - status
+          write_mode: over-write
+        selected: false
+        title: 變數分配器 4 (1)
+        type: assigner
+        version: '2'
+      height: 88
+      id: '17478390872770'
+      position:
+        x: 6869.405232068553
+        y: 46.308747658194164
+      positionAbsolute:
+        x: 6869.405232068553
+        y: 46.308747658194164
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"{{#1747984552657.text#}}\"\n        }\n\
+              \    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479843913150'
+      position:
+        x: 4680.244448667529
+        y: 45.256903521969264
+      positionAbsolute:
+        x: 4680.244448667529
+        y: 45.256903521969264
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1742442861275'
+          - result
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 89b76307-e015-4f85-bad1-6344d7da745d
+          role: system
+          text: '請根據以下資訊，以一句話回覆使用者，並在句首加上「[ Info ]」。
+
+            情境：你是一個 SMO 網管意圖的判別器，負責解釋使用者需求對應到的RAG資訊。
+
+            請整合使用者問題與先前的結果回覆，組織出一句話答覆。
+
+
+            使用者的問題：
+
+            {{#sys.query#}}
+
+
+            先前的RAG結果：
+
+            {{#context#}}'
+        selected: false
+        title: '[LLM回覆] 意圖轉Scenario辨識器'
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1747984552657'
+      position:
+        x: 4412.498311650139
+        y: 64.44723841624108
+      positionAbsolute:
+        x: 4412.498311650139
+        y: 64.44723841624108
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": {{#1747988261914.human_in_the_loop_payload#}}\n\
+              \        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (2)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479848446040'
+      position:
+        x: 8512.311134530011
+        y: 6.540192701338924
+      positionAbsolute:
+        x: 8512.311134530011
+        y: 6.540192701338924
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(arg1: str) -> dict:\n    return {\n        \"result\": arg1,\n\
+          \    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 代碼執行 3
+        type: code
+        variables:
+        - value_selector:
+          - conversation
+          - scenario_payload
+          variable: arg1
+      height: 54
+      id: '1747987702090'
+      position:
+        x: 7142.390376483633
+        y: 6.540192701338924
+      positionAbsolute:
+        x: 7142.390376483633
+        y: 6.540192701338924
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        parameters:
+        - description: 將payload轉string資料型態
+          name: human_in_the_loop_payload
+          required: true
+          type: string
+        query:
+        - '1747987702090'
+        - result
+        reasoning_mode: prompt
+        selected: false
+        title: 參數提取器 2
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1747988261914'
+      position:
+        x: 7421.792965216007
+        y: 6.540192701338924
+      positionAbsolute:
+        x: 7421.792965216007
+        y: 6.540192701338924
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"目前的情境執行參數為：\"\n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (3)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479898049120'
+      position:
+        x: 8192.10516469652
+        y: 6.540192701338924
+      positionAbsolute:
+        x: 8192.10516469652
+        y: 6.540192701338924
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"是否要執行工作流?\"\n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (3)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479906916690'
+      position:
+        x: 8853.235999583574
+        y: -179.7191101416311
+      positionAbsolute:
+        x: 8853.235999583574
+        y: -179.7191101416311
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 5e1b033b-486e-46c3-b3aa-f3558bb488ac
+            value: 是
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 'true'
+          logical_operator: and
+        - case_id: 89ba0132-a4ff-4c34-88ca-eafb768a1494
+          conditions:
+          - comparison_operator: contains
+            id: 2fce63e2-3635-4681-aafd-852b4806fdd0
+            value: 否
+            varType: string
+            variable_selector:
+            - sys
+            - query
+          id: 89ba0132-a4ff-4c34-88ca-eafb768a1494
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 條件分支 9
+        type: if-else
+      height: 174
+      id: '1747990842053'
+      position:
+        x: -1520.5964996423036
+        y: -119.0629581036621
+      positionAbsolute:
+        x: -1520.5964996423036
+        y: -119.0629581036621
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"開始執行情境\"\n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (4)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479908826710'
+      position:
+        x: -1128.8166099922664
+        y: -171.91822303004153
+      positionAbsolute:
+        x: -1128.8166099922664
+        y: -171.91822303004153
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"停止執行情境，請重新輸入需求。\"\n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (5)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479909154640'
+      position:
+        x: -1128.8166099922664
+        y: -38.06681440130748
+      positionAbsolute:
+        x: -1128.8166099922664
+        y: -38.06681440130748
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"目前的情境執行參數為：\"\n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (4)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479912596970'
+      position:
+        x: 7516.430413504619
+        y: -179.7191101416311
+      positionAbsolute:
+        x: 7516.430413504619
+        y: -179.7191101416311
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": {{#17479914772300.human_in_the_loop_payload#}}\n\
+              \        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (3)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479912651100'
+      position:
+        x: 8512.311134530011
+        y: -179.7191101416311
+      positionAbsolute:
+        x: 8512.311134530011
+        y: -179.7191101416311
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        parameters:
+        - description: 將payload轉string資料型態
+          name: human_in_the_loop_payload
+          required: true
+          type: string
+        query:
+        - '17479914826570'
+        - result
+        reasoning_mode: prompt
+        selected: false
+        title: 參數提取器 2 (1)
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '17479914772300'
+      position:
+        x: 8192.10516469652
+        y: -179.7191101416311
+      positionAbsolute:
+        x: 8192.10516469652
+        y: -179.7191101416311
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(arg1: str) -> dict:\n    return {\n        \"result\": arg1,\n\
+          \    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 代碼執行 3 (1)
+        type: code
+        variables:
+        - value_selector:
+          - conversation
+          - scenario_payload
+          variable: arg1
+      height: 54
+      id: '17479914826570'
+      position:
+        x: 7858.319336371002
+        y: -179.7191101416311
+      positionAbsolute:
+        x: 7858.319336371002
+        y: -179.7191101416311
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"{{#conversation.confirmation_prompt#}}\"\
+              \n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (5)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479924729840'
+      position:
+        x: 7217.977261219612
+        y: -179.7191101416311
+      positionAbsolute:
+        x: 7217.977261219612
+        y: -179.7191101416311
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-9
+            key: ''
+            type: text
+            value: "{\n    \"conversation_uid\": \"{{#conversation.conversation_uid#}}\"\
+              ,\n    \"text_content\": [\n        {\n            \"type\": \"message\"\
+              ,\n            \"content\": \"{{#conversation.confirmation_prompt#}}\"\
+              \n        }\n    ]\n}"
+          type: raw-text
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: '[回覆] 意圖轉Scenario辨識器 (6)'
+        type: http-request
+        url: '{{#env.MITLAB_BACKEND#}}workflow_mgt/WorkflowManager/human_in_the_loop'
+        variables: []
+      height: 129
+      id: '17479925676070'
+      position:
+        x: 7842.85999423623
+        y: 6.540192701338924
+      positionAbsolute:
+        x: 7842.85999423623
+        y: 6.540192701338924
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: constant
+          operation: set
+          value: init
+          variable_selector:
+          - conversation
+          - status
+          write_mode: over-write
+        - input_type: constant
+          operation: set
+          value: '{}'
+          variable_selector:
+          - conversation
+          - scenario_payload
+          write_mode: over-write
+        - input_type: constant
+          operation: set
+          value: ' '
+          variable_selector:
+          - conversation
+          - confirmation_prompt
+          write_mode: over-write
+        - input_type: constant
+          operation: set
+          value: http://null/api/v1
+          variable_selector:
+          - conversation
+          - api_path
+          write_mode: over-write
+        - input_type: constant
+          operation: set
+          value: 'false'
+          variable_selector:
+          - conversation
+          - is_completed
+          write_mode: over-write
+        - input_type: constant
+          operation: set
+          value: ' '
+          variable_selector:
+          - conversation
+          - scenario_template
+          write_mode: over-write
+        selected: false
+        title: 變數分配器 4 (1)
+        type: assigner
+        version: '2'
+      height: 228
+      id: '17479931487170'
+      position:
+        x: -454.9493396846142
+        y: -171.91822303004153
+      positionAbsolute:
+        x: -454.9493396846142
+        y: -171.91822303004153
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "import requests\nfrom typing import Any, Dict\n\n__all__ = [\"main\"\
+          , \"send_to_human_in_the_loop\"]\n\n\ndef send_to_human_in_the_loop(\n \
+          \   backend_url: str,\n    conversation_uid: str,\n    message: str,\n \
+          \   *,\n    timeout: int = 30,\n) -> requests.Response:\n    \"\"\"Post\
+          \ a single text message to human_in_the_loop API.\n\n    The payload schema\
+          \ is strictly:\n    {\n        \"conversation_uid\": <conversation_uid>,\n\
+          \        \"text_content\": [\n            {\"type\": \"message\", \"content\"\
+          : <message>}\n        ]\n    }\n    \"\"\"\n    endpoint = f\"{backend_url.rstrip('/')}/workflow_mgt/WorkflowManager/human_in_the_loop\"\
+          \n    payload = {\n        \"conversation_uid\": conversation_uid,\n   \
+          \     \"text_content\": [\n            {\n                \"type\": \"message\"\
+          ,\n                \"content\": message,\n            }\n        ],\n  \
+          \  }\n    return requests.post(endpoint, json=payload, timeout=timeout)\n\
+          \n\ndef main(\n    *,\n    backend_url: str = \"http://YOUR_BACKEND_SERVER_URL\"\
+          ,\n    conversation_uid: str = \"測試UID-12345\",\n    payload: str = \"\"\
+          ,\n) -> Dict[str, Any]:\n    \"\"\"Entry point for Dify Code Node.\n\n \
+          \   Sends *payload* as a single text message to the backend and returns\n\
+          \    the raw HTTP result for downstream logging/inspection.\n    \"\"\"\n\
+          \    try:\n        response = send_to_human_in_the_loop(\n            backend_url=backend_url,\n\
+          \            conversation_uid=conversation_uid,\n            message=payload,\n\
+          \        )\n        return {\n            \"result\": \"success\",\n\n \
+          \       }\n    except Exception as exc:\n        return {\n            \"\
+          result\": \"fail\",\n        }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 代碼執行 5
+        type: code
+        variables:
+        - value_selector:
+          - env
+          - MITLAB_BACKEND
+          variable: backend_url
+        - value_selector:
+          - '1747811265733'
+          - text
+          variable: payload
+        - value_selector:
+          - conversation
+          - conversation_uid
+          variable: conversation_uid
+      height: 54
+      id: '1748431211528'
+      position:
+        x: -327.3322481399596
+        y: 607.445406057522
+      positionAbsolute:
+        x: -327.3322481399596
+        y: 607.445406057522
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 555.7012660521891
+      y: 150.67925190342243
+      zoom: 0.659753955386447

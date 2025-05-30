@@ -1,0 +1,34 @@
+{
+	scenario_id: "get_all_ue_status", # Scenario 唯一識別
+	scenario_name: "ITRI 51館 5樓 UE狀態查詢", # 中文顯示名稱
+	description: "查詢 ITRI 51館 5樓所有 UE 的目前連線與運作狀態", # 功能描述
+	example_utterances:[
+ "請求 ITRI 51館 5樓所有 UE 狀態",
+ "查詢 51館 5F UE 狀態",
+	"幫我看一下 ITRI 51館 5樓的 UE 現況"
+	],
+	api_endpoint: {
+ path: "e8f1cc4d-7560-4ae6-8ec2-dece817160be",
+ method: "GET"
+	},
+	time_constraints: {
+ required: false,
+ start_time: null,
+ end_time: null,
+ default_value: null,
+ ask_prompt: null
+	},
+	location_constraints: {
+ required: true,
+ default_value: "ITRI 51館 5樓",
+ coordinates: null, # 若有精確座標可填 "lat,lng"
+ scope: {
+ type: "floor_range", # 樓層範圍
+ value: 5, # 目標樓層
+ unit: "floor",
+ default_value:5
+ },
+	ask_prompt: 準備執行查詢ITRI 51館 5樓所有 UE 狀態的動作,
+	entity_type: "LOCATION"
+	},
+}

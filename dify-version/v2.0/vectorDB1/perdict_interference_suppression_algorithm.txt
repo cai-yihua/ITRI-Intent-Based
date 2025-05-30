@@ -1,0 +1,112 @@
+{
+ "scenario_id": "1234567890",
+ "scenario_name": "execute_interference_suppression_algorithm",
+ "description": "對系統設定 Cell Edge UE 個數條件（未設定採預設值）後，預測干擾抑制演算法成果。",
+ "example_utterances": [
+ "預測干擾抑制並維持整體UE的訊號強度",
+ "優化 Edge UE 條件並預測干擾抑制演算法成果，提供使用者預測後的結果"
+ ],
+
+ "api_endpoint": {
+ "path": "da0e5281-0fbc-4c30-adb6-76b23824ec28",
+ "method": "POST"
+ },
+
+ "time_constraints": {
+ "required":false,
+ "start_time": null,
+ "end_time": null,
+ "default_value": null,
+ "ask_prompt": null
+ },
+ "location_constraints": {
+ "required":false,
+ "default_value": null,
+ "coordinates": null,
+ "scope": {
+ "type": "single",
+ "value": null,
+ "unit": null,
+ "default_value": null
+ },
+ "ask_prompt": null,
+ "entity_type": null
+ },
+
+ "common_parameters": [
+ {
+ "name": "manualNumOfNonInterferedRb",
+ "type": "integer",
+ "required": true,
+ "default_value": -1,
+ "ask_prompt": "請輸入 manualNumOfNonInterferedRb（-1 代表自動）",
+ "validation_rules": {
+ "min_value": -1
+ },
+ "entity_type": null
+ },
+ {
+ "name": "percentOfEdgeUeNumForGtCaseBound",
+ "type": "number",
+ "required": true,
+ "default_value": null,
+ "ask_prompt": "請輸入 Edge UE 比例上界（0–1）",
+ "validation_rules": {
+ "min_value": 0,
+ "max_value": 1
+ },
+ "entity_type": null
+ },
+ {
+ "name": "percentOfEdgeUeNumForLtCaseBound",
+ "type": "number",
+ "required": true,
+ "default_value": 0.3,
+ "ask_prompt": "請輸入 Edge UE 比例下界（0–1）",
+ "validation_rules": {
+ "min_value": 0,
+ "max_value": 1
+ },
+ "entity_type": null
+ },
+ {
+ "name": "percentOfCenterUeAvgTputForGtCase",
+ "type": "number",
+ "required": true,
+ "default_value": 0.75,
+ "ask_prompt": "請輸入 Center UE 平均吞吐量上界（0–1）",
+ "validation_rules": {
+ "min_value": 0,
+ "max_value": 1
+ },
+ "entity_type": null
+ },
+ {
+ "name": "percentOfCenterUeAvgTputForEqCase",
+ "type": "number",
+ "required": true,
+ "default_value": 0.75,
+ "ask_prompt": "請輸入 Center UE 平均吞吐量等於條件值（0–1）",
+ "validation_rules": {
+ "min_value": 0,
+ "max_value": 1
+ },
+ "entity_type": null
+ },
+ {
+ "name": "percentOfCenterUeAvgTputForLtCase",
+ "type": "number",
+ "required": true,
+ "default_value": 0.75,
+ "ask_prompt": "請輸入 Center UE 平均吞吐量下界（0–1）",
+ "validation_rules": {
+ "min_value": 0,
+ "max_value": 1
+ },
+ "entity_type": null
+ }
+ ],
+
+ "confirmation_prompt_template": "已套用 Edge/Center UE 比例條件並將 Center UE 平均吞吐量維持至少 75%，是否執行干擾抑制演算法？",
+ "output_modalities": ["Text"]
+}
