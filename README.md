@@ -75,7 +75,7 @@ nano ./Dashboard/.env
 
 ## 執行部署腳本
 ```bash
-uv run python build_fix.py
+uv run python build.py
 ```
 
 
@@ -83,8 +83,3 @@ uv run python build_fix.py
 1. Sandbox 設定問題
     
     ![alt text](Sandbox-setting.png)
-
-## 常見問題
-- 啟動錯誤時，請確認 .env 檔案與依賴已正確安裝。
-- Docker 部署順序請依照說明：n8n → dify → Backend → Dashboard。
-- 若遇到 Sandbox 設定問題，請參考下方圖片。
