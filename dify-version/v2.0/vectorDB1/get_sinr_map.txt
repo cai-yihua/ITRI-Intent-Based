@@ -1,0 +1,41 @@
+{
+ "scenario_id": "get_sinr_map",
+ "scenario_name": "ITRI 51館 5樓 SINR Map 查詢",
+ "description": "查詢 ITRI 51館 5樓區域的 SINR（訊號雜訊比）分布圖",
+ "example_utterances": [
+ "請求 ITRI 51館 5樓的 SINR Map",
+ "查詢 51館 5F SINR 分布",
+ "幫我看一下 ITRI 51館 5樓的 SINR 熱點"
+ ],
+
+ "api_endpoint": {
+ "path": "3401ee6a-e5ed-434f-8356-c915746206bd",
+ "method": "GET"
+ },
+
+ "time_constraints": {
+ "required": false,
+ "start_time": null,
+ "end_time": null,
+ "default_value": null,
+ "ask_prompt": null
+ },
+ "location_constraints": {
+ "required": true,
+ "default_value": "ITRI 51館 5樓",
+ "coordinates": null,
+ "scope": {
+ "type": "floor_range",
+ "value": 5,
+ "unit": "floor",
+ "default_value": 5
+ },
+ "ask_prompt": null,
+ "entity_type": "LOCATION"
+ },
+ 
+ "common_parameters": [],
+
+ "confirmation_prompt_template": "即將查詢 {{location_constraints.default_value}} 的 SINR Map。請確認是否繼續？",
+ "output_modalities": ["Image"]
+}
