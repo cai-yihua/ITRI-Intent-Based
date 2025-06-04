@@ -1,6 +1,8 @@
 #!/bin/bash
 
 DIFY_DIR="dify"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_SRC="$SCRIPT_DIR/.env.dify"
 
 echo "🚀 下載 dify 原始碼（分支：$DIFY_BRANCH）..."
 if [ ! -d "$DIFY_DIR" ]; then
@@ -9,43 +11,22 @@ else
   echo "📁 $DIFY_DIR 目錄已存在，略過 clone"
 fi
 
+echo "ENV_SRC $ENV_SRC"
 cd "$DIFY_DIR/docker" || exit 1
 
-if [ ! -f ".env" ]; then
-  echo "📄 建立 .env 檔案..."
-  cp .env.example .env
+if [ -f "$ENV_SRC" ]; then
+  echo "📄 偵測到自訂環境檔：$ENV_SRC"
+  cp "$ENV_SRC" .env
+  echo "✅ 已複製 .env.dify 為 .env"
 else
-  echo "✅ .env 檔案已存在"
+  echo "⚠️ 找不到 $ENV_SRC，改用範例檔案"
+  if [ ! -f ".env" ]; then
+    cp .env.example .env
+    echo "✅ 已從 .env.example 建立 .env"
+  else
+    echo "✅ .env 已存在，略過建立"
+  fi
 fi
-
-echo "🔧 更新 .env 內的 SANDBOX 環境變數..."
-# 更新或加入 SANDBOX 相關變數
-sed -i '/^SANDBOX_API_KEY=/d' .env
-echo "SANDBOX_API_KEY=dify-sandbox" >> .env
-
-sed -i '/^SANDBOX_GIN_MODE=/d' .env
-echo "SANDBOX_GIN_MODE=release" >> .env
-
-sed -i '/^SANDBOX_WORKER_TIMEOUT=/d' .env
-echo "SANDBOX_WORKER_TIMEOUT=600" >> .env
-
-sed -i '/^SANDBOX_ENABLE_NETWORK=/d' .env
-echo "SANDBOX_ENABLE_NETWORK=true" >> .env
-
-sed -i '/^SANDBOX_HTTP_PROXY=/d' .env
-echo "SANDBOX_HTTP_PROXY=http://ssrf_proxy:3128" >> .env
-
-sed -i '/^SANDBOX_HTTPS_PROXY=/d' .env
-echo "SANDBOX_HTTPS_PROXY=http://ssrf_proxy:3128" >> .env
-
-sed -i '/^SANDBOX_PORT=/d' .env
-echo "SANDBOX_PORT=8194" >> .env
-
-sed -i '/^PLUGIN_S3_USE_PATH_STYLE=/d' .env
-echo "PLUGIN_S3_USE_PATH_STYLE=false" >> .env
-
-sed -i '/^PLUGIN_S3_USE_AWS_MANAGED_IAM=/d' .env
-echo "PLUGIN_S3_USE_AWS_MANAGED_IAM=false" >> .env
 
 echo "🐳 使用 docker compose 啟動 dify 容器..."
 docker compose up -d
