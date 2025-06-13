@@ -723,7 +723,7 @@ if __name__ == "__main__":
             futs = [pool.submit(step_dify), pool.submit(step_n8n)]
             for f in as_completed(futs): f.result()
     elif N8N_EXIST == "YES":
-        step_dify()
+        pass
     else:
         log_error("⚠️ 請設定 .env N8N_EXIST 為 YES/NO")
 
