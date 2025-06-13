@@ -39,6 +39,14 @@ load_dotenv(dotenv_path=dotenv_path, override=True)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 HTTP_DIFY_HOST = os.getenv("HTTP_DIFY_HOST")
 
+dotenv_path = os.path.abspath("./Dashboard/.env")
+load_dotenv(dotenv_path=dotenv_path, override=True)
+PROTOCAL = os.getenv("PROTOCAL")
+HOST = os.getenv("HOST")
+API_PORT = os.getenv("API_PORT")
+API_ROOT = os.getenv("API_ROOT")
+API_VERSION = os.getenv("API_VERSION")
+
 dotenv_path = os.path.abspath(".env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
 
@@ -288,8 +296,10 @@ def json_to_payload() -> List[JSONPayload]:
             if filename.endswith('.json'):
                 file_path = os.path.join(json_dir, filename)
                 with open(file_path, 'r', encoding='utf-8') as f:
-                    json_content = json.load(f)
-                    json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
+                    text = f.read()
+                text = re.sub("http://192.168.153.128:30000/api/v2/", f"{PROTOCAL}://{HOST}:{API_PORT}/{API_ROOT}/{API_VERSION}/", text, flags=re.IGNORECASE)
+                json_content = json.loads(text)
+                json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
                 payload = {
                     "mode": "json-content",
                     "json_payload": json_payload
