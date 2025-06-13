@@ -29,7 +29,7 @@ workflow:
     selector:
     - env
     - MITLAB_BACKEND
-    value: http://192.168.1.140:30000/api/v2.0/
+    value: http://192.168.1.140:30000/api/v2/
     value_type: string
   features:
     file_upload:
