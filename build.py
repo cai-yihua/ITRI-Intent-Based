@@ -628,6 +628,26 @@ def init_db(file_ids, token, vectorDB_name) -> str:
     except Exception as e:
         log_error(f"設定資料庫錯誤：{e}")
 
+def publish(token):
+    try:
+        payload = {"marked_name": "", "marked_comment": ""}
+        
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {token}"
+        }
+
+        url = f"{DIFY_BASE}/apps/{APP_ID}/workflows/publish"
+        
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            if response.status_code == 201:
+                logging.info("✅ 發布 dify 工作流成功")
+        except Exception as e:
+            log_error(f"發布 dify 工作流失敗：{e}")
+
+    except Exception as e:
+        log_error(f"發布 dify 工作流錯誤：{e}")
 
 # ────────────────── 主要步驟封裝成函式 ──────────────────
 def step_n8n():
@@ -669,8 +689,9 @@ def step_dify():
 
     def step_dify_init_workflow():
         dify_payload = yaml_to_payload()
-        app_id = dify_create_workflow(dify_payload, DIFY_TOKEN)
-        workflow_token = get_workflow_token(app_id, DIFY_TOKEN)
+        global APP_ID
+        APP_ID = dify_create_workflow(dify_payload, DIFY_TOKEN)
+        workflow_token = get_workflow_token(APP_ID, DIFY_TOKEN)
         update_backend_api_key_base(workflow_token)
         
     def step_dify_init_db():
@@ -686,7 +707,7 @@ def step_dify():
             return            # 直接結束本函式，主程式照常執行
         with step_timer("dify_set_openai_api_key"):
             _run_with_retry(set_openai_api_key, DIFY_TOKEN)
-
+        publish(DIFY_TOKEN)
         # 2025/06/13 移除 "創建知識庫" 功能，包含 upload_file(), init_db() 
 
     with step_timer("dify_setup_container"):
