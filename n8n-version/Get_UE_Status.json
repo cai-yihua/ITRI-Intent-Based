@@ -1,0 +1,84 @@
+{
+  "name": "Get UE Status",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e8f1cc4d-7560-4ae6-8ec2-dece817160be",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        280
+      ],
+      "id": "2a9455be-1b17-4302-8ba3-1d4361fc3f95",
+      "name": "Webhook",
+      "webhookId": "d9c7c32d-5147-4c09-8c20-0762307b1e3b"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        280
+      ],
+      "id": "21491434-ff6a-4358-9249-2d1b99f690e7",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    \"chain\": [\n      {\n        \"type\": \"message\",\n        \"content\": \"ITRI 51館5樓的網路中有 50 個UE，其throughput的統計如下表所示。\"\n      },\n      {\n        \"type\": \"table\",\n        \"content\": {\n          \"columns\": [\n            \"C:E = 20 : 30 (Total UEs: 50)\",\n            \"Total (Mbps)\",\n            \"Average (Mbps)\"\n          ],\n          \"data\": [\n            [\n              \"Center UE\",\n              \"534.00\",\n              \"26.70\"\n            ],\n            [\n              \"Edge UE\",\n              \"294.00\",\n              \"10.50\"\n            ],\n            [\n              \"Center + Edge\",\n              \"828.00\",\n              \"17.25\"\n            ]\n          ]\n        }\n      },\n      {\n        \"type\": \"table\",\n        \"content\": {\n          \"columns\": [\n            \"BS ID\",\n            \"UE ID\",\n            \"Throughput (Mbps)\"\n          ],\n          \"data\": [\n            [\n              131,\n              \"225\",\n              \"9.00\"\n            ],\n            [\n              131,\n              \"317\",\n              \"12.00\"\n            ],\n            [\n              131,\n              \"196\",\n              \"15.00\"\n            ],\n            [\n              131,\n              \"421\",\n              \"11.00\"\n            ],\n            [\n              131,\n              \"133\",\n              \"10.00\"\n            ],\n            [\n              131,\n              \"173\",\n              \"21.00\"\n            ],\n            [\n              131,\n              \"41\",\n              \"15.00\"\n            ],\n            [\n              131,\n              \"420\",\n              \"25.00\"\n            ],\n            [\n              132,\n              \"231\",\n              \"3.00\"\n            ],\n            [\n              132,\n              \"174\",\n              \"7.00\"\n            ],\n            [\n              132,\n              \"154\",\n              \"6.00\"\n            ],\n            [\n              132,\n              \"262\",\n              \"8.00\"\n            ],\n            [\n              132,\n              \"280\",\n              \"7.00\"\n            ],\n            [\n              132,\n              \"501\",\n              \"7.00\"\n            ],\n            [\n              132,\n              \"98\",\n              \"7.00\"\n            ],\n            [\n              132,\n              \"138\",\n              \"9.00\"\n            ],\n            [\n              132,\n              \"208\",\n              \"5.00\"\n            ],\n            [\n              132,\n              \"283\",\n              \"2.00\"\n            ],\n            [\n              135,\n              \"114\",\n              \"18.00\"\n            ],\n            [\n              135,\n              \"157\",\n              \"22.00\"\n            ],\n            [\n              135,\n              \"219\",\n              \"9.00\"\n            ],\n            [\n              135,\n              \"391\",\n              \"4.00\"\n            ],\n            [\n              135,\n              \"310\",\n              \"9.00\"\n            ],\n            [\n              135,\n              \"11\",\n              \"11.00\"\n            ],\n            [\n              135,\n              \"254\",\n              \"14.00\"\n            ],\n            [\n              135,\n              \"290\",\n              \"14.00\"\n            ],\n            [\n              135,\n              \"258\",\n              \"12.00\"\n            ],\n            [\n              135,\n              \"294\",\n              \"2.00\"\n            ]\n          ]\n        }\n      }\n    ]\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        280
+      ],
+      "id": "2cfe92d6-2b41-4a9c-be54-10c4a50a166f",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "76ec1b0e-8589-40e0-9a18-e681f791dbe8",
+  "meta": {
+    "instanceId": "59bb76d2e42d14dde08493ef4499ee8ce06f23adf89b1b1f67b4f078db33c959"
+  },
+  "id": "b5znNN3TTroYYKbW",
+  "tags": []
+}
