@@ -687,11 +687,7 @@ def step_dify():
         with step_timer("dify_set_openai_api_key"):
             _run_with_retry(set_openai_api_key, DIFY_TOKEN)
 
-        file_ids = upload_file(DIFY_TOKEN, vectorDB="vectorDB1")
-        init_db(file_ids, DIFY_TOKEN, vectorDB_name="scenario template")
-
-        file_ids = upload_file(DIFY_TOKEN, vectorDB="vectorDB2")
-        init_db(file_ids, DIFY_TOKEN, vectorDB_name="intent template")
+        # 2025/06/13 移除 "創建知識庫" 功能，包含 upload_file(), init_db() 
 
     with step_timer("dify_setup_container"):
         _run_with_retry(step_dify_setup_container)
