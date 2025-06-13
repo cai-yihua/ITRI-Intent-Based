@@ -1,10 +1,10 @@
 from __future__ import annotations
-import os, sys, json, time, subprocess, requests, logging, mimetypes
+import os, sys, json, time, subprocess, requests, logging, mimetypes, re
 from pathlib import Path
 from datetime import datetime
 from contextlib import contextmanager
 from dotenv import load_dotenv, set_key
-from typing import Callable, List, Tuple, TypedDict
+from typing import List, TypedDict
 from tenacity import retry, stop_after_attempt, wait_fixed
 import docker
 from docker.errors import NotFound, APIError
@@ -36,8 +36,11 @@ def log_error(msg: str):
 # ────────────────── 共用工具 ──────────────────
 dotenv_path = os.path.abspath("./Backend/.env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
-
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+dotenv_path = os.path.abspath("./Dashboard/.env")
+load_dotenv(dotenv_path=dotenv_path, override=True)
+HOST = os.getenv("HOST")
 
 dotenv_path = os.path.abspath(".env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
@@ -405,6 +408,8 @@ def yaml_to_payload() -> YamlPayload:
                 yaml_file = os.path.join(yaml_dir, filename)
                 with open(yaml_file, "r", encoding="utf-8") as f:
                     yaml_content = f.read()
+                    yaml_content = re.sub("http://192.168.1.128:5678", N8N_BASE_URL, yaml_content, flags=re.IGNORECASE)
+                    yaml_content = re.sub("http://192.168.1.140:30000/api/v2/", f"http://{HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
 
         payload = {
             "mode": "yaml-content",
