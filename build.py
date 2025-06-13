@@ -37,10 +37,7 @@ def log_error(msg: str):
 dotenv_path = os.path.abspath("./Backend/.env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-dotenv_path = os.path.abspath("./Dashboard/.env")
-load_dotenv(dotenv_path=dotenv_path, override=True)
-HOST = os.getenv("HOST")
+HTTP_DIFY_HOST = os.getenv("HTTP_DIFY_HOST")
 
 dotenv_path = os.path.abspath(".env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
@@ -409,7 +406,7 @@ def yaml_to_payload() -> YamlPayload:
                 with open(yaml_file, "r", encoding="utf-8") as f:
                     yaml_content = f.read()
                     yaml_content = re.sub("http://192.168.1.128:5678", N8N_BASE_URL, yaml_content, flags=re.IGNORECASE)
-                    yaml_content = re.sub("http://192.168.1.140:30000/api/v2/", f"http://{HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
+                    yaml_content = re.sub("http://192.168.1.140:30000/api/v2/", f"http://{HTTP_DIFY_HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
 
         payload = {
             "mode": "yaml-content",
