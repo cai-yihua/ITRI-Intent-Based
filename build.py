@@ -1,10 +1,10 @@
 from __future__ import annotations
-import os, sys, json, time, subprocess, requests, logging, mimetypes
+import os, sys, json, time, subprocess, requests, logging, mimetypes, re
 from pathlib import Path
 from datetime import datetime
 from contextlib import contextmanager
 from dotenv import load_dotenv, set_key
-from typing import Callable, List, Tuple, TypedDict
+from typing import List, TypedDict
 from tenacity import retry, stop_after_attempt, wait_fixed
 import docker
 from docker.errors import NotFound, APIError
@@ -36,8 +36,16 @@ def log_error(msg: str):
 # ────────────────── 共用工具 ──────────────────
 dotenv_path = os.path.abspath("./Backend/.env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
-
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+HTTP_DIFY_HOST = os.getenv("HTTP_DIFY_HOST")
+
+dotenv_path = os.path.abspath("./Dashboard/.env")
+load_dotenv(dotenv_path=dotenv_path, override=True)
+PROTOCAL = os.getenv("PROTOCAL")
+HOST = os.getenv("HOST")
+API_PORT = os.getenv("API_PORT")
+API_ROOT = os.getenv("API_ROOT")
+API_VERSION = os.getenv("API_VERSION")
 
 dotenv_path = os.path.abspath(".env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
@@ -288,8 +296,10 @@ def json_to_payload() -> List[JSONPayload]:
             if filename.endswith('.json'):
                 file_path = os.path.join(json_dir, filename)
                 with open(file_path, 'r', encoding='utf-8') as f:
-                    json_content = json.load(f)
-                    json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
+                    text = f.read()
+                text = re.sub("http://192.168.153.128:30000/api/v2/", f"{PROTOCAL}://{HOST}:{API_PORT}/{API_ROOT}/{API_VERSION}/", text, flags=re.IGNORECASE)
+                json_content = json.loads(text)
+                json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
                 payload = {
                     "mode": "json-content",
                     "json_payload": json_payload
@@ -405,6 +415,8 @@ def yaml_to_payload() -> YamlPayload:
                 yaml_file = os.path.join(yaml_dir, filename)
                 with open(yaml_file, "r", encoding="utf-8") as f:
                     yaml_content = f.read()
+                    yaml_content = re.sub("http://192.168.1.128:5678", N8N_BASE_URL, yaml_content, flags=re.IGNORECASE)
+                    yaml_content = re.sub("http://192.168.1.140:30000/api/v2/", f"http://{HTTP_DIFY_HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
 
         payload = {
             "mode": "yaml-content",
@@ -523,111 +535,26 @@ def set_openai_api_key(token) -> bool:
     except Exception as e:
         log_error(f"設定 OPENAI API KEY 錯誤：{e}")
 
-def upload_file(token, vectorDB) -> List[str]:
+def publish(token):
     try:
-        vector_dir = Path(f"dify-version/{DIFY_TAG}/{vectorDB}")
-        if not vector_dir.exists():
-            raise FileNotFoundError(vector_dir)
-
-        files_to_upload = sorted(
-            list(vector_dir.glob("*.txt")) + list(vector_dir.glob("*.xlsx"))
-        )
-        if not files_to_upload:
-            log_error("⚠️ 找不到任何 .txt / .xlsx 檔")
-
-        uploaded_ids = []
-        headers = {
-            "Authorization": f"Bearer {token}"
-        }
-
-        for fp in files_to_upload :
-            mime_type = mimetypes.guess_type(fp.name)[0] or "application/octet-stream"
-            try:
-                with fp.open("rb") as f:
-                    files = {"file": (fp.name, f, mime_type)}
-                    response = requests.post(DIFY_UPLOAD_TXT, files=files, headers=headers)
-
-                if response.status_code == 201:
-                    logging.info("✅ 上傳 file 成功")
-                    file_id = response.json()["id"]
-                    uploaded_ids.append(file_id)
-                else:
-                    log_error("⚠️ 上傳 file 失敗")
-
-            except Exception as e:
-                log_error(f"上傳 file 錯誤：{e}")
-        return uploaded_ids
-
-    except Exception as e:
-        log_error(f"上傳 file 錯誤：{e}")
-
-def init_db(file_ids, token, vectorDB_name) -> str:
-    try:
-        payload = {
-            "data_source":{
-                "type":"upload_file",
-                "info_list":{
-                    "data_source_type":"upload_file",
-                    "file_info_list":{"file_ids":file_ids}
-                }
-            },
-            "indexing_technique":"high_quality",
-            "process_rule":{
-                "rules":{
-                    "pre_processing_rules":[{
-                        "id":"remove_extra_spaces","enabled":"true"},
-                        {"id":"remove_urls_emails","enabled":"false"}
-                    ],
-                    "segmentation":{"separator":"\n\n\n","max_tokens":4000,"chunk_overlap":50}
-                },
-                "mode":"custom"},
-                "doc_form":"text_model",
-                "doc_language":"English",
-                "retrieval_model":{
-                    "search_method":"semantic_search",
-                    "reranking_enable":"false",
-                    "reranking_model":{"reranking_provider_name":"","reranking_model_name":""},
-                    "top_k":1,"score_threshold_enabled":"false",
-                    "score_threshold":0.5,"reranking_mode":"weighted_score",
-                    "weights":{
-                        "weight_type":"customized",
-                        "vector_setting":{
-                            "vector_weight":0.7,
-                            "embedding_provider_name":"","embedding_model_name":""
-                        },
-                        "keyword_setting":{"keyword_weight":0.3}
-                    }
-                },
-            "embedding_model":"text-embedding-3-small",
-            "embedding_model_provider":"langgenius/openai/openai"
-        }
+        payload = {"marked_name": "", "marked_comment": ""}
+        
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {token}"
         }
-        response = requests.post(DIFY_INIT_DB, json=payload, headers=headers)
 
-        if response.status_code != 200:
-            log_error("⚠️ 設定資料庫失敗")
+        url = f"{DIFY_BASE}/apps/{APP_ID}/workflows/publish"
         
-        ds_id  = response.json()["dataset"]["id"]
-        logging.info("✅ 設定資料庫成功")
-
-        # ---------- rename ----------
-        rename_body = {"name": vectorDB_name}
-        rename_url  = f"{DIFY_BASE}/datasets/{ds_id}"
-        rp = requests.patch(rename_url, json=rename_body, headers=headers)
-
-        if rp.status_code == 200:
-            logging.info(f"✅ 名稱已改為 {vectorDB_name}")
-        else:
-            log_error("⚠️ 資料庫改名失敗")
-
-        return ds_id
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            if response.status_code == 201:
+                logging.info("✅ 發布 dify 工作流成功")
+        except Exception as e:
+            log_error(f"發布 dify 工作流失敗：{e}")
 
     except Exception as e:
-        log_error(f"設定資料庫錯誤：{e}")
-
+        log_error(f"發布 dify 工作流錯誤：{e}")
 
 # ────────────────── 主要步驟封裝成函式 ──────────────────
 def step_n8n():
@@ -669,8 +596,9 @@ def step_dify():
 
     def step_dify_init_workflow():
         dify_payload = yaml_to_payload()
-        app_id = dify_create_workflow(dify_payload, DIFY_TOKEN)
-        workflow_token = get_workflow_token(app_id, DIFY_TOKEN)
+        global APP_ID
+        APP_ID = dify_create_workflow(dify_payload, DIFY_TOKEN)
+        workflow_token = get_workflow_token(APP_ID, DIFY_TOKEN)
         update_backend_api_key_base(workflow_token)
         
     def step_dify_init_db():
@@ -686,12 +614,8 @@ def step_dify():
             return            # 直接結束本函式，主程式照常執行
         with step_timer("dify_set_openai_api_key"):
             _run_with_retry(set_openai_api_key, DIFY_TOKEN)
-
-        file_ids = upload_file(DIFY_TOKEN, vectorDB="vectorDB1")
-        init_db(file_ids, DIFY_TOKEN, vectorDB_name="scenario template")
-
-        file_ids = upload_file(DIFY_TOKEN, vectorDB="vectorDB2")
-        init_db(file_ids, DIFY_TOKEN, vectorDB_name="intent template")
+        publish(DIFY_TOKEN)
+        # 2025/06/13 移除 "創建知識庫" 功能，包含 upload_file(), init_db() 
 
     with step_timer("dify_setup_container"):
         _run_with_retry(step_dify_setup_container)
@@ -723,7 +647,7 @@ if __name__ == "__main__":
             futs = [pool.submit(step_dify), pool.submit(step_n8n)]
             for f in as_completed(futs): f.result()
     elif N8N_EXIST == "YES":
-        step_dify()
+        pass
     else:
         log_error("⚠️ 請設定 .env N8N_EXIST 為 YES/NO")
 
