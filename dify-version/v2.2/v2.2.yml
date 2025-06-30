@@ -29,7 +29,7 @@ workflow:
     selector:
     - env
     - MITLAB_BACKEND
-    value: http://140.118.162.139:33402/api/v2/
+    value: http://140.118.162.94:30000/api/v2/
     value_type: string
   features:
     file_upload:
@@ -1564,7 +1564,7 @@ workflow:
           max_write_timeout: 0
         title: HTTP 請求
         type: http-request
-        url: http://140.118.162.139:5678/webhook/9a74bbcd-861d-4c03-b3b4-1410c6dddb08
+        url: http://140.118.162.94:5678/webhook/9a74bbcd-861d-4c03-b3b4-1410c6dddb08
         variables: []
       height: 156
       id: '1748840756787'
