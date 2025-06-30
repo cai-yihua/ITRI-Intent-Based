@@ -73,6 +73,7 @@ docker run -d --network $NETWORK \
     -p $HTTP_WORKFLOW_MGT_PORT:$HTTP_WORKFLOW_MGT_PORT \
     itri-intent-backend \
     sh -c "
+      python manage.py makemigrations &&
       python manage.py migrate --noinput &&
       daphne -b 0.0.0.0 -p $HTTP_WORKFLOW_MGT_PORT main.asgi:application
     "
@@ -82,4 +83,4 @@ docker run -d --network $NETWORK \
   --name itri-intent-worker \
   --env-file Backend/.env \
   itri-intent-backend \
-  bash -c "source Backend/.env && python manage.py runworker consumer"
+  bash -c "source .env && python manage.py runworker consumer"
