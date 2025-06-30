@@ -2,6 +2,7 @@
 
 # 宣告 network
 NETWORK=itri-net
+IMAGE=itri-intent-backend
 
 function remove_container_if_exists() {
   local container_name="$1"
@@ -12,10 +13,20 @@ function remove_container_if_exists() {
   fi
 }
 
+function remove_image_if_exists () {
+  local image="$1"
+  if docker images -q "${image}" | grep -q .; then
+    echo "Removing old image ${image}"
+    docker rmi -f "${image}" >/dev/null
+  fi
+}
+
 remove_container_if_exists "itri-intent-backend"
+remove_container_if_exists "itri-intent-worker"
 remove_container_if_exists "intent-postgres-db"
 remove_container_if_exists "intent-redis-db"
 remove_container_if_exists "intent-pgadmin"
+remove_image_if_exists "${IMAGE}"
 
 
 source Backend/.env
@@ -60,4 +71,16 @@ docker build --no-cache -t itri-intent-backend ./Backend
 docker run -d --network $NETWORK \
     --name itri-intent-backend \
     -p $HTTP_WORKFLOW_MGT_PORT:$HTTP_WORKFLOW_MGT_PORT \
-    itri-intent-backend
+    itri-intent-backend \
+    sh -c "
+      python manage.py makemigrations &&
+      python manage.py migrate --noinput &&
+      daphne -b 0.0.0.0 -p $HTTP_WORKFLOW_MGT_PORT main.asgi:application
+    "
+
+# 啟動 意圖後端系統 Channels Worker 監聽 ChannelNameRouter
+docker run -d --network $NETWORK \
+  --name itri-intent-worker \
+  --env-file Backend/.env \
+  itri-intent-backend \
+  bash -c "source .env && python manage.py runworker consumer"
