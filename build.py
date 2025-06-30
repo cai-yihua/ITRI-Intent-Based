@@ -297,7 +297,7 @@ def json_to_payload() -> List[JSONPayload]:
                 file_path = os.path.join(json_dir, filename)
                 with open(file_path, 'r', encoding='utf-8') as f:
                     text = f.read()
-                text = re.sub("http://192.168.153.128:30000/api/v2/", f"{PROTOCAL}://{HOST}:{API_PORT}/{API_ROOT}/{API_VERSION}/", text, flags=re.IGNORECASE)
+                text = re.sub("http://140.118.162.94:30000/api/v2/", f"{PROTOCAL}://{HOST}:{API_PORT}/{API_ROOT}/{API_VERSION}/", text, flags=re.IGNORECASE)
                 json_content = json.loads(text)
                 json_payload = {key: json_content[key] for key in allowed_fields if key in json_content}
                 payload = {
@@ -404,7 +404,7 @@ def dify_login_and_get_token() -> str:
 
 def yaml_to_payload() -> YamlPayload:
     """
-    根據 DIFY_TAG 尋找 /n8n-version/{DIFY_TAG}/ 的所有 YMAL 檔案，並將內容嵌入 YAML payload 中。
+    根據 DIFY_TAG 尋找 /dify-version/{DIFY_TAG}/ 的所有 YMAL 檔案，並將內容嵌入 YAML payload 中。
     """
     try:
         yaml_file = None
@@ -415,8 +415,8 @@ def yaml_to_payload() -> YamlPayload:
                 yaml_file = os.path.join(yaml_dir, filename)
                 with open(yaml_file, "r", encoding="utf-8") as f:
                     yaml_content = f.read()
-                    yaml_content = re.sub("http://192.168.1.128:5678", N8N_BASE_URL, yaml_content, flags=re.IGNORECASE)
-                    yaml_content = re.sub("http://192.168.1.140:30000/api/v2/", f"http://{HTTP_DIFY_HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
+                    yaml_content = re.sub("http://140.118.162.94:5678", N8N_BASE_URL, yaml_content, flags=re.IGNORECASE)
+                    yaml_content = re.sub("http://140.118.162.94:30000/api/v2/", f"http://{HTTP_DIFY_HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
 
         payload = {
             "mode": "yaml-content",
