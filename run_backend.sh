@@ -22,6 +22,7 @@ function remove_image_if_exists () {
 }
 
 remove_container_if_exists "itri-intent-backend"
+remove_container_if_exists "itri-intent-worker"
 remove_container_if_exists "intent-postgres-db"
 remove_container_if_exists "intent-redis-db"
 remove_container_if_exists "intent-pgadmin"
