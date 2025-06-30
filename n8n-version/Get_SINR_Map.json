@@ -90,7 +90,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://192.168.153.128:30000/api/v2/workflow_mgt/WorkflowManager/human_in_the_loop",
+        "url": "http://140.118.162.94:30000/api/v2/workflow_mgt/WorkflowManager/human_in_the_loop",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"conversation_uid\":\"{{ $('Webhook').item.json.body.conversation_uid }}\",\n  \"text_content\":[\n    {\n      \"type\": \"image\",\n      \"content\":\"{{ $json.chain[0].content.data.data }}\"\n    }\n  ]\n} ",
