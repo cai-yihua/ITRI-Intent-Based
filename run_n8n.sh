@@ -24,6 +24,7 @@ docker run -it -d \
   --restart unless-stopped \
   --env-file ./.env \
   -v n8n_data:/home/node/.n8n \
+  -v $PWD/n8n-images:/files \
   -p 5678:5678 \
   "n8nio/n8n:${N8N_TAG}"
 
