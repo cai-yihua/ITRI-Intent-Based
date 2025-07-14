@@ -73,9 +73,8 @@ docker run -d --network $NETWORK \
     -p $HTTP_WORKFLOW_MGT_PORT:$HTTP_WORKFLOW_MGT_PORT \
     itri-intent-backend \
     sh -c "
-      python manage.py makemigrations &&
       python manage.py migrate --noinput &&
-      daphne -b 0.0.0.0 -p $HTTP_WORKFLOW_MGT_PORT main.asgi:application
+      python manage.py runserver 0.0.0.0:$HTTP_WORKFLOW_MGT_PORT
     "
 
 # 啟動 意圖後端系統 Channels Worker 監聽 ChannelNameRouter
