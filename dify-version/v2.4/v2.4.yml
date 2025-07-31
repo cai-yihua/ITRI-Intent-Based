@@ -336,7 +336,7 @@ workflow:
         model:
           completion_params: {}
           mode: chat
-          name: gemini-2.5-flash-preview-04-17
+          name: gemini-2.0-flash
           provider: langgenius/gemini/google
         prompt_template:
         - id: a7eedaa0-fc4d-470f-9357-0d700c232e8b
