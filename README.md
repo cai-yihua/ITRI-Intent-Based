@@ -83,3 +83,8 @@ uv run python build.py
 1. Sandbox 設定問題
     
     ![alt text](Sandbox-setting.png)
+
+
+## License
+This project is licensed under the Apache 2.0 License - see the [LICENSE](./LICENSE) file for details.
+This project also uses third-party libraries under their respective licenses - see the [THIRD-PARTY-LICENSES.md](./THIRD-PARTY-LICENSES.md) file for details.
