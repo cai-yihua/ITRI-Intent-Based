@@ -16,13 +16,13 @@ This project uses the following third-party libraries and components:
 |  | channels_redis | BSD 3-Clause License | Django Channels Redis 後端 |
 |  | pymongo | Apache License 2.0 | MongoDB Python 客戶端 |
 |  | mongoengine | MIT License | MongoDB ORM |
-|  | sseclient-py | MIT License | SSE (Server-Sent Events) Python 客戶端 |
+|  | sseclient-py | Apache License 2.0 | SSE (Server-Sent Events) Python 客戶端 |
 |  | pytest | MIT License | Python 的測試框架 |
 |  | django-pytest | MIT License | Django 測試整合 |
 |  | django-debug-toolbar | BSD 3-Clause License | Django 除錯工具 |
 |  | gunicorn | MIT License | WSGI HTTP Server |
 |  | Postgres | PostgreSQL License | 資料庫（docker image: postgres:latest） |
-|  | Redis | BSD 3-Clause License | 快取與訊息佇列（docker image: redis） |
+|  | Redis | BSD 3-Clause License	 | 快取與訊息佇列（docker image: redis:6-alpine） |
 |  | pgAdmin | PostgreSQL License | 資料庫管理工具（docker image: dpage/pgadmin4） |
 | Dashboard | Next.js | MIT License | React-based 前端開發框架 |
 |  | React | MIT License | 前端 UI 框架 |
@@ -38,7 +38,7 @@ This project uses the following third-party libraries and components:
 |  | eslint | MIT License | JavaScript 程式碼檢查工具 |
 |  | eslint-config-next | MIT License | Next.js 的 ESLint 設定 |
 |  | typescript | Apache License 2.0 | 強型別的 JavaScript 語法 |
-|  | npm | MIT License | Node.js 套件管理工具 |
+|  | npm | Artistic License 2.0 | Node.js 套件管理工具 |
 | n8n | n8n | Apache License 2.0 | 自動化流程工具（docker image: n8nio/n8n） |
 | dify | dify | Apache License 2.0 | AI 工作流/資料處理平台（docker image: langgenius/dify） |
 | General | Docker | Apache License 2.0 | 容器化與部署 |
