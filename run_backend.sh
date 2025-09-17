@@ -59,7 +59,7 @@ docker run --network $NETWORK --name intent-redis-db \
   -e REDIS_USER=$HTTP_REDIS_DATABASE_HOST_USER \
   -e REDIS_PASSWORD=$HTTP_REDIS_DATABASE_PASSWORD \
   -p $HTTP_REDIS_DATABASE_HOST_PORT:6379 \
-  -d redis \
+  -d redis:6-alpine \
   sh -c 'echo "databases 16" > /tmp/redis.conf && \
          echo "user $REDIS_USER on >$REDIS_PASSWORD ~* +@all" >> /tmp/redis.conf && \
          redis-server /tmp/redis.conf'
