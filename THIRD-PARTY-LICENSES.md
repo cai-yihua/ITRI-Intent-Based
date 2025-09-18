@@ -39,6 +39,6 @@ This project uses the following third-party libraries and components:
 |  | eslint-config-next | MIT License | Next.js 的 ESLint 設定 |
 |  | typescript | Apache License 2.0 | 強型別的 JavaScript 語法 |
 |  | npm | Artistic License 2.0 | Node.js 套件管理工具 |
-| n8n | n8n | Apache License 2.0 | 自動化流程工具（docker image: n8nio/n8n） |
+| n8n | n8n | Sustainable Use License | 自動化流程工具（docker image: n8nio/n8n） |
 | dify | dify | Apache License 2.0 | AI 工作流/資料處理平台（docker image: langgenius/dify） |
 | General | Docker | Apache License 2.0 | 容器化與部署 |
