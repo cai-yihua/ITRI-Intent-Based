@@ -408,6 +408,8 @@ def yaml_to_payload() -> YamlPayload:
     """
     try:
         yaml_file = None
+        tools_file = []
+        agents_file = None
         yaml_dir = os.path.join(os.getcwd(), 'dify-version', DIFY_TAG)
 
         for filename in os.listdir(yaml_dir):
@@ -417,14 +419,25 @@ def yaml_to_payload() -> YamlPayload:
                     yaml_content = f.read()
                     yaml_content = re.sub("http://140.118.162.94:5678", N8N_BASE_URL, yaml_content, flags=re.IGNORECASE)
                     yaml_content = re.sub("http://140.118.162.94:30000/api/v2/", f"http://{HTTP_DIFY_HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
+                
+                logging.info(f"✨ 識別 YAML 檔案：{filename}")
 
-        payload = {
-            "mode": "yaml-content",
-            "yaml_content": yaml_content
-        }
+                payload = {
+                    "mode": "yaml-content",
+                    "yaml_content": yaml_content
+                }
+
+                if 'agent' in filename.lower():
+                    agents_file = payload
+                    logging.info(f"✨ 識別主要 YAML 檔案：{filename}")
+                else:
+                    tools_file.append(payload)
 
         logging.info("✅ 獲取 yaml 成功")
-        return payload
+        return {
+            "tools_file": tools_file,
+            "agents_file": agents_file
+        }
 
     except Exception as e:
         log_error(f"獲取 yaml 錯誤：{e}")
@@ -434,11 +447,21 @@ def dify_create_workflow(payload, token) -> str:
     發送創建 workflow 的請求，回傳 app_id
     """
     try:
+        tools_file = payload["tools_file"]
+        agents_file = payload["agents_file"]
+
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {token}"
         }
-        response = requests.post(DIFY_IMPORT_URL, json=payload, headers=headers)
+
+        for content in tools_file:
+            response = requests.post(DIFY_IMPORT_URL, json=content, headers=headers)
+
+            if response.status_code == 200:
+                logging.info("✅ 創建 workflow 成功")
+
+        response = requests.post(DIFY_IMPORT_URL, json=agents_file, headers=headers)
 
         if response.status_code == 200:
             logging.info("✅ 創建 workflow 成功")

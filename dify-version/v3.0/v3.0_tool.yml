@@ -1,0 +1,1164 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: 1009_工具Payload對應_HengshaoYu
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.2.4@1dc8cd4a3198584fd7639023951f388fff023caa234a4bdb8bba69d6091c2e64
+kind: app
+version: 0.3.0
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: ''
+    id: c43eac63-a663-4ce5-b7fa-c714882e3246
+    name: n8n_base_url
+    selector:
+    - env
+    - n8n_base_url
+    value: http://140.118.162.94:5678/webhook/
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: if-else
+      id: 1759385584551-source-1759385630181-target
+      source: '1759385584551'
+      sourceHandle: source
+      target: '1759385630181'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1759385630181-true-1759386679650-target
+      selected: false
+      source: '1759385630181'
+      sourceHandle: 'true'
+      target: '1759386679650'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1759385630181-7aa28a9d-49ac-4677-9c67-3f762a7365ca-1759389583173-target
+      selected: false
+      source: '1759385630181'
+      sourceHandle: 7aa28a9d-49ac-4677-9c67-3f762a7365ca
+      target: '1759389583173'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1759385630181-7c47019c-0449-4155-8c66-fdc67a5b5747-1759390459081-target
+      selected: false
+      source: '1759385630181'
+      sourceHandle: 7c47019c-0449-4155-8c66-fdc67a5b5747
+      target: '1759390459081'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1759385630181-76cc7c8c-2f51-4ac7-9daf-a84d3feaac6c-1759390584676-target
+      selected: false
+      source: '1759385630181'
+      sourceHandle: 76cc7c8c-2f51-4ac7-9daf-a84d3feaac6c
+      target: '1759390584676'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1759385630181-e23fb81f-783b-4aeb-945a-6ad4278eec40-1759390608073-target
+      selected: false
+      source: '1759385630181'
+      sourceHandle: e23fb81f-783b-4aeb-945a-6ad4278eec40
+      target: '1759390608073'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: end
+      id: 1759385630181-false-1759460275946-target
+      source: '1759385630181'
+      sourceHandle: 'false'
+      target: '1759460275946'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: template-transform
+      id: 1759386679650-source-1759993833982-target
+      selected: false
+      source: '1759386679650'
+      sourceHandle: source
+      target: '1759993833982'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 1759993833982-source-1759389115212-target
+      selected: false
+      source: '1759993833982'
+      sourceHandle: source
+      target: '1759389115212'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: template-transform
+      id: 1759389583173-source-17599940257970-target
+      selected: false
+      source: '1759389583173'
+      sourceHandle: source
+      target: '17599940257970'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: template-transform
+      id: 1759390459081-source-17599940255700-target
+      selected: false
+      source: '1759390459081'
+      sourceHandle: source
+      target: '17599940255700'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: template-transform
+      id: 1759390584676-source-17599940253290-target
+      selected: false
+      source: '1759390584676'
+      sourceHandle: source
+      target: '17599940253290'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: template-transform
+      id: 1759390608073-source-17599940250500-target
+      selected: false
+      source: '1759390608073'
+      sourceHandle: source
+      target: '17599940250500'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 17599940257970-source-1759389618068-target
+      selected: false
+      source: '17599940257970'
+      sourceHandle: source
+      target: '1759389618068'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 17599940255700-source-1759390668315-target
+      selected: false
+      source: '17599940255700'
+      sourceHandle: source
+      target: '1759390668315'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 17599940253290-source-1759390685294-target
+      selected: false
+      source: '17599940253290'
+      sourceHandle: source
+      target: '1759390685294'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 17599940250500-source-1759390692590-target
+      selected: false
+      source: '17599940250500'
+      sourceHandle: source
+      target: '1759390692590'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: template-transform
+      id: 1759385630181-daeb7c60-63e4-4cde-90aa-11cb86eb9919-1760345424108-target
+      source: '1759385630181'
+      sourceHandle: daeb7c60-63e4-4cde-90aa-11cb86eb9919
+      target: '1760345424108'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 1760345424108-source-1760345481936-target
+      source: '1760345424108'
+      sourceHandle: source
+      target: '1760345481936'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: template-transform
+      id: 1759385630181-4da6fd2a-166b-4cc8-8f0f-5e136ea7e780-1760409751815-target
+      source: '1759385630181'
+      sourceHandle: 4da6fd2a-166b-4cc8-8f0f-5e136ea7e780
+      target: '1760409751815'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: template-transform
+        targetType: end
+      id: 1760409751815-source-1760409763408-target
+      source: '1760409751815'
+      sourceHandle: source
+      target: '1760409763408'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 開始
+        type: start
+        variables:
+        - label: tool_name
+          max_length: 256
+          options: []
+          required: true
+          type: text-input
+          variable: tool_name
+        - label: intent_description
+          max_length: 256
+          options: []
+          required: true
+          type: text-input
+          variable: intent_description
+      height: 116
+      id: '1759385584551'
+      position:
+        x: 64.822022531845
+        y: 629.2458422770853
+      positionAbsolute:
+        x: 64.822022531845
+        y: 629.2458422770853
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: ef5f2f42-553b-4eef-80bd-d16eca4fdd16
+            value: get_ue_status
+            varType: string
+            variable_selector:
+            - '1759385584551'
+            - tool_name
+          id: 'true'
+          logical_operator: and
+        - case_id: 7aa28a9d-49ac-4677-9c67-3f762a7365ca
+          conditions:
+          - comparison_operator: contains
+            id: 135e6829-0ab3-4a85-8896-206d68d9def7
+            value: enable_im
+            varType: string
+            variable_selector:
+            - '1759385584551'
+            - tool_name
+          id: 7aa28a9d-49ac-4677-9c67-3f762a7365ca
+          logical_operator: and
+        - case_id: 7c47019c-0449-4155-8c66-fdc67a5b5747
+          conditions:
+          - comparison_operator: contains
+            id: 89dde5a7-4e95-424b-8d3d-a96b7b6a7911
+            value: simulate_im
+            varType: string
+            variable_selector:
+            - '1759385584551'
+            - tool_name
+          id: 7c47019c-0449-4155-8c66-fdc67a5b5747
+          logical_operator: and
+        - case_id: 76cc7c8c-2f51-4ac7-9daf-a84d3feaac6c
+          conditions:
+          - comparison_operator: contains
+            id: 6e6b3496-fcf7-4741-a226-e6fa239382e8
+            value: enable_qoe
+            varType: string
+            variable_selector:
+            - '1759385584551'
+            - tool_name
+          id: 76cc7c8c-2f51-4ac7-9daf-a84d3feaac6c
+          logical_operator: and
+        - case_id: e23fb81f-783b-4aeb-945a-6ad4278eec40
+          conditions:
+          - comparison_operator: contains
+            id: d11fd4ad-8e1d-495e-8027-bf1fa2cd31f8
+            value: simulate_qoe
+            varType: string
+            variable_selector:
+            - '1759385584551'
+            - tool_name
+          id: e23fb81f-783b-4aeb-945a-6ad4278eec40
+          logical_operator: and
+        - case_id: daeb7c60-63e4-4cde-90aa-11cb86eb9919
+          conditions:
+          - comparison_operator: contains
+            id: e517344e-48db-4b2c-85ef-50d79a1ddbed
+            value: get_active_rapp_status
+            varType: string
+            variable_selector:
+            - '1759385584551'
+            - tool_name
+          id: daeb7c60-63e4-4cde-90aa-11cb86eb9919
+          logical_operator: and
+        - case_id: 4da6fd2a-166b-4cc8-8f0f-5e136ea7e780
+          conditions:
+          - comparison_operator: contains
+            id: 30f3d64e-b9d5-44e5-9b74-dff22e37ddd5
+            value: disable_qoe
+            varType: string
+            variable_selector:
+            - '1759385584551'
+            - tool_name
+          id: 4da6fd2a-166b-4cc8-8f0f-5e136ea7e780
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 條件分支
+        type: if-else
+      height: 414
+      id: '1759385630181'
+      position:
+        x: 386.3855859133289
+        y: 629.2458422770853
+      positionAbsolute:
+        x: 386.3855859133289
+        y: 629.2458422770853
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: b6893ac6-ad64-4ae3-b590-ae2f3cb5d74d
+          role: system
+          text: "# 角色\n你是一個 O-RAN 系統的 API Payload 生成專家。\n\n# 核心任務\n你的唯一任務是分析使用者傳入的「意圖描述」，並為\
+            \ `get_ue_status` 這個工具生成一個**嚴格且唯一的 JSON payload**。你必須遵循底下的規則，且規則有優先級順序。\n\
+            \n# 知識庫 (地點定義)\n在執行規則之前，你必須先載入並理解這個地點定義知識庫。這是將使用者提到的地點名稱轉換為 API 所需 payload\
+            \ 的唯一依據。\n\n[\n  {\n    \"display_name\": \"電梯前\",\n    \"aliases\": [\"\
+            電梯\"],\n    \"payload\": {\"location\": \"131\"}\n  },\n  {\n    \"display_name\"\
+            : \"501前走廊\",\n    \"aliases\": [\"501走廊\"],\n    \"payload\": {\"location\"\
+            : \"132\"}\n  },\n  {\n    \"display_name\": \"502前走廊\",\n    \"aliases\"\
+            : [\"502走廊\"],\n    \"payload\": {\"all_edge\": \"true\"}\n  },\n  {\n\
+            \    \"display_name\": \"503會議室區域\",\n    \"aliases\": [\"貨梯前\", \"503會議室\"\
+            , \"茶水間\", \"貨梯\"],\n    \"payload\": {\"location\": \"135\"}\n  }\n]\n\
+            \n# 生成規則 (必須依序檢查，擇一使用)\n\n1.  **[最高優先] 檢查 UE ID**:\n    * 如果「意圖描述」包含一個明確的\
+            \ UE ID (通常是一串純數字)。\n    * **動作**: 生成 `{\"ueid\": \"...\"}` 格式的 payload，並立刻結束。\n\
+            \    * **範例**: \"幫我查 UE ID 112233 的狀態\" -> `{\"ueid\": \"112233\"}`\n\n\
+            2.  **[次高優先] 檢查地點**:\n    * 如果「意圖描述」中包含的字詞，符合上述「知識庫」中任何一個地點的 `display_name`\
+            \ 或其 `aliases` 陣列中的任何一個值。\n    * **動作**: 直接使用該地點物件中定義的 `payload` 作為最終輸出，並立刻結束。\n\
+            \    * **範例**: \"503會議室的網路如何\" -> `{\"location\": \"135\"}`\n    * **範例**:\
+            \ \"我想看502走廊的狀況\" -> `{\"all_edge\": \"true\"}`\n\n3.  **[第三優先] 檢查「受干擾」意圖**:\n\
+            \    * 如果「意圖描述」中包含 \"受干擾\" 或 \"被干擾\" 的關鍵字。\n    * **動作**: 生成固定的 payload\
+            \ `{\"all_edge\": \"true\"}`，並立刻結束。\n    * **範例**: \"查詢場域中所有受干擾的 UE\"\
+            \ -> `{\"all_edge\": \"true\"}`\n\n4.  **[第四優先] 檢查「未受干擾」意圖**:\n    * 如果「意圖描述」中包含\
+            \ \"未受干擾\" 或 \"無干擾\" 的關鍵字。\n    * **動作**: 生成固定的 payload `{\"all_center\"\
+            : \"true\"}`，並立刻結束。\n    * **範例**: \"篩選出未受干擾的設備\" -> `{\"all_center\"\
+            : \"true\"}`\n\n5.  **[第五優先] 檢查「效能最差比例」意圖**:\n    * 如果「意圖描述」中包含 \"最差\"\
+            、\"效能最爛\" 等字眼，並跟著一個百分比數字 (例如 `20%` 或 `百分之二十`)。\n    * **動作**: 提取該百分比數字，將其轉換為小數（例如\
+            \ 20% -> 0.2），然後生成 `{\"worst_part\": 轉換後的小數}` 格式的 payload，並立刻結束。\n   \
+            \ * **範例**: \"列出效能最差10%的UE\" -> `{\"worst_part\": 0.1}`\n\n6.  **[預設/最低優先]\
+            \ 查詢全部**:\n    * 如果以上所有條件皆不符合。\n    * **動作**: 生成一個空的 JSON 物件 `{}` 作為 payload。\n\
+            \    * **範例**: \"查一下現在的UE狀況\" -> `{}`\n\n# 輸出格式\n* **絕對禁止** 包含任何解釋、註解、思考過程或\
+            \ ```json ... ``` 這樣的 markdown 格式。\n* 你的輸出**必須**直接就是 payload 本身，一個純粹的、機器可讀的\
+            \ JSON 物件。\n\n---\n意圖描述:\n{{#1759385584551.intent_description#}}"
+        selected: false
+        title: 查詢UE的payload
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1759386679650'
+      position:
+        x: 759.1525521155614
+        y: 444.54654927774084
+      positionAbsolute:
+        x: 759.1525521155614
+        y: 444.54654927774084
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1759386679650'
+          - text
+          value_type: string
+          variable: API_info
+        - value_selector:
+          - '1759993833982'
+          - output
+          value_type: string
+          variable: API_endpoint
+        selected: false
+        title: 結束 回傳參數
+        type: end
+      height: 116
+      id: '1759389115212'
+      position:
+        x: 1427.1525521155613
+        y: 444.54654927774084
+      positionAbsolute:
+        x: 1427.1525521155613
+        y: 444.54654927774084
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 7c75d17d-e3f1-43e2-afa8-407ce90d7c53
+          role: system
+          text: "# 角色\n你是一個 O-RAN 系統的 API Payload 生成專家。\n\n# 核心任務\n你的唯一任務是分析使用者傳入的「意圖描述」，並為\
+            \ `enable_im` 這個工具生成一個**嚴格、完整且唯一的 JSON payload**。你必須遵循一個多步驟的生成流程，並使用下方提供的知識庫來做出正確的判斷。\n\
+            \n# 知識庫\n\n### 知識庫 1: 基礎 Payload 模板\n所有 `enable_im` 的 payload 都**必須**以此模板作為起點。\n\
+            {\n  \"manualNumOfNonInterferedRb\": -1,\n  \"percentOfEdgeUeNumForGtCaseBound\"\
+            : 0.5,\n  \"percentOfEdgeUeNumForLtCaseBound\": 0.3,\n  \"percentOfCenterUeAvgTputForGtCase\"\
+            : 0.75,\n  \"percentOfCenterUeAvgTputForEqCase\": 0.75,\n  \"percentOfCenterUeAvgTputForLtCase\"\
+            : 0.75\n}\n\n### 知識庫 2: 地點定義\n這是將使用者提到的地點名稱轉換為 API 所需 `filter` 和 `optimization_method`\
+            \ 的唯一依據。\n[\n  {\n    \"display_name\": \"電梯前\",\n    \"aliases\": [\"\
+            電梯\"],\n    \"filter_payload\": {\"location\": \"131\"},\n    \"optimization_method\"\
+            : 3\n  },\n  {\n    \"display_name\": \"501前走廊\",\n    \"aliases\": [\"\
+            501走廊\"],\n    \"filter_payload\": {\"location\": \"132\"},\n    \"optimization_method\"\
+            : 3\n  },\n  {\n    \"display_name\": \"502前走廊\",\n    \"aliases\": [\"\
+            502走廊\"],\n    \"filter_payload\": {\"all_edge\": true},\n    \"optimization_method\"\
+            : 2\n  },\n  {\n    \"display_name\": \"503會議室區域\",\n    \"aliases\":\
+            \ [\"貨梯前\", \"503會議室\", \"茶水間\", \"貨梯\"],\n    \"filter_payload\": {\"\
+            location\": \"135\"},\n    \"optimization_method\": 3\n  }\n]\n\n# Payload\
+            \ 生成流程\n\n你必須嚴格按照以下步驟來構建最終的 JSON payload：\n\n### **步驟 1: 初始化 Payload**\n\
+            * 從「知識庫 1: 基礎 Payload 模板」完整複製其內容，作為你的工作基礎。\n\n### **步驟 2: 決定 `optimization_inc_percent`**\n\
+            * 檢查「意圖描述」中是否包含提升效能的比例，例如 \"提升20%\"、\"增加30%\"、\"優化0.15\"。\n* 如果找到，將其轉換為小數，然後再轉換為**字串**格式填入。\n\
+            * 如果沒有找到，使用預設值 `\"0.1\"`。\n\n### **步驟 3: 決定 `filter`, `optimization_method`,\
+            \ 和 `optimization_param` (依序檢查，擇一使用)**\n這部分是互斥的，只要符合一項，就必須立刻決定這三個欄位的值，並跳到步驟\
+            \ 4。\n\n1.  **[最高優先] 檢查地點**:\n    * 如果「意圖描述」中的地名符合「知識庫 2」中的任何 `display_name`\
+            \ 或 `aliases`。\n    * **動作**:\n        * `filter` 欄位設為該地點對應的 `filter_payload`。\n\
+            \        * `optimization_method` 欄位設為該地點對應的 `optimization_method` 值。\n\
+            \        * `optimization_param` 欄位設為 `null`。\n    * **範例**: \"優化503會議室\"\
+            \ -> `filter` 為 `{\"location\": \"135\"}`, `optimization_method` 為 `3`,\
+            \ `optimization_param` 為 `null`。\n\n2.  **[次高優先] 檢查「效能最差比例」**:\n    *\
+            \ 如果「意圖描述」中包含 \"最差...%\" 或 \"效能最爛...%\"。\n    * **動作**:\n        * 提取百分比並轉為小數\
+            \ (例如 20% -> 0.2)。\n        * `filter` 欄位設為 `{\"worst_part\": 小數}`。\n\
+            \        * `optimization_method` 欄位設為 `6`。\n        * `optimization_param`\
+            \ 欄位設為 `{\"worst_percent\": 小數}`。\n    * **範例**: \"優化最差20%的UE\" -> `filter`\
+            \ 為 `{\"worst_part\": 0.2}`, `optimization_method` 為 `6`, `optimization_param`\
+            \ 為 `{\"worst_percent\": 0.2}`。\n\n3.  **[第三優先] 檢查「受干擾」意圖**:\n    * 如果「意圖描述」中包含\
+            \ \"受干擾\" 或 \"被干擾\"。\n    * **動作**:\n        * `filter` 欄位設為 `{\"all_edge\"\
+            : true}`。\n        * `optimization_method` 欄位設為 `2`。\n        * `optimization_param`\
+            \ 欄位設為 `null`。\n    * **範例**: \"改善受干擾的UE\" -> `filter` 為 `{\"all_edge\"\
+            : true}`, `optimization_method` 為 `2`, `optimization_param` 為 `null`。\n\
+            \n4.  **[第四優先] 檢查「未受干擾」意圖**:\n    * 如果「意圖描述」中包含 \"未受干擾\" 或 \"無干擾\"。\n\
+            \    * **動作**:\n        * `filter` 欄位設為 `{\"all_center\": true}`。\n  \
+            \      * `optimization_method` 欄位設為 `3`。\n        * `optimization_param`\
+            \ 欄位設為 `null`。\n    * **範例**: \"優化未受干擾的使用者\" -> `filter` 為 `{\"all_center\"\
+            : true}`, `optimization_method` 為 `3`, `optimization_param` 為 `null`。\n\
+            \n5.  **[預設/最低優先] 優化整個場域**:\n    * 如果以上條件皆不符合。\n    * **動作**:\n      \
+            \  * `filter` 欄位設為 `{}`。\n        * `optimization_method` 欄位設為 `4`。\n\
+            \        * `optimization_param` 欄位設為 `null`。\n    * **範例**: \"開啟優化\" 或\
+            \ \"改善網路\" -> `filter` 為 `{}`, `optimization_method` 為 `4`, `optimization_param`\
+            \ 為 `null`。\n\n\n### **步驟 4: 組合最終 Payload**\n* 將步驟 1, 2, 3 中決定的所有欄位組合起來，生成最終的\
+            \ JSON 物件。\n\n# 輸出格式\n* **絕對禁止** 包含任何解釋、註解、思考過程或 ```json ... ``` 這樣的 markdown\
+            \ 格式。\n* 你的輸出**必須**直接就是 payload 本身，一個純粹的、機器可讀的 JSON 物件。\n\n---\n意圖描述:\n\
+            {{#1759385584551.intent_description#}}"
+        selected: false
+        title: 執行IM的payload
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1759389583173'
+      position:
+        x: 759.1525521155614
+        y: 590.5221181308654
+      positionAbsolute:
+        x: 759.1525521155614
+        y: 590.5221181308654
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1759389583173'
+          - text
+          value_type: string
+          variable: API_info
+        - value_selector:
+          - '17599940257970'
+          - output
+          value_type: string
+          variable: API_endpoint
+        selected: false
+        title: 結束 回傳參數
+        type: end
+      height: 116
+      id: '1759389618068'
+      position:
+        x: 1427.1525521155613
+        y: 590.5221181308654
+      positionAbsolute:
+        x: 1427.1525521155613
+        y: 590.5221181308654
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: d9b6ed76-c4c6-48b2-bff6-3c9b7cd59325
+          role: system
+          text: "# 角色\n你是一個 O-RAN 系統的 API Payload 生成專家。\n\n# 核心任務\n你的唯一任務是分析使用者傳入的「意圖描述」，並為\
+            \ `simulate_im` 這個工具生成一個**嚴格、完整且唯一的 JSON payload**。你必須遵循一個多步驟的生成流程，並使用下方提供的知識庫來做出正確的判斷。\n\
+            \n# 知識庫\n\n### 知識庫 1: 基礎 Payload 模板\n所有 `simulate_im` 的 payload 都**必須**以此模板作為起點。\n\
+            {\n  \"manualNumOfNonInterferedRb\": -1,\n  \"percentOfEdgeUeNumForGtCaseBound\"\
+            : 0.5,\n  \"percentOfEdgeUeNumForLtCaseBound\": 0.3,\n  \"percentOfCenterUeAvgTputForGtCase\"\
+            : 0.75,\n  \"percentOfCenterUeAvgTputForEqCase\": 0.75,\n  \"percentOfCenterUeAvgTputForLtCase\"\
+            : 0.75\n}\n\n### 知識庫 2: 地點定義\n這是將使用者提到的地點名稱轉換為 API 所需 `filter` 和 `optimization_method`\
+            \ 的唯一依據。\n[\n  {\n    \"display_name\": \"電梯前\",\n    \"aliases\": [\"\
+            電梯\"],\n    \"filter_payload\": {\"location\": \"131\"},\n    \"optimization_method\"\
+            : 3\n  },\n  {\n    \"display_name\": \"501前走廊\",\n    \"aliases\": [\"\
+            501走廊\"],\n    \"filter_payload\": {\"location\": \"132\"},\n    \"optimization_method\"\
+            : 3\n  },\n  {\n    \"display_name\": \"502前走廊\",\n    \"aliases\": [\"\
+            502走廊\"],\n    \"filter_payload\": {\"all_edge\": true},\n    \"optimization_method\"\
+            : 2\n  },\n  {\n    \"display_name\": \"503會議室區域\",\n    \"aliases\":\
+            \ [\"貨梯前\", \"503會議室\", \"茶水間\", \"貨梯\"],\n    \"filter_payload\": {\"\
+            location\": \"135\"},\n    \"optimization_method\": 3\n  }\n]\n\n# Payload\
+            \ 生成流程\n\n你必須嚴格按照以下步驟來構建最終的 JSON payload：\n\n### **步驟 1: 初始化 Payload**\n\
+            * 從「知識庫 1: 基礎 Payload 模板」完整複製其內容，作為你的工作基礎。\n\n### **步驟 2: 決定 `optimization_inc_percent`**\n\
+            * 檢查「意圖描述」中是否包含提升效能的比例，例如 \"提升20%\"、\"增加30%\"、\"優化0.15\"。\n* 如果找到，將其轉換為小數，然後再轉換為**字串**格式填入。\n\
+            * 如果沒有找到，使用預設值 `\"0.1\"`。\n\n### **步驟 3: 決定 `filter`, `optimization_method`,\
+            \ 和 `optimization_param` (依序檢查，擇一使用)**\n這部分是互斥的，只要符合一項，就必須立刻決定這三個欄位的值，並跳到步驟\
+            \ 4。\n\n1.  **[最高優先] 檢查地點**:\n    * 如果「意圖描述」中的地名符合「知識庫 2」中的任何 `display_name`\
+            \ 或 `aliases`。\n    * **動作**:\n        * `filter` 欄位設為該地點對應的 `filter_payload`。\n\
+            \        * `optimization_method` 欄位設為該地點對應的 `optimization_method` 值。\n\
+            \        * `optimization_param` 欄位設為 `null`。\n    * **範例**: \"模擬優化503會議室\"\
+            \ -> `filter` 為 `{\"location\": \"135\"}`, `optimization_method` 為 `3`,\
+            \ `optimization_param` 為 `null`。\n\n2.  **[次高優先] 檢查「效能最差比例」**:\n    *\
+            \ 如果「意圖描述」中包含 \"最差...%\" 或 \"效能最爛...%\"。\n    * **動作**:\n        * 提取百分比並轉為小數\
+            \ (例如 20% -> 0.2)。\n        * `filter` 欄位設為 `{\"worst_part\": 小數}`。\n\
+            \        * `optimization_method` 欄位設為 `6`。\n        * `optimization_param`\
+            \ 欄位設為 `{\"worst_percent\": 小數}`。\n    * **範例**: \"模擬優化最差20%的UE\" -> `filter`\
+            \ 為 `{\"worst_part\": 0.2}`, `optimization_method` 為 `6`, `optimization_param`\
+            \ 為 `{\"worst_percent\": 0.2}`。\n\n3.  **[第三優先] 檢查「受干擾」意圖**:\n    * 如果「意圖描述」中包含\
+            \ \"受干擾\" 或 \"被干擾\"。\n    * **動作**:\n        * `filter` 欄位設為 `{\"all_edge\"\
+            : true}`。\n        * `optimization_method` 欄位設為 `2`。\n        * `optimization_param`\
+            \ 欄位設為 `null`。\n    * **範例**: \"模擬改善受干擾的UE\" -> `filter` 為 `{\"all_edge\"\
+            : true}`, `optimization_method` 為 `2`, `optimization_param` 為 `null`。\n\
+            \n4.  **[第四優先] 檢查「未受干擾」意圖**:\n    * 如果「意圖描述」中包含 \"未受干擾\" 或 \"無干擾\"。\n\
+            \    * **動作**:\n        * `filter` 欄位設為 `{\"all_center\": true}`。\n  \
+            \      * `optimization_method` 欄位設為 `3`。\n        * `optimization_param`\
+            \ 欄位設為 `null`。\n    * **範例**: \"模擬優化未受干擾的使用者\" -> `filter` 為 `{\"all_center\"\
+            : true}`, `optimization_method` 為 `3`, `optimization_param` 為 `null`。\n\
+            \n5.  **[預設/最低優先] 優化整個場域**:\n    * 如果以上條件皆不符合。\n    * **動作**:\n      \
+            \  * `filter` 欄位設為 `{}`。\n        * `optimization_method` 欄位設為 `4`。\n\
+            \        * `optimization_param` 欄位設為 `null`。\n    * **範例**: \"模擬開啟優化\"\
+            \ 或 \"模擬改善網路\" -> `filter` 為 `{}`, `optimization_method` 為 `4`, `optimization_param`\
+            \ 為 `null`。\n\n\n### **步驟 4: 組合最終 Payload**\n* 將步驟 1, 2, 3 中決定的所有欄位組合起來，生成最終的\
+            \ JSON 物件。\n\n# 輸出格式\n* **絕對禁止** 包含任何解釋、註解、思考過程或 ```json ... ``` 這樣的 markdown\
+            \ 格式。\n* 你的輸出**必須**直接就是 payload 本身，一個純粹的、機器可讀的 JSON 物件。\n\n---\n意圖描述:\n\
+            {{#1759385584551.intent_description#}}"
+        selected: false
+        title: 模擬優化IM的payload
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1759390459081'
+      position:
+        x: 759.1525521155614
+        y: 725.5465492777408
+      positionAbsolute:
+        x: 759.1525521155614
+        y: 725.5465492777408
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 6678505b-c2cf-4e43-813e-753437277edd
+          role: system
+          text: "# 角色\n你是一個 O-RAN 系統的 API Payload 生成專家。\n\n# 核心任務\n你的唯一任務是分析使用者傳入的「意圖描述」，並為\
+            \ `enable_qoe` 這個工具生成一個**嚴格、完整且唯一的 JSON payload**。\n\n# Payload 生成流程\n\
+            \n你必須嚴格按照以下步驟來構建最終的 JSON payload：\n\n### **步驟 1: 提取 `ueid` (必要參數)**\n\
+            * 從「意圖描述」中找出明確指定的 UE ID。UE ID 通常是一串數字。\n* 你必須將提取出的 UE ID 作為字串(string)格式。\n\
+            \n### **步驟 2: 決定 `optimization_inc_percent` (可選參數)**\n* 接著，檢查「意圖描述」中是否包含提升效能的比例，例如\
+            \ \"提升30%\"、\"增加0.4\"、\"提升百分之二十五\"。\n* **如果找到**: 將其轉換為浮點數(float)格式 (例如\
+            \ 30% -> 0.3)。\n* **如果沒有找到**: 使用預設值 `0.1`。\n\n### **步驟 3: 組合最終 Payload**\n\
+            * 將步驟 1 和 步驟 2 中得到的 `ueid` 和 `optimization_inc_percent` 組合起來，生成最終的 JSON\
+            \ 物件。\n* 最終格式為 `{\"ueid\": \"...\", \"optimization_inc_percent\": ...}`。\n\
+            \n# 範例\n\n* **範例 1 (使用者只提供 UE ID)**\n    * 意圖描述: \"幫我優化 UE ID 111515\"\
+            \n    * 生成結果: `{\"ueid\": \"111515\", \"optimization_inc_percent\": 0.1}`\n\
+            \n* **範例 2 (使用者提供所有資訊)**\n    * 意圖描述: \"幫我優化 UE 111515，提升 30% 流量\"\n \
+            \   * 生成結果: `{\"ueid\": \"111515\", \"optimization_inc_percent\": 0.3}`\n\
+            \n* **範例 3 (使用者使用小數)**\n    * 意圖描述: \"對 223344 啟用 QoE，目標提升 0.25\"\n  \
+            \  * 生成結果: `{\"ueid\": \"223344\", \"optimization_inc_percent\": 0.25}`\n\
+            \n\n# 輸出格式\n* **絕對禁止** 包含任何解釋、註解、思考過程或 ```json ... ``` 這樣的 markdown 格式。\n\
+            * 你的輸出**必須**直接就是 payload 本身，一個純粹的、機器可讀的 JSON 物件。\n\n---\n意圖描述:\n{{#1759385584551.intent_description#}}"
+        selected: false
+        title: 執行qoe的payload
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1759390584676'
+      position:
+        x: 759.1525521155614
+        y: 850.5465492777408
+      positionAbsolute:
+        x: 759.1525521155614
+        y: 850.5465492777408
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 3ca8af1d-e3ba-40eb-8d80-2d375fbd32f6
+          role: system
+          text: "# 角色\n你是一個 O-RAN 系統的 API Payload 生成專家。\n\n# 核心任務\n你的唯一任務是分析使用者傳入的「意圖描述」，並為\
+            \ `simulate_qoe` 這個工具生成一個**嚴格、完整且唯一的 JSON payload**。\n\n# Payload 生成流程\n\
+            \n你必須嚴格按照以下步驟來構建最終的 JSON payload：\n\n### **步驟 1: 提取 `ueid` (必要參數)**\n\
+            * 從「意圖描述」中找出明確指定的 UE ID。UE ID 通常是一串數字。\n* 你必須將提取出的 UE ID 作為字串(string)格式。\n\
+            \n### **步驟 2: 決定 `optimization_inc_percent` (可選參數)**\n* 接著，檢查「意圖描述」中是否包含提升效能的比例，例如\
+            \ \"提升30%\"、\"增加0.4\"、\"提升百分之二十五\"。\n* **如果找到**: 將其轉換為浮點數(float)格式 (例如\
+            \ 30% -> 0.3)。\n* **如果沒有找到**: 使用預設值 `0.1`。\n\n### **步驟 3: 組合最終 Payload**\n\
+            * 將步驟 1 和 步驟 2 中得到的 `ueid` 和 `optimization_inc_percent` 組合起來，生成最終的 JSON\
+            \ 物件。\n* 最終格式為 `{\"ueid\": \"...\", \"optimization_inc_percent\": ...}`。\n\
+            \n# 範例\n\n* **範例 1 (使用者只提供 UE ID)**\n    * 意圖描述: \"幫我模擬優化 UE ID 111515\
+            \ 的效果\"\n    * 生成結果: `{\"ueid\": \"111515\", \"optimization_inc_percent\"\
+            : 0.1}`\n\n* **範例 2 (使用者提供所有資訊)**\n    * 意圖描述: \"我想看看如果幫 UE 111515 提升\
+            \ 30% 流量會怎樣\"\n    * 生成結果: `{\"ueid\": \"111515\", \"optimization_inc_percent\"\
+            : 0.3}`\n\n* **範例 3 (使用者使用小數)**\n    * 意圖描述: \"模擬對 223344 啟用 QoE，目標提升\
+            \ 0.25\"\n    * 生成結果: `{\"ueid\": \"223344\", \"optimization_inc_percent\"\
+            : 0.25}`\n\n\n# 輸出格式\n* **絕對禁止** 包含任何解釋、註解、思考過程或 ```json ... ``` 這樣的 markdown\
+            \ 格式。\n* 你的輸出**必須**直接就是 payload 本身，一個純粹的、機器可讀的 JSON 物件。\n\n---\n意圖描述:\n\
+            {{#1759385584551.intent_description#}}"
+        selected: false
+        title: 模擬優化qoe的payload
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1759390608073'
+      position:
+        x: 759.1525521155614
+        y: 984.9067098384761
+      positionAbsolute:
+        x: 759.1525521155614
+        y: 984.9067098384761
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1759390459081'
+          - text
+          value_type: string
+          variable: API_info
+        - value_selector:
+          - '17599940255700'
+          - output
+          value_type: string
+          variable: API_endpoint
+        selected: false
+        title: 結束 回傳參數
+        type: end
+      height: 116
+      id: '1759390668315'
+      position:
+        x: 1427.1525521155613
+        y: 725.5465492777408
+      positionAbsolute:
+        x: 1427.1525521155613
+        y: 725.5465492777408
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1759390584676'
+          - text
+          value_type: string
+          variable: API_info
+        - value_selector:
+          - '17599940253290'
+          - output
+          value_type: string
+          variable: API_endpoint
+        selected: false
+        title: 結束 回傳參數
+        type: end
+      height: 116
+      id: '1759390685294'
+      position:
+        x: 1427.1525521155613
+        y: 850.5465492777408
+      positionAbsolute:
+        x: 1427.1525521155613
+        y: 850.5465492777408
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1759390608073'
+          - text
+          value_type: string
+          variable: API_info
+        - value_selector:
+          - '17599940250500'
+          - output
+          value_type: string
+          variable: API_endpoint
+        selected: false
+        title: 結束 回傳參數
+        type: end
+      height: 116
+      id: '1759390692590'
+      position:
+        x: 1427.1525521155613
+        y: 984.9067098384761
+      positionAbsolute:
+        x: 1427.1525521155613
+        y: 984.9067098384761
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs: []
+        selected: false
+        title: 結束
+        type: end
+      height: 54
+      id: '1759460275946'
+      position:
+        x: 764.1271267629678
+        y: 1350.9765816565978
+      positionAbsolute:
+        x: 764.1271267629678
+        y: 1350.9765816565978
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        selected: false
+        template: '{{ n8n_base_url }}e8f1cc4d-7560-4ae6-8ec2-dece817160be'
+        title: 指定工具路徑
+        type: template-transform
+        variables:
+        - value_selector:
+          - env
+          - n8n_base_url
+          variable: n8n_base_url
+      height: 54
+      id: '1759993833982'
+      position:
+        x: 1093.1525521155613
+        y: 444.54654927774084
+      positionAbsolute:
+        x: 1093.1525521155613
+        y: 444.54654927774084
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        selected: true
+        template: '{{ n8n_base_url }}7aa374ea-d239-462c-987e-42872a27133e'
+        title: 指定工具路徑
+        type: template-transform
+        variables:
+        - value_selector:
+          - env
+          - n8n_base_url
+          variable: n8n_base_url
+      height: 54
+      id: '17599940250500'
+      position:
+        x: 1093.1525521155613
+        y: 984.9067098384761
+      positionAbsolute:
+        x: 1093.1525521155613
+        y: 984.9067098384761
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        selected: false
+        template: '{{ n8n_base_url }}fbc98177-6e62-4738-9e47-2312896ff5da'
+        title: 指定工具路徑
+        type: template-transform
+        variables:
+        - value_selector:
+          - env
+          - n8n_base_url
+          variable: n8n_base_url
+      height: 54
+      id: '17599940253290'
+      position:
+        x: 1093.1525521155613
+        y: 850.5465492777408
+      positionAbsolute:
+        x: 1093.1525521155613
+        y: 850.5465492777408
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        selected: false
+        template: '{{ n8n_base_url }}da0e5281-0fbc-4c30-adb6-76b23824ec28'
+        title: 指定工具路徑
+        type: template-transform
+        variables:
+        - value_selector:
+          - env
+          - n8n_base_url
+          variable: n8n_base_url
+      height: 54
+      id: '17599940255700'
+      position:
+        x: 1093.1525521155613
+        y: 725.5465492777408
+      positionAbsolute:
+        x: 1093.1525521155613
+        y: 725.5465492777408
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        selected: false
+        template: '{{ n8n_base_url }}34450a85-c8b0-44c0-9ef5-e02ce3b77b43'
+        title: 指定工具路徑
+        type: template-transform
+        variables:
+        - value_selector:
+          - env
+          - n8n_base_url
+          variable: n8n_base_url
+      height: 54
+      id: '17599940257970'
+      position:
+        x: 1093.1525521155613
+        y: 590.5221181308654
+      positionAbsolute:
+        x: 1093.1525521155613
+        y: 590.5221181308654
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        selected: false
+        template: '{{ n8n_base_url }}e36fcc1c-bf54-4590-a894-c00bcb5c318c'
+        title: 指定工具路徑
+        type: template-transform
+        variables:
+        - value_selector:
+          - env
+          - n8n_base_url
+          variable: n8n_base_url
+      height: 54
+      id: '1760345424108'
+      position:
+        x: 764.1271267629678
+        y: 1102.4618619711096
+      positionAbsolute:
+        x: 764.1271267629678
+        y: 1102.4618619711096
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        outputs:
+        - value_selector: []
+          variable: API_info
+        - value_selector:
+          - '1760345424108'
+          - output
+          value_type: string
+          variable: API_endpoint
+        selected: false
+        title: 結束 回傳參數
+        type: end
+      height: 90
+      id: '1760345481936'
+      position:
+        x: 1093.1525521155613
+        y: 1102.4618619711096
+      positionAbsolute:
+        x: 1093.1525521155613
+        y: 1102.4618619711096
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        selected: false
+        template: '{{ n8n_base_url }}009cca49-effc-492a-b985-e14e0a95b133'
+        title: 指定工具路徑
+        type: template-transform
+        variables:
+        - value_selector:
+          - env
+          - n8n_base_url
+          variable: n8n_base_url
+      height: 54
+      id: '1760409751815'
+      position:
+        x: 759.1525521155614
+        y: 1213.1461478759024
+      positionAbsolute:
+        x: 759.1525521155614
+        y: 1213.1461478759024
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        outputs:
+        - value_selector: []
+          variable: API_info
+        - value_selector:
+          - '1760409751815'
+          - output
+          value_type: string
+          variable: API_endpoint
+        selected: false
+        title: 結束 回傳參數
+        type: end
+      height: 90
+      id: '1760409763408'
+      position:
+        x: 1093.1525521155613
+        y: 1213.1461478759024
+      positionAbsolute:
+        x: 1093.1525521155613
+        y: 1213.1461478759024
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: -208.84551685575548
+      y: -440.41945238211974
+      zoom: 0.8705505632961251
