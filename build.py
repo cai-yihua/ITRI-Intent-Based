@@ -46,6 +46,11 @@ HOST = os.getenv("HOST")
 API_PORT = os.getenv("API_PORT")
 API_ROOT = os.getenv("API_ROOT")
 API_VERSION = os.getenv("API_VERSION")
+DASHBOARD_VERSION = os.getenv("VERSION", "PROD")  # DEV or PROD
+
+# Dashboard 容器名稱配置
+DASHBOARD_DEV_CONTAINER_NAME = "itri-intent-dashboard-dev"
+DASHBOARD_PROD_CONTAINER_NAME = "itri-intent-dashboard-prod"
 
 dotenv_path = os.path.abspath(".env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
@@ -660,7 +665,9 @@ def step_backend():
 def step_dashboard():
     with step_timer("dashboard_init"):
         run_shell_script("run_dashboard.sh")
-        wait_for_container_ready(["itri-intent-dashboard"], timeout=50, require_healthy=False)
+        # 根據 DASHBOARD_VERSION 決定要等待的容器名稱
+        dashboard_container = DASHBOARD_DEV_CONTAINER_NAME if DASHBOARD_VERSION == "DEV" else DASHBOARD_PROD_CONTAINER_NAME
+        wait_for_container_ready([dashboard_container], timeout=50, require_healthy=False)
 
 
 # ────────────────── 主程式 ──────────────────
