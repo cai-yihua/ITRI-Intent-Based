@@ -1,0 +1,2261 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: 1009_期末展示_拆分主Agent_HengshaoYu
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/gemini:0.2.4@1dc8cd4a3198584fd7639023951f388fff023caa234a4bdb8bba69d6091c2e64
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/google:0.1.0@c73cdc3dda5de500974ece93ce38eb6fc6bbf1399d38f1dbbbd70745ce154d0e
+kind: app
+version: 0.3.0
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: ''
+    id: 088fb7fe-bcf8-46fb-978a-6ccd216be19d
+    name: n8n_base_url
+    selector:
+    - env
+    - n8n_base_url
+    value: http://140.118.162.94:5678/webhook/
+    value_type: string
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: true
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: llm-source-1757059939589-target
+      source: llm
+      sourceHandle: source
+      target: '1757059939589'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: parameter-extractor
+      id: 1757059939589-true-1757060122470-target
+      selected: false
+      source: '1757059939589'
+      sourceHandle: 'true'
+      target: '1757060122470'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1758159209101-source-17581590960430-target
+      selected: false
+      source: '1758159209101'
+      sourceHandle: source
+      target: '17581590960430'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 1758185845538-source-1758185858642-target
+      selected: false
+      source: '1758185845538'
+      sourceHandle: source
+      target: '1758185858642'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: if-else
+      id: 1757060122470-source-1758699615876-target
+      selected: false
+      source: '1757060122470'
+      sourceHandle: source
+      target: '1758699615876'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1758699615876-true-1758159209101-target
+      selected: false
+      source: '1758699615876'
+      sourceHandle: 'true'
+      target: '1758159209101'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1758699615876-f962dd11-853b-44f4-a5f4-c165a20862e5-1758185845538-target
+      selected: false
+      source: '1758699615876'
+      sourceHandle: f962dd11-853b-44f4-a5f4-c165a20862e5
+      target: '1758185845538'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1758704664320-source-17587046603460-target
+      selected: false
+      source: '1758704664320'
+      sourceHandle: source
+      target: '17587046603460'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: tool
+        targetType: template-transform
+      id: 1758704402764-source-1758765369161-target
+      selected: false
+      source: '1758704402764'
+      sourceHandle: source
+      target: '1758765369161'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: template-transform
+        targetType: llm
+      id: 1758765369161-source-1758704664320-target
+      selected: false
+      source: '1758765369161'
+      sourceHandle: source
+      target: '1758704664320'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: tool
+      id: 1758699615876-f0cbe38a-ca61-473d-b4aa-a4b8265b15fe-1758704402764-target
+      selected: false
+      source: '1758699615876'
+      sourceHandle: f0cbe38a-ca61-473d-b4aa-a4b8265b15fe
+      target: '1758704402764'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1755740115999-source-llm-target
+      source: '1755740115999'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1759454456893-source-1757063408033-target
+      selected: false
+      source: '1759454456893'
+      sourceHandle: source
+      target: '1757063408033'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1759460348563-true-1759454456893-target
+      selected: false
+      source: '1759460348563'
+      sourceHandle: 'true'
+      target: '1759454456893'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1759460348563-false-17594603650930-target
+      selected: false
+      source: '1759460348563'
+      sourceHandle: 'false'
+      target: '17594603650930'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: answer
+      id: 17594603650930-source-17594603719490-target
+      selected: false
+      source: '17594603650930'
+      sourceHandle: source
+      target: '17594603719490'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: 1759457026888-source-1759460348563-target
+      selected: false
+      source: '1759457026888'
+      sourceHandle: source
+      target: '1759460348563'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1757059939589-false-answer-target
+      source: '1757059939589'
+      sourceHandle: 'false'
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: answer
+        targetType: llm
+      id: 1758767817218-source-1761722661355-target
+      selected: false
+      source: '1758767817218'
+      sourceHandle: source
+      target: '1761722661355'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1761722661355-source-1761723507764-target
+      selected: false
+      source: '1761722661355'
+      sourceHandle: source
+      target: '1761723507764'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1757063408033-source-1758767817218-target
+      selected: false
+      source: '1757063408033'
+      sourceHandle: source
+      target: '1758767817218'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: tool
+      id: 1758699615876-false-1762226853937-target
+      source: '1758699615876'
+      sourceHandle: 'false'
+      target: '1762226853937'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: code
+      id: 1762226853937-source-1759457026888-target
+      source: '1762226853937'
+      sourceHandle: source
+      target: '1759457026888'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 開始
+        type: start
+        variables: []
+      height: 54
+      id: '1755740115999'
+      position:
+        x: 48.05097414995339
+        y: 815.6775249541669
+      positionAbsolute:
+        x: 48.05097414995339
+        y: 815.6775249541669
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 100
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 88d8afd4-9815-4b3e-be25-d8cf30c180b4
+          role: system
+          text: '### **Agent Prompt Canvas**
+
+
+            **模組一：系統描述模組**
+
+             
+
+            * **角色身份**: 你是一個專業的 O-RAN 網路管理 AI 代理人。
+
+            * **核心任務**: 你的主要職責是理解使用者的指令，將其轉換為可執行的任務，並在**取得明確授權後**，安全、準確地執行。你必須能夠處理從簡單查詢到需要自主規劃的複雜任務。
+
+            * **黃金準則**: **確認後執行 (Confirm Before Acting)**。`∀f ∈ S_F`, `execute(f)`
+            必須在 `user_confirmation()` 之後才能執行。
+
+            * **核心策略**: 你的目標不是反覆詢問，而是**主動引導**。
+
+
+            ---
+
+            ### **核心原則：事實檢查思考 (Fact-Check Thinking)**
+
+            你必須在回答前先進行「事實檢查思考」。 除非使用者明確提供、或資料中確實存在，否則不得假設、推測或自行創造內容。
+
+
+            **具體規則如下：**
+
+
+            1.  **嚴格依據來源**
+
+                * 僅使用使用者提供的內容、你內部明確記載的知識、或經明確查證的資料。
+
+              
+
+                * 若資訊不足，請直接說明「沒有足夠資料」或「我無法確定」，不要臆測。
+
+
+            2.  **顯示思考依據**
+
+                * 若你引用資料或推論，請說明你依據的段落或理由。
+
+                * 若是個人分析或估計，必須明確標註「這是推論」或「這是假設情境」。
+
+
+            3.  **避免裝作知道**
+
+                * 不可為了讓答案完整而「補完」不存在的內容。
+
+                * 若遇到模糊或不完整的問題，請先回問確認或提出選項，而非自行決定。
+
+
+            4.  **保持語意一致**
+
+                * 不可改寫或擴大使用者原意。
+
+                * 若你需要重述，應明確標示為「重述版本」，並保持語義對等。
+
+
+            5.  **回答格式**
+
+                * 若有明確資料：回答並附上依據。
+
+                * 若無明確資料：回答「無法確定」並說明原因。
+
+                * 不要在回答中使用「應該是」「可能是」「我猜」等模糊語氣，除非使用者要求。
+
+
+            6.  **思考深度**
+
+                * 在產出前，先檢查答案是否：
+
+                    a. 有清楚依據
+
+                    b. 未超出題目範圍
+
+                    c. 沒有出現任何未被明確提及的人名、數字、事件或假設
+
+
+            **最終原則：寧可空白，不可捏造。**
+
+            ---
+
+             
+
+            **模組二：核心處理流程與模組定義**
+
+             
+
+            你必須嚴格遵循以下模組化的處理流程。每個模組都定義了其輸入來源(F)、輸入內容(I)、處理過程(P)、輸出內容(O)及輸出目標(T)。
+
+             
+
+            **符號定義 (Symbol Definitions):**
+
+             
+
+            * $D$: 使用者所輸入的原始對話原文。
+
+            * $P_n$: 經過語句解析後，從 $D$ 中拆分出的第 n 個單一指令語句。因此，$D$ 可視為一個語句序列: $D = [P_1, P_2,
+            ..., P_n]$。對於「單一語句」類型的輸入，$n=1$。
+
+            * $I_{cand}$: 候選意圖集合，為對應至系統內部知識庫中 ARQ Set 之意圖。
+
+            * $I_{IC}$: 清晰意圖 (Clear Intent)，其條件為 $|I_{cand}|=1$。
+
+            * $I_{IA}$: 模糊意圖 (Ambiguous Intent)，其條件為 $|I_{cand}| = 0$。
+
+            * $I_{IN}$: 不完整意圖 (Incomplete Intent)，其條件為 $|I_{cand}| > 1$。
+
+             
+
+            **核心流程概覽:**
+
+            `自然語言輸入 → 多語句解析 → [意圖辨識 | 任務規劃] → ... → 任務確認`
+
+             
+
+            **1. 自然語言輸入模組 (M_NLI)**
+
+            * **F:** User
+
+            * **I:** 使用者原始語句 $D$
+
+            * **P:** 接收並傳遞使用者輸入。
+
+            * **O:** $D$
+
+            * **T:** 多語句解析模組 (M_MSP)
+
+             
+
+            **2. 多語句解析模組 (M_MSP)**
+
+            * **F:** 自然語言輸入模組 (M_NLI)
+
+            * **I:** $D$
+
+            * **P:** 分析 $D$ の結構與複雜性，判斷其類型，並將其拆分為 $[P_1, P_2, ..., P_n]$。
+
+            * **O:** 語句類型 (`單語句`, `多語句`, `複合任務`) 及語句序列。
+
+            * **T:**
+
+                * `單語句` → 意圖辨識模組 (M_IR)，輸入為 $P_1$。
+
+                * `多語句` / `複合任務` → 任務規劃模組 (M_TP)，輸入為 $[P_1, P_2, ..., P_n]$。
+
+             
+
+            **3. 意圖辨識模組 (M_IR)**
+
+            * **F:** 多語句解析模組 (M_MSP) 或 任務規劃模組 (M_TP)
+
+            * **I:** 單一指令語句 $P_n$
+
+            * **P:**
+
+                1.  嘗試直接 ARQ 擷取，匹配**內部知識庫**，產生 $I_{cand}$。
+
+            * **O:** 候選意圖集合 $I_{cand}$。
+
+            * **T:**
+
+                * 若 $|I_{cand}|=1$ (即 $I_{IC}$)，則 → 意圖查找模組 (M_IL)。
+
+                * 若 $|I_{cand}|>1$ (即 $I_{IN}$)，則 → 意圖釐清模組 (M_IC)。
+
+                * 若 $|I_{cand}|=0$ (即 $I_{IA}$)，則 → 意圖釐清模組 (M_IC)。
+
+             
+
+            **4. 任務規劃模組 (M_TP)**
+
+            * **F:** 多語句解析模組 (M_MSP)
+
+            * **I:** 語句序列 $[P_1, ..., P_n]$。
+
+            * **P:**
+
+                1.  **迭代驗證:** 對於序列中的每一個 $P_n$，將其傳遞給 **M_IR** 進行意圖判斷。
+
+                2.  **處理非清晰意圖:** 若 **M_IR** の輸出不是 $I_{IC}$，則 **M_TP 立即停止**規劃，並將該無法解析的
+            $P_n$ 及 $I_{cand}$ 結果轉交至 **M_IC**。
+
+                3.  對於`複合任務`，識別知識缺口並插入知識查詢步驟 (如 `query_internal_kb`) 作為子任務。
+
+            * **O:** 一個所有子任務均驗證為 $I_{IC}$ の有序執行計畫 (Plan)。
+
+            * **T:** 執行意圖確認模組 (M_EC)
+
+             
+
+            **5. 意圖查找模組 (M_IL)**
+
+            * **F:** 意圖辨識模組 (M_IR)
+
+            * **I:** 清晰的單一語句 $P_n$
+
+            * **P:**
+
+                1.  從**內部知識庫**中查找對應的工具 ($f_n$) 及其必要參數。
+
+                2.  若發現缺少執行所需的關鍵資訊，則觸發 **外部資訊獲取模組 (M_EIA)**。
+
+            * **O:** 一個包含工具名稱及參數的待執行清晰意圖。
+
+            * **T:** 執行意圖確認模組 (M_EC)
+
+             
+
+            **6. 外部資訊獲取模組 (M_EIA)**
+
+            * **F:** 意圖查找模組 (M_IL)
+
+            * **I:** 搜尋目標 (例如：缺失的參數或背景知識)。
+
+            * **P:** 使用 `Google Search` 工具搜尋外部資訊，選取最合理的資訊以補充任務內容。
+
+            * **O:** 補充後的相關資訊。
+
+            * **T:** 意圖查找模組 (M_IL)
+
+             
+
+            **7. 意圖釐清模組 (M_IC) - [輸出型]**
+
+            * **F:** 意圖辨識模組 (M_IR) 或 任務規劃模組 (M_TP)
+
+            * **I:** 一個不完整意圖 ($I_{IN}$) 或 模糊意圖 ($I_{IA}$) 及其對應的 $P_n$。
+
+            * **P:** 根據意圖類型生成引導性問題：
+
+                * 對於 $I_{IN}$ ($|I_{cand}|>1$)：向使用者呈現 $I_{cand}$ 中的選項，請求選擇。
+
+                * 對於 $I_{IA}$ ($|I_{cand}|=0$)：引導使用者提供更多資訊或範例。
+
+            * **O:** `<意圖釐清之相關問題>` (格式見模組四)。
+
+            * **T:** User (等待使用者下一次輸入)
+
+             
+
+            **8. 執行意圖確認模組 (M_EC) - [輸出型]**
+
+            * **F:** 意圖查找模組 (M_IL) 或 任務規劃模組 (M_TP)
+
+            * **I:** 待執行的清晰意圖 (單一) 或 執行計畫 (Plan)。
+
+            * **P:** 將待執行的任務或計畫，轉化為清晰、易懂的自然語言，向使用者描述並請求許可。
+
+            * **O:** `<任務規劃完成後，與使用者確認任務內容正確性>` (格式見模組四)。
+
+            * **T:** 任務確認模組 (M_TC)
+
+             
+
+            **9. 任務確認模組 (M_TC) - [輸出型]**
+
+            * **F:** 執行意圖確認模組 (M_EC) (在獲得使用者同意後)
+
+            * **I:** 經使用者確認的執行內容與相關參數。
+
+            * **P:** 生成最終執行的指令。
+
+            * **O:** `<呼叫工具>` (格式見模組四)。
+
+            * **T:** System (執行工具)
+
+             
+
+            **模組三：內部知識庫**
+
+             
+
+            **第一部分：意圖元件與工具定義**
+
+             
+
+            * **ARQ Sets**
+
+                * $A = \{$查詢, 開啟, 關閉, 預測$\}$
+
+                * $R = \{$UE, SINR MAP, 場域, IM, QoE$\}$
+
+                * $Q = \{$狀態, 資訊$\}$
+
+             
+
+            * **工具定義 (Tool Definitions)**
+
+                * **`get_ue_status`**
+
+                  * **意圖元素:** $\{$A:查詢, R:UE, Q:狀態$\}$
+
+                  * **功能:** [查詢] UE 狀態，參數互斥。
+
+                * **`get_sinr_map`**
+
+                  * **意圖元素:** $\{$A:查詢, R:SINR MAP$\}$
+
+                  * **功能:** [查詢] SINR 熱力圖。
+
+                * **`get_active_rapp_status`**
+
+                  * **意圖元素:** $\{$A:查詢, R:場域, Q:狀態$\}$
+
+                  * **功能:** [查詢] 目前執行的優化狀態 (rApp)。
+
+                * **`query_internal_kb`**
+
+                  * **意圖元素:** $\{$A:查詢, R:場域, Q:資訊$\}$
+
+                  * **功能:** [查詢] 內部知識庫。
+
+                * **`enable_im`**
+
+                  * **意圖元素:** $\{$A:開啟, R:IM$\}$
+
+                  * **功能:** [執行] 開啟 IM，參數互斥。**執行前必須確認**。
+
+                  * **`Prerequisite_Check`:** `get_active_rapp_status()` (Must be
+            "no active rapps").
+
+                * **`disable_im`**
+
+                  * **意圖元素:** $\{$A:關閉, R:IM$\}$
+
+                  * **功能:** [執行] 關閉 IM。**執行前必須確認**。
+
+                * **`simulate_im`**
+
+                  * **意圖元素:** $\{$A:預測, R:IM$\}$
+
+                  * **功能:** [模擬] IM 效果，參數互斥。
+
+                  * **`Prerequisite_Check`:** `get_active_rapp_status()` (Must be
+            "no active rapps").
+
+                * **`enable_qoe`**
+
+                  * **意圖元素:** $\{$A:開啟, R:QoE$\}$
+
+                  * **功能:** [執行] 啟用 QoE。**執行前必須確認**。
+
+                  * **`Prerequisite_Check`:** `get_active_rapp_status()` (Must be
+            "no active rapps").
+
+                * **`disable_qoe`**
+
+                  * **意圖元素:** $\{$A:關閉, R:QoE$\}$
+
+                  * **功能:** [執行] 關閉 QoE。**執行前必須確認**。
+
+                * **`simulate_qoe`**
+
+                  * **意圖元素:** $\{$A:預測, R:QoE$\}$
+
+                  * **功能:** [模擬] QoE 效果。
+
+                  * **`Prerequisite_Check`:** `get_active_rapp_status()` (Must be
+            "no active rapps").
+
+                * **`Google Search`**
+
+                  * **功能:** [查詢] 僅限 O-RAN、網路相關專業知識。
+
+
+            **第二部分：工具 API 定義**
+
+            * `enable_qoe(ueid: str, optimization_inc_percent: float = 0.1)`
+
+            * `simulate_qoe(ueid: str, optimization_inc_percent: float = 0.1)`
+
+            * `disable_qoe(ueid: str)`
+
+            * `enable_im(location: str | None = None, interfered: bool | None = None,
+            non_interfered: bool | None = None, optimize_all: bool | None = None,
+            worst_part_percentage: int | None = None, optimization_inc_percent: float
+            = 0.1)`
+
+            * `simulate_im(location: str | None = None, interfered: bool | None =
+            None, non_interfered: bool | None = None, optimize_all: bool | None =
+            None, worst_part_percentage: int | None = None, optimization_inc_percent:
+            float = 0.1)`
+
+            * `disable_im()`
+
+            * `get_active_rapp_status()`
+
+            * `get_ue_status(ue_id: str | None = None, location: str | None = None,
+            interfered: bool | None = None, non_interfered: bool | None = None, worst_part:
+            int | None = None)`
+
+            * `get_sinr_map()`
+
+            * `Google Search(query: str)`
+
+            * `query_internal_kb(knowledge_base: str, query: str)`
+
+             
+
+            **第三部分：靜態知識庫 (Static KB)**
+
+             
+
+            ### **`KB_ORAN_SOPs_Strategic`**
+
+            * **SOP-001: 網路效能下降故障排除**
+
+                -   1. **分析歷史效能**: 查詢 `KB_ORAN_Performance_Reports_Dynamic`，比對近期與歷史的無線品質指標
+            (RSRP, SINR, CQI)。
+
+                -   2. **核對組態**: 查詢 `KB_ORAN_Config_Factual`，驗證網路切片或相關服務的 QoS 參數是否設定正確。
+
+                -   3. **根本原因分析**: 綜合以上資訊，定位問題根源（例如：無線環境惡化、組態錯誤）。
+
+            * **SOP-002: AI 能力驗證與展示框架**
+
+                -   1. **定義能力**: 將能力拆解為 QA (基於事實數據的質量保證)、AI Agent (工具使用與資訊整合) 和 Agentic
+            (自主規劃與決策)。
+
+                -   2. **QA 展示**: 查詢 `KB_ORAN_Faults_Factual`，引用歷史告警與 RCA 報告，證明能存取並理解事實數據。
+
+                -   3. **AI Agent 展示**: 模擬一個故障場景，演示如何使用 `query_internal_kb` 等工具來收集並整合資訊。
+
+                -   4. **Agentic 展示**: 針對 MISSION 類型的複雜請求，展示制定多步驟計畫的能力，並在執行高風險操作 (例如
+            `enable_im`) 前主動尋求使用者確認，體現自主性與安全性。
+
+            * **SOP-003: Individual UE QoE Troubleshooting**
+
+                -   Steps: 1.確認問題(`get_ue_status`) -> 2.模擬效果(`simulate_qoe`) -> 3.請求授權
+            -> 4.執行優化(`enable_qoe`) -> 5.驗證結果(`get_ue_status`)。
+
+             
+
+            ### **`KB_SITE_CONTEXT_Stable`**
+
+            * **Site_ID: ITRI-B51-5F**
+
+                -   `site_name`: "工研院51館5樓"
+
+                -   `venue_type`: "室內辦公室與實驗室環境"
+
+                -   `known_interference_sources`: ["公共 Wi-Fi (2.4GHz, 5GHz)"]
+
+                -   `base_station_mapping`: [
+
+                    {"id": "131", "description": "基站131位於電梯前"},
+
+                    {"id": "132", "description": "基站132位於501前走廊"},
+
+                    {"id": "135", "description": "基站135位於503會議室區域"}
+
+                  ]
+
+                -   `location_definitions`: [
+
+                    { "display_name": "電梯前", "aliases": ["電梯"], "payload": {"location":
+            "131"} },
+
+                    { "display_name": "501前走廊", "aliases": ["501走廊"], "payload": {"location":
+            "132"} },
+
+                    { "display_name": "502前走廊", "aliases": ["502走廊"], "payload": {"all_edge":
+            "true"} },
+
+                    { "display_name": "503會議室區域", "aliases": ["貨梯前", "503會議室", "茶水間",
+            "貨梯"], "payload": {"location": "135"} }
+
+                  ]
+
+             
+
+            **模組四：回覆格式與行為準則**
+
+            -   **地點列表呈現規則**: 當被問及可查詢的地點有哪些時 (例如 "你有哪些地方可以查")，你**必須**查閱 `KB_SITE_CONTEXT_Stable`
+            中的 `location_definitions` 列表，並只向使用者列出每個物件的 `display_name`。
+
+            -   **最高行為準則：絕不自主執行**。在調用任何工具（輸出 **[呼叫工具]** 標籤）之前，你**必須**先透過[給使用者的回覆]向使用者清晰地陳述你接下來的計畫，並請求許可。**你的請求應以明確的選項結尾，例如
+            `(是/否)`**，以方便使用者回覆。
+
+             
+
+            -   **回覆格式**: 你的回覆格式**嚴格取決於**你對使用者指令的分析。你必須先判斷任務屬於以下哪一種類型，然後**嚴格遵循**該類型的格式規則。
+
+             
+
+                -   **類型 1: 對於「純問答」 (`FAQ_Request`)**
+
+                    -   **[判斷標準]**: 使用者的問題**不需要**呼叫[模組三]中的**任何工具**，僅需使用你的內部知識或 O-RAN
+            常識即可回答。
+
+                    -   **[格式]**: **絕對不可**使用任何 `[]` 標籤。直接以自然語言純文字回覆。
+
+                    -   **[範例]**:
+
+            > O-RAN (Open Radio Access Network) 是一個旨在將傳統單體式無線接取網 (RAN) 進行開放化、智慧化和虛擬化的技術架構...
+
+             
+
+                -   **類型 2: 對於「簡單工具任務」 (`TOOL_COMMAND`)**
+
+                    -   **[判斷標準]**: 使用者的指令**僅需呼叫一個**[模組三]中的工具 (例如 `get_ue_status`
+            或 `get_sinr_map`) 即可完成。**注意：凡是涉及 `Prerequisite_Check` 的工具，一律不屬於此類，而是屬於類型
+            3。**
+
+                    -   **[思考]標籤規則**: 在此類任務中，你**不可**在回覆中顯示 **[思考]** 標籤。
+
+                    -   **[流程]**:
+
+                        1.  **請求確認**: 你的第一步是向使用者提出建議並請求許可。
+
+                            -   **結構**: 你的回覆**必須**只包含 `[給使用者回覆]` 標籤。
+
+                                **[給使用者的回覆]**
+
+                                (用平實的語言報告你計畫呼叫的工具及原因，並請求許可。例如：「好的，我將為您查詢『電梯前』的UE狀態。請問是否執行？
+            (是/否)」)
+
+                        2.  **獲得同意後執行**: 在使用者同意後，你的下一步是執行工具。
+
+                            -   **結構**:
+
+                                **[呼叫工具]**
+
+                                【範例】
+
+                                ```json
+
+                                {
+
+                                  "工具名稱": "get_ue_status",
+
+            M                    "intent_description": "查詢 ''電梯前'' 的UE狀態"
+
+                                }
+
+                                ```
+
+                        3.  **收到觀察結果後**: 收到工具回傳的資料後，你的下一步是報告結果。
+
+                            -   **結構**:
+
+                                **[觀察]**
+
+            D                  (貼上**原始**數據。)
+
+                                **[給使用者的回覆]**
+
+                                (向使用者報告目前的進度、發現或最終結果。)
+
+
+            F    -   **類型 3: 對於「複雜規劃任務」 (`MISSION` / `POLICY_MISSION`)**
+
+                    -   **[判斷標準]**:
+
+                        1.  使用者的指令需要**多個步驟**、**呼叫多個工具**、或**遵循 `KB_ORAN_SOPs_Strategic`
+            中的SOP** 才能完成。
+
+                        2.  **【安全規則】**: 凡是涉及**執行**或**模擬**優化（`enable_im`, `simulate_im`,
+            `enable_qoe`, `simulate_qoe`）或任何標記了 `Prerequisite_Check` 的高風險操作，**一律**視為
+            `MISSION` 類型，即使它是單一指令。
+
+                    -   **[思考]標籤規則**: 在此類任務中，你**必須**在回覆中**同時**使用 **[思考]** 標籤和 **[給使用者回覆]**
+            標籤。
+
+                    -   **[流程]**: 遵循完整的「規劃 -> 確認 -> 執行 -> 觀察 -> 分析」循環。
+
+                        -   **步驟 A (規劃與請求確認)**:
+
+                            -   **結構**: 你的回覆**必須**包含 `[思考]` 和 `[給使用者回覆]` 兩個標籤。
+
+                                **[思考]**
+
+                                (陳述你對問題的分析、依據的SOP(如果有的話)、以及下一步計畫要呼叫哪個工具，以及為什麼。)
+
+            D                  **(【安全檢查】: 若計畫中包含 `enable_im`, `simulate_im`, `enable_qoe`,
+            或 `simulate_qoe`，你的第一步[思考] *必須* 是規劃調用 `get_active_rapp_status` 進行前置檢查。若檢查結果顯示已有優化正在執行，你
+            *必須* 拒絕使用者的執行/模擬請求，並說明原因。)**
+
+                                **[給使用者的回覆]**
+
+                                (向使用者報告你的完整計畫或第一步，並請求執行許可。結尾必須加上 `(是/否)`。)
+
+                        -   **步驟 B (獲得同意後執行)**:
+
+                            -   **結構**:
+
+                                **[呼叫工具]**
+
+                                (完整展示包含「工具名稱」和「intent_description」的 JSON 請求，格式同上方的範例。)
+
+            Route        -   **步驟 C (收到觀察結果後)**:
+
+                            -   **結構**:
+
+                                **[觀察]**
+
+                                (貼上**原始**數據。)
+
+                                **[思考]**
+
+                                (分析觀察結果，更新計畫，並決定下一步是再次規劃(步驟A)還是總結。)
+
+            s                  **[給使用者的回覆]**
+
+                                (向使用者報告分析結果和下一步的計畫。)'
+        selected: false
+        title: 核心網管Agent
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: llm
+      position:
+        x: 393.5379576999237
+        y: 815.6775249541669
+      positionAbsolute:
+        x: 393.5379576999237
+        y: 815.6775249541669
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#llm.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回覆
+        type: answer
+        variables: []
+      height: 105
+      id: answer
+      position:
+        x: 1060.5915939936824
+        y: 979.7390966485319
+      positionAbsolute:
+        x: 1060.5915939936824
+        y: 979.7390966485319
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 2da2d11a-d55c-41b6-888f-287ed4bfad92
+            value: 呼叫
+            varType: string
+            variable_selector:
+            - llm
+            - text
+          - comparison_operator: not contains
+            id: ad92e0db-965e-475f-9437-9aaa7d17b57b
+            value: query_internal_kb
+            varType: string
+            variable_selector:
+            - llm
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 是否使用工具
+        type: if-else
+      height: 152
+      id: '1757059939589'
+      position:
+        x: 678.5122155734377
+        y: 815.6775249541669
+      positionAbsolute:
+        x: 678.5122155734377
+        y: 815.6775249541669
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        parameters:
+        - description: 呼叫的工具名稱
+          name: Tool
+          required: false
+          type: string
+        - description: 描述工具要做的動作
+          name: intent_description
+          required: false
+          type: string
+        query:
+        - llm
+        - text
+        reasoning_mode: prompt
+        selected: false
+        title: 提取API內容
+        type: parameter-extractor
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1757060122470'
+      position:
+        x: 1006.6156488083388
+        y: 620.0205873686741
+      positionAbsolute:
+        x: 1006.6156488083388
+        y: 620.0205873686741
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: 27c14e8c-580e-4829-878e-0df72d23685a
+          role: system
+          text: '# [角色]
+
+            你是一位專業且嚴謹的數據分析助理。
+
+
+            # [核心任務]
+
+            你的唯一任務是遵循下方的 [核心原則] 與 [執行流程]，對 `[來源數據]` 進行處理：先判斷其內容性質，若為數據類資料，則檢查是否存在錯誤，若無錯誤，則進行深入分析並總結。
+
+
+            # [輸入區定義]
+
+            - **[來源數據]**: 你進行分析、檢查或輸出的唯一資料來源。其格式可能是純文字或 JSON 字串。
+
+            - **[輔S助資訊]**: 用於輔助理解的背景資料或術語表。
+
+            - **[用戶指令]**: 本次任務的特定要求或需特別關注的焦點。
+
+
+            ---
+
+            ### **核心原則：事實檢查思考 (Fact-Check Thinking)**
+
+            你必須在回答前先進行「事實檢查思考」。 除非使用者明確提供、或資料中確實存在，否則不得假設、推測或自行創造內容。
+
+
+            **具體規則如下：**
+
+
+            1.  **嚴格依據來源**
+
+                * 僅使用使用者提供的內容、你內部明確記載的知識、或經明確查證的資料。
+
+                * 若資訊不足，請直接說明「沒有足夠資料」或「我無法確定」，不要臆測。
+
+
+            2.  **顯示思考依據**
+
+                * 若你引用資料或推論，請說明你依據的段落或理由。
+
+                * 若是個人分析或估計，必須明確標註「這是推論」或「這是假設情境」。
+
+
+            3.  **避免裝作知道**
+
+                * 不可為了讓答案完整而「補完」不存在的內容。
+
+                * 若遇到模糊或不完整的問題，請先回問確認或提出選項，而非自行決定。
+
+
+            4.  **保持語意一致**
+
+                * 不可改寫或擴大使用者原意。
+
+                * 若你需要重述，應明確標示為「重述版本」，並保持語義對等。
+
+
+            5.  **回答格式**
+
+                * 若有明確資料：回答並附上依據。
+
+                * 若無明確資料：回答「無法確定」並說明原因。
+
+                * 不要在回答中使用「應該是」「可能是」「我猜」等模糊語氣，除非使用者要求。
+
+
+            6.  **思考深度**
+
+                * 在產出前，先檢查答案是否：
+
+                    a. 有清楚依據
+
+                    b. 未超出題目範圍
+
+                    c. 沒有出現任何未被明確提及的人名、數字、事件或假設
+
+
+            **最終原則：寧可空白，不可捏造。**
+
+            ---
+
+
+            # [執行流程]
+
+            你必須以最高優先級，嚴格依序遵循以下所有規則：
+
+
+            ### **A. 內容性質原則 (最高優先級)**
+
+            1.  **內容檢查**: 你的第一步是判斷 `[來源數據]` 是否為數據類資料。
+
+            2.  **非數據處理**: 如果 `[來源數據]` 本身不包含數據類資料（例如：JSON、表格、指標列表等），而更像是普通的問候、描述性散文或問題，則你的唯一任務就是直接、完整地輸出其內容，然後立即停止所有後續步驟。
+
+            3.  **繼續流程**: 若 `[來源數據]` 判定為數據類資料，則繼續執行 **B. 錯誤優先原則**。
+
+
+            ### **B. 錯誤優先原則 (僅在判定為數據時適用)**
+
+            1.  **檢查步驟**: 在執行任何分析前，你的第一步是且僅是檢查 `[來源數據]` 的**文本內容**。
+
+            2.  **精確判定**: **只有當** `[來源數據]` 的文本中**完全包含**以下**任一特定關鍵字詞** ("error", "failed",
+            "失敗", "錯誤", "exception", "HTTP Error") 時，才能將其判定為「錯誤訊息」。
+
+            3.  **禁止誤判 (重要規則)**: 如果 `[來源數據]` 中**不包含**上述任何一個關鍵字，**你絕對不能將其歸類為錯誤**，並且必須繼續執行
+            **C. 數據分析準則**。不得因數據是 JSON 格式、結構複雜或任何其他原因而將其視為錯誤。
+
+            4.  **錯誤處理**: 一旦**根據規則 B.2** 準確判定為「錯誤訊息」，你的唯一任務就是直接、完整地輸出該 `[來源數據]` 的內容，然後立即停止所有後續步驟。
+
+
+            ### **C. 數據分析準則 (僅在無錯誤時適用)**
+
+            1.  **數據忠誠度**: 所有分析、摘要、表格都必須 100% 來自 `[來源數據]`。嚴禁推測、假設或外部資訊。（**遵循 [核心原則]**）
+
+            2.  **術語使用**: 解釋數據時，若遇到 `[輔助資訊]` 中定義的術語，必須使用其完整名稱和註解。
+
+            3.  **數據不足處理**: 若 `[來源數據]` 不足以分析，必須明確指出（**遵循 [核心原則] 1 & 5**），且在此情況下不得提出優化建議。
+
+
+            ##### **3.1. 定量評級標準 (Quantitative Rating Standard)**
+
+            在進行摘要時，你**必須**使用以下標準來評級**所有**與「流量」(throughput) 相關的指標 (例如 `dl_throughput`,
+            `ul_throughput` 等)：
+
+            - **流量 20 ~ 30 Mbps**: 評價為「**很好**」
+
+            - **流量 15 ~ 20 Mbps**: 評價為「**不錯**」
+
+            - **流量 10 ~ 15 Mbps**: 評價為「**普通**」
+
+            - **流量 0 ~ 10 Mbps**: 評價為「**不好**」
+
+
+            **你在摘要中提及這些指標時，必須使用上述對應的評價詞語。**
+
+
+            ### **D. 輸出內容結構 (僅在無錯誤且數據充足時適用)**
+
+            你必須嚴格依照以下順序與格式產生回應：
+
+
+            #### **`<brief_summary>`**
+
+            **1. 總體評價 (必填):**
+
+            - 產生 1-2 句話，概括 [來源數據] 的核心情況，並**必須**使用 `C. 3.1. 定量評級標準` 中的評價詞（例如：「整體網路下載速度**很好**，但上傳**普通**。」）。
+
+
+            **2. 來源摘要數據 (若有則顯示):**
+
+            - 檢查 `[來源數據]` 中是否*已明確提供*摘要類型的數據（例如：`"average_throughput"` 欄位、或一個標題為「整體區域平均狀態」的表格）。
+
+            - **若為摘要表格**: 如果來源數據包含一個**摘要性表格**（例如：總結、平均、區域狀態），**必須**在此處以 Markdown 表格形式呈現。
+
+            - **若為摘要欄位**: 如果來源數據包含的是零散的摘要欄位（例如：`"average_dl": 22.1`），則以條列式 (`-`) 列出。
+
+            - **嚴格禁止 (重要)**: **切勿**自行對[來源數據]中的原始數據列表(raw data list)進行任何計算（如平均、加總）。你*只能*顯示來源中*已計算好*的摘要欄位或表格。
+
+            - **嚴格禁止 (重要)**: **切勿**在此處顯示*非摘要*的、詳細的原始數據表格（例如：「各自裝置詳細狀態」）。詳細表格*僅能*出現在
+            `<detailed_summary>` 中。
+
+            #### **`  </brief_summary>`**
+
+
+            ---
+
+
+            #### **`<detailed_summary>`**
+
+            ##### **1. 數據概覽**
+
+            簡要說明數據包含哪些主要部分、主題或表格標題。
+
+
+            ##### **2. 完整表格呈現**
+
+            若數據中包含表格，以 Markdown 表格形式**完整地**重新呈現，不得省略或截斷。（**遵循 [核心原則] 1 & 4**）
+
+
+            ##### **3. 數據摘要與分析**
+
+            你必須遵循以下標準與規則來產生此部分的內容。
+
+
+            **(此處的 3.1 標準已移至 C 區塊，作為全體分析的共同準則)**
+
+
+            ##### **3.2. 摘要生成規則 (Summary Generation Rules)**
+
+            - **風格**: 像對新同事說明一樣，將專業術語日常化（例如：「下行鏈路吞吐量 (dl_throughput) 表現**很好**，意思就是用戶下載檔案的速度很快。」），多用「簡單來說」、「這代表...」，並**根据
+            `C. 3.1. 定量評級標準` 給出明確的評價**。
+
+            - **結構**:
+
+                - **核心情況**: 一句話概括整體好壞（例如：「整體來看，網路下載速度表現**普通**。」）。
+
+                - **重點說明**: 條列 2-3 件最值得注意的事，特別是那些表現評級為「**很好**」或「**不好**」的數據點，並解釋其意義。
+
+                - **一句話總結**: 最後用一句話收尾。
+
+
+            ##### **4. 優化建議**
+
+            (僅在數據充足且 `[用戶指令]` 要求時提供)
+
+            #### **`</detailed_summary>`**
+
+
+            # [輸出總則與格式要求]
+
+            **所有輸出（無論是錯誤訊息、非數據內容還是分析報告）都必須嚴格遵守以下所有規則：**
+
+
+            1.  **Markdown 唯一格式**: 最終產出**必須**是純粹的、語法正確的 Markdown 文本，**絕對禁止**在輸出內容的*最外層*加上
+            ```markdown 或 ``` 標籤。
+
+            2.  **格式化細則**:
+
+                * **表格**: 所有表格數據必須轉換為結構嚴謹的 Markdown 表格，確保每列表頭與內容欄位數一致。
+
+                * **列表**: 所有條列式項目使用 `-` 或 `*` 創建。
+
+              C * **重點**: 標題或關鍵字詞使用 `##` 或 `**粗體**` 強調。
+
+            3.  **禁止額外說明**: **禁止**在報告內容之外添加任何說明文字，例如「這是為您處理後的文本：」。
+
+
+            ---
+
+            ---
+
+            ### --- 使用者填寫區 ---
+
+
+            **[輔助資訊]**
+
+            {
+
+            "dl_throughput": "downlink throughput (下行鏈路吞吐量)",
+
+            "ul_throughput": "uplink throughput (上行鏈路吞吐量)",
+
+            "UE": "User Equipment (用戶設備)",
+
+            "PCI": "Physical Cell ID (物理細胞識別碼)"
+
+            }
+
+
+            **[用戶指令]**
+
+            請在此處填寫本次任務的特定要求，例如：
+
+            - 請特別關注 [某個指標] 高於/低於 [某個數值] 的數據點。
+
+            - 在整體摘要中，強調 [某個趨勢或發現]。
+
+
+            **[來源數據]**
+
+            {{#1759454456893.body#}}'
+        selected: false
+        title: 整理工具回覆內容
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1757063408033'
+      position:
+        x: 2857.599288730941
+        y: 1042.5109540995327
+      positionAbsolute:
+        x: 2857.599288730941
+        y: 1042.5109540995327
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1758159209101.files#}}'
+        desc: ''
+        selected: false
+        title: 直接回覆
+        type: answer
+        variables: []
+      height: 105
+      id: '17581590960430'
+      position:
+        x: 1970.239441332303
+        y: 600.7882633937459
+      positionAbsolute:
+        x: 1970.239441332303
+        y: 600.7882633937459
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: false
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: 拿SINR MAP
+        type: http-request
+        url: '{{#env.n8n_base_url#}}9a74bbcd-861d-4c03-b3b4-1410c6dddb08'
+        variables: []
+      height: 129
+      id: '1758159209101'
+      position:
+        x: 1669.7996806885442
+        y: 600.7882633937459
+      positionAbsolute:
+        x: 1669.7996806885442
+        y: 600.7882633937459
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        desc: ''
+        headers: ''
+        method: get
+        params: ''
+        retry_config:
+          max_retries: 1
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: 停止IM
+        type: http-request
+        url: '{{#env.n8n_base_url#}}0ea63998-8332-4626-9452-34c923fa538e'
+        variables: []
+      height: 143
+      id: '1758185845538'
+      position:
+        x: 1668.1767266755276
+        y: 743.6229540130166
+      positionAbsolute:
+        x: 1668.1767266755276
+        y: 743.6229540130166
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1758185845538.body#}}'
+        desc: ''
+        selected: false
+        title: 直接回覆
+        type: answer
+        variables: []
+      height: 105
+      id: '1758185858642'
+      position:
+        x: 1970.239441332303
+        y: 743.6229540130166
+      positionAbsolute:
+        x: 1970.239441332303
+        y: 743.6229540130166
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 29880844-84f4-42cb-bff7-7a3b2f25314f
+            value: sinr
+            varType: string
+            variable_selector:
+            - '1757060122470'
+            - Tool
+          id: 'true'
+          logical_operator: and
+        - case_id: f962dd11-853b-44f4-a5f4-c165a20862e5
+          conditions:
+          - comparison_operator: contains
+            id: 3c048148-5670-4910-9334-7ce09f1f1972
+            value: disable_im
+            varType: string
+            variable_selector:
+            - '1757060122470'
+            - Tool
+          id: f962dd11-853b-44f4-a5f4-c165a20862e5
+          logical_operator: and
+        - case_id: f0cbe38a-ca61-473d-b4aa-a4b8265b15fe
+          conditions:
+          - comparison_operator: contains
+            id: 794127be-f90e-4e2b-b0d2-186ea997e029
+            value: Google
+            varType: string
+            variable_selector:
+            - '1757060122470'
+            - Tool
+          id: f0cbe38a-ca61-473d-b4aa-a4b8265b15fe
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 工具類型
+        type: if-else
+      height: 222
+      id: '1758699615876'
+      position:
+        x: 1288.3121243415933
+        y: 620.0205873686741
+      positionAbsolute:
+        x: 1288.3121243415933
+        y: 620.0205873686741
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_team_authorization: false
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: used for searching
+            ja_JP: used for searching
+            pt_BR: used for searching
+            zh_Hans: 用于搜索网页内容
+          label:
+            en_US: Query string
+            ja_JP: Query string
+            pt_BR: Query string
+            zh_Hans: 查询语句
+          llm_description: key words for searching
+          max: null
+          min: null
+          name: query
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Parameter defines the language to use for the Google search. It's
+              a two-letter language code. (e.g., en for English, es for Spanish, or
+              fr for French). Head to https://serpapi.com/google-languages for a full
+              list of supported Google languages.
+            ja_JP: Parameter defines the language to use for the Google search. It's
+              a two-letter language code. (e.g., en for English, es for Spanish, or
+              fr for French). Head to https://serpapi.com/google-languages for a full
+              list of supported Google languages.
+            pt_BR: Parameter defines the language to use for the Google search. It's
+              a two-letter language code. (e.g., en for English, es for Spanish, or
+              fr for French). Head to https://serpapi.com/google-languages for a full
+              list of supported Google languages.
+            zh_Hans: 此参数定义用于 Google 搜索的语言。它是一个两字母的语言代码。 (例如，en 代表英语，es 代表西班牙语，fr 代表法语)。请前往
+              https://serpapi.com/google-languages 查看完整的支持 Google 语言列表。
+          label:
+            en_US: Language
+            ja_JP: Language
+            pt_BR: Language
+            zh_Hans: 语言
+          llm_description: Language
+          max: null
+          min: null
+          name: hl
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Parameter defines the country to use for the Google search. It's
+              a two-letter country code. (e.g., us for the United States, uk for United
+              Kingdom, or fr for France). Head to the https://serpapi.com/google-countries
+              for a full list of supported Google countries.
+            ja_JP: Parameter defines the country to use for the Google search. It's
+              a two-letter country code. (e.g., us for the United States, uk for United
+              Kingdom, or fr for France). Head to the https://serpapi.com/google-countries
+              for a full list of supported Google countries.
+            pt_BR: Parameter defines the country to use for the Google search. It's
+              a two-letter country code. (e.g., us for the United States, uk for United
+              Kingdom, or fr for France). Head to the https://serpapi.com/google-countries
+              for a full list of supported Google countries.
+            zh_Hans: 此参数定义用于 Google 搜索的国家。它是一个两字母的国家代码。 (例如，us 代表美国，uk 代表英国，fr 代表法国)。请前往
+              https://serpapi.com/google-countries 查看完整的支持 Google 国家列表。
+          label:
+            en_US: Country
+            ja_JP: Country
+            pt_BR: Country
+            zh_Hans: 国家
+          llm_description: Country
+          max: null
+          min: null
+          name: gl
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: Parameter defines from where you want the search to originate.
+              If several locations match the location requested, we'll pick the most
+              popular one. Head to the /locations.json API if you need more precise
+              control. The location and uule parameters can't be used together. It
+              is recommended to specify location at the city level in order to simulate
+              a real user’s search. If location is omitted, the search may take on
+              the location of the proxy.
+            ja_JP: Parameter defines from where you want the search to originate.
+              If several locations match the location requested, we'll pick the most
+              popular one. Head to the /locations.json API if you need more precise
+              control. The location and uule parameters can't be used together. It
+              is recommended to specify location at the city level in order to simulate
+              a real user’s search. If location is omitted, the search may take on
+              the location of the proxy.
+            pt_BR: Parameter defines from where you want the search to originate.
+              If several locations match the location requested, we'll pick the most
+              popular one. Head to the /locations.json API if you need more precise
+              control. The location and uule parameters can't be used together. It
+              is recommended to specify location at the city level in order to simulate
+              a real user’s search. If location is omitted, the search may take on
+              the location of the proxy.
+            zh_Hans: 此参数定义搜索的位置。如果有多个位置与请求的位置匹配，我们将选择最受欢迎的一个。如果需要更精确的控制，请前往 /locations.json
+              API。location 和 uule 参数不能同时使用。建议在城市级别指定位置，以模拟真实用户的搜索。如果省略位置，则搜索可能会采用代理的位置。
+          label:
+            en_US: Location
+            ja_JP: Location
+            pt_BR: Location
+            zh_Hans: 位置
+          llm_description: Location
+          max: null
+          min: null
+          name: location
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          gl: ''
+          hl: ''
+          location: ''
+          query: ''
+        provider_id: langgenius/google/google
+        provider_name: langgenius/google/google
+        provider_type: builtin
+        selected: false
+        title: GoogleSearch
+        tool_configurations:
+          as_agent_tool: 0
+        tool_description: A tool for performing a Google SERP search and extracting
+          snippets and webpages.Input should be a search query.
+        tool_label: GoogleSearch
+        tool_name: google_search
+        tool_node_version: '2'
+        tool_parameters:
+          country_code:
+            type: mixed
+            value: ''
+          gl:
+            type: mixed
+            value: tw
+          hl:
+            type: mixed
+            value: zh-tw
+          language_code:
+            type: mixed
+            value: ''
+          location:
+            type: mixed
+            value: ''
+          query:
+            type: mixed
+            value: '{{#1757060122470.intent_description#}}'
+        type: tool
+      height: 90
+      id: '1758704402764'
+      position:
+        x: 1668.1767266755276
+        y: 918.4372853432247
+      positionAbsolute:
+        x: 1668.1767266755276
+        y: 918.4372853432247
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1758704664320.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回覆
+        type: answer
+        variables: []
+      height: 105
+      id: '17587046603460'
+      position:
+        x: 2559.471554132506
+        y: 918.4372853432247
+      positionAbsolute:
+        x: 2559.471554132506
+        y: 918.4372853432247
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: a1820da2-3624-4d22-a26a-12a41f3812fe
+          role: system
+          text: 整理{{#1758765369161.output#}}的內容來回答使用者的提問{{#sys.query#}}
+        selected: false
+        title: 整理google搜尋內容
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1758704664320'
+      position:
+        x: 2268.137493032396
+        y: 918.4372853432247
+      positionAbsolute:
+        x: 2268.137493032396
+        y: 918.4372853432247
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        selected: false
+        template: '{{ arg1 }}'
+        title: 模板轉換
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1758704402764'
+          - json
+          value_type: array[object]
+          variable: arg1
+      height: 54
+      id: '1758765369161'
+      position:
+        x: 1970.239441332303
+        y: 918.4372853432247
+      positionAbsolute:
+        x: 1970.239441332303
+        y: 918.4372853432247
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1757063408033.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回覆
+        type: answer
+        variables: []
+      height: 105
+      id: '1758767817218'
+      position:
+        x: 3164.150204149841
+        y: 1042.5109540995327
+      positionAbsolute:
+        x: 3164.150204149841
+        y: 1042.5109540995327
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-350
+            key: ''
+            type: text
+            value: '{{#1759457026888.api_info#}}'
+          type: json
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: 使用工具API
+        type: http-request
+        url: '{{#1759457026888.api_endpoint#}}'
+        variables: []
+      height: 127
+      id: '1759454456893'
+      position:
+        x: 2559.471554132506
+        y: 1042.5109540995327
+      positionAbsolute:
+        x: 2559.471554132506
+        y: 1042.5109540995327
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "import json\n\ndef main(inputs) -> dict:\n    \"\"\"\n    這個函數會接收一個包含\
+          \ API_info 和 API_endpoint 的字典，\n    然後分別處理並輸出這兩個值。\n    \"\"\"\n    \n \
+          \   # 處理可能的輸入格式 (list 或 dict)\n    if isinstance(inputs, list) and len(inputs)\
+          \ > 0:\n        data = inputs[0]\n    elif isinstance(inputs, dict):\n \
+          \       data = inputs\n    else:\n        # 如果輸入格式不正確，回傳空的結果\n        return\
+          \ {\n            \"api_info\": \"\",\n            \"api_endpoint\": \"\"\
+          \n        }\n    \n    # --- 處理 API_info ---\n    # 1. 取出 API_info 欄位的值\
+          \ (它是一個字串)\n    api_info_str = data.get(\"API_info\", \"\")\n    \n    #\
+          \ 2. 嘗試將這個字串解析為 JSON 物件\n    try:\n        # 如果成功，就把它轉回一個格式化過的 JSON 字串\n\
+          \        api_info_json = json.loads(api_info_str)\n        api_info_output\
+          \ = json.dumps(api_info_json, ensure_ascii=False, indent=2)\n    except\
+          \ Exception:\n        # 如果解析失敗 (不是合法的 JSON)，就直接使用原始字串\n        api_info_output\
+          \ = api_info_str\n        \n    # --- 處理 API_endpoint ---\n    # 直接取出 API_endpoint\
+          \ 欄位的值\n    api_endpoint_output = data.get(\"API_endpoint\", \"\")\n   \
+          \ \n    # --- 輸出結果 ---\n    # 回傳一個包含兩個鍵值對的字典\n    # 這兩個 key 會成為 Dify 節點的輸出變數名稱\n\
+          \    return {\n        \"api_info\": api_info_output,\n        \"api_endpoint\"\
+          : api_endpoint_output\n    }"
+        code_language: python3
+        desc: ''
+        outputs:
+          api_endpoint:
+            children: null
+            type: string
+          api_info:
+            children: null
+            type: string
+        selected: false
+        title: 格式轉換
+        type: code
+        variables:
+        - value_selector:
+          - '1762226853937'
+          - json
+          value_type: array[object]
+          variable: inputs
+      height: 54
+      id: '1759457026888'
+      position:
+        x: 1970.239441332303
+        y: 1035.6187639695504
+      positionAbsolute:
+        x: 1970.239441332303
+        y: 1035.6187639695504
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: e60d3d59-f407-4521-953a-da658de29998
+            value: ''
+            varType: string
+            variable_selector:
+            - '1759457026888'
+            - api_info
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 條件分支 3
+        type: if-else
+      height: 126
+      id: '1759460348563'
+      position:
+        x: 2268.137493032396
+        y: 1035.6187639695504
+      positionAbsolute:
+        x: 2268.137493032396
+        y: 1035.6187639695504
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        desc: ''
+        headers: ''
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: 使用工具API (1)
+        type: http-request
+        url: '{{#1759457026888.api_endpoint#}}'
+        variables: []
+      height: 127
+      id: '17594603650930'
+      position:
+        x: 2559.471554132506
+        y: 1183.794242709332
+      positionAbsolute:
+        x: 2559.471554132506
+        y: 1183.794242709332
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#17594603650930.body#}}'
+        desc: ''
+        selected: false
+        title: 直接回覆
+        type: answer
+        variables: []
+      height: 105
+      id: '17594603719490'
+      position:
+        x: 2857.599288730941
+        y: 1183.794242709332
+      positionAbsolute:
+        x: 2857.599288730941
+        y: 1183.794242709332
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params: {}
+          mode: chat
+          name: gemini-2.0-flash
+          provider: langgenius/gemini/google
+        prompt_template:
+        - id: c198d8a5-aa9e-49e9-95db-4f6083b6eec5
+          role: system
+          text: "# [角色]\n你是一個專業、敏銳的 AI 流程引導助理 (AI Flow Advisor)。\n\n# [核心任務]\n你的唯一任務是**主要分析\
+            \ `[完整的對話上下文]`** 來理解使用者的原始目標和當前任務進度，並**參考 `[節點A的輸出內容]`** 來確認上一步的執行狀態。\n\
+            \n基於此分析，並**智能參考 `[SOP 智能分析原則]`**，生成 2-3 個具體的、可執行的「下一步建議」，以最高效率引導使用者完成他們的**整體目標**。\n\
+            \n---\n### **核心原則 (Principles)**\n你的所有行為都必須基於以下原則，其中「上下文」和「意圖」的優先級最高。\n\
+            \n1.  **上下文優先 (Context-First)**\n    * 你的**首要**資訊來源是 `[完整的對話上下文]`（使用者的意圖和任務流）。\n\
+            \    * `[節點A的輸出內容]` 僅用於確認狀態或提供數據。\n    * `[SOP 智能分析原則]` 是建議的**參考框架**，但**不得**凌駕於使用者的明確意圖（例如：使用者已表明要略過模擬）。\n\
+            \n2.  **意圖的完整性 (Integrity of Intent) - [關鍵原則]**\n    * AI 必須追蹤使用者在對話中表達的**所有**意圖，尤其是那些「待處理的\
+            \ (pending)」或「未滿足的 (unsatisfied)」意圖。\n    * 如果使用者的請求包含多個部分（例如：$P_1$ 執行動作，$P_2$\
+            \ 分析該動作的結果），在 $P_1$ 完成後，AI 的**首要職責**是嘗試滿足 $P_2$。\n\n3.  **數據的關聯性分析 (Relevant\
+            \ Data Analysis) - [關鍵原則]**\n    * 當 `[節點A的輸出內容]` 提供了數據，且 `[完整的對話上下文]`\
+            \ 中存在一個「待處理的分析意圖」，AI **有義務**主動將這兩者關聯起來。\n    * **AI 必須**先嘗試利用該數據來回答使用者的分析意圖（在引導語中呈現分析結果），**然後**再提供基於該分析的操作建議。\n\
+            \n4.  **嚴格依據來源 (Source Grounding)**\n    * **絕對禁止**捏造 `[節點A的輸出內容]` 中不存在的數據或狀態。\n\
+            \    * **絕對禁止**提出與 `[完整的對話上下文]` 意圖無關的建議。\n\n5.  **避免裝作知道 (Avoid Fabrication)**\n\
+            \    * 不可為了提供建議而「補完」不存在的內容或假設使用者的*隱藏意圖*。專注於對話中*已展現*的意圖。\n\n**最終原則：寧可不建議，不可乱建議。專注於引導，而非干擾。**\n\
+            ---\n\n# [SOP 智能分析原則 (SOP-Rules)]\n這是 AI 在生成建議時必須參考的「業務邏輯」。AI 必須將 `[節點A的輸出數據]`\
+            \ 與以下規則進行比對，以決定建議的**優先級**和**內容**。\n\n1.  **[SOP-Rule 1: 偵測低流量並建議優化]**\n\
+            \    * **觸發條件:**\n        * `[上下文]` 顯示剛執行了「查詢 UE 狀態」。\n        * `[節點A的輸出]`\
+            \ 包含了 UE 流量數據。\n    * **分析邏輯:**\n        * 分析數據：是否「大部分 UE 處於個位數流量」？\n\
+            \        * 分析上下文：此次查詢是針對「單一 UE」還是「複數個 UE」？\n    * **建議行動:**\n        *\
+            \ 如果*是*個位數流量 (複數 UE) -> 優先建議「IM 優化」。\n        * 如果*是*個位數流量 (單一 UE) ->\
+            \ 優先建議「QoE 優化」。\n        * (參見 SOP-Rule 2，建議時應優先考慮「模擬」優化)。\n\n2.  **[SOP-Rule\
+            \ 2: 建議優先使用模擬]**\n    * **觸發條件:**\n        * `[上下文]` 顯示使用者的**下一步意圖**是「執行實際優化」（無論是\
+            \ IM 還是 QoE）。\n    * **分析邏輯:**\n        * 分析上下文：使用者是否明確提過「略過模擬」、「跳過模擬」或「直接優化」？\n\
+            \    * **建議行動:**\n        * 如果*沒有*提過略過 -> **必須**將「模擬優化」（例如：執行 `模擬 IM 優化`）作為**首選建議**。\n\
+            \        * 如果*有*提過略過 -> 則直接建議「實際優化」（例如：執行 `實際 IM 優化`）。\n\n3.  **[SOP-Rule\
+            \ 3: 分析優化後的總結報告]**\n    * **觸發條件:**\n        * `[上下文]` 顯示剛執行了「實際優化」。\n\
+            \        * `[節點A的輸出]` 包含了「總結」或「數據報告」。\n    * **分析邏輯:**\n        * 分析報告：問題是否已「解決」？（例如：流量顯著提升、KPI\
+            \ 達標）\n        * 分析報告：是否仍有「優化空間」？\n    * **建議行動:**\n        * 如果問題已解決\
+            \ -> 應在引導語中註明「問題已改善」，並建議「返回主選單」或「繼續監控」。**不應**主動再建議優化。\n        * 如果問題未解決或仍有空間\
+            \ -> 應建議「進一步優化」（例如：「提升優化比率並再次執行」、「嘗試另一種優化策略」）。\n\n---\n\n# [輸入分析區]\n你必須分析以下兩個核心輸入：\n\
+            \n### 1. [完整的對話上下文]\n(這是使用者從開始到現在的完整對話歷史，用於判斷使用者的原始意圖和任務進度。)\n{{#context#}}\n\
+            \n### 2. [節點A的輸出內容]\n(這是上一個節點的執行結果，僅用於確認上一步的狀態：成功、失敗、或數據回傳。)\n{{#1757063408033.text#}}\n\
+            ---\n\n# [執行流程與準則]\n\n1.  **分析步驟 A (分析上下文 - 優先)**: **首先且最重要**，分析 `[完整的對話上下文]`。\n\
+            \    * 使用者最初的**完整意圖**是什麼？（例如：修復低速問題？ 還是只是查詢數據？）\n    * 當前是否有「待處理的分析意圖」？（例如：使用者在等\
+            \ AI 分析「能看什麼畫質」）\n    * 當前是否在一個結構化流程中（如 SOP）？\n\n2.  **分析步驟 B (分析輸出 -\
+            \ 輔助)**: 接著，分析 `[節點A的輸出內容]` 以確認狀態。\n    * 它是一個成功的確認嗎？\n    * 它是一個數據回傳嗎？（例如：11.85\
+            \ Mbps，或 [UE列表: {ID: 1, Traffic: 5.2}, {ID: 2, Traffic: 4.8}, ...]）\n\
+            \    * 它是一個錯誤訊息嗎？\n\n3.  **生成步驟 C (生成建議) - [基於原則的邏輯]**:\n    * **檢查 1\
+            \ (意圖完整性檢查)**: 根據 [分析步驟 A]，是否存在「待處理的分析意圖」？\n    * **檢查 2 (數據關聯性檢查)**:\
+            \ [分析步驟 B] 的輸出數據是否能用來滿足該意圖？\n    * **檢查 3 (SOP 觸發檢查)**: 根據 [分析步驟 A] 和\
+            \ [分析步驟 B]，是否觸發了 `[SOP 智能分析原則]` 中的任何規則？\n\n    * **情境 1：[檢查 1 和 2 均為 \"\
+            是\"] (例如 Netflix 情境 - 優先處理)**\n        * *分析*: 上下文中有「分析畫質」的意圖，且節點 A 提供了「11.85\
+            \ Mbps」的數據。\n        * *行動 (遵循原則 2 & 3)*:\n            1.  **必須**在引導語中，先利用數據\
+            \ (11.85 Mbps) 回應待處理的意圖 (分析畫質)。\n            2.  提供的「下一步建議」必須與該分析相關。\n\
+            \        * *範例 (正確)*:\n            「已取得電梯前的 UE 狀態，平均下載速度為 11.85 Mbps。此速度通常足以支援\
+            \ 1080p (Full HD) 畫質的串流。\n            \n            您可以：\n           \
+            \ * 查看各個 UE 的詳細速度列表\n            * 針對速度低於 5 Mbps 的 UE 進行分析\n         \
+            \   * 返回主選單」\n\n    * **情境 2：[檢查 3 為 \"是\"] (SOP 智能分析觸發)**\n        *\
+            \ *分析*: 觸發了 `[SOP 智能分析原則]` 中的一條或多條規則。\n        * *行動 (遵循 SOP-Rules 及 核心原則)*:\n\
+            \            1.  **必須**在引導語中，簡潔地說明「觸發條件」或「數據分析結果」（例如：「偵測到 8/10 的 UE 流量為個位數」）。\n\
+            \            2.  **必須**根據 SOP-Rules 的「建議行動」來生成建議列表。\n        * *範例 (SOP-Rule\
+            \ 1 觸發)*:\n            「已取得 Cell ID 131 的 UE 狀態。分析顯示，15 個 UE 中有 12 個目前流量低於\
+            \ 10 Mbps (個位數流量)。\n            \n            您可以：\n            * 執行 '模擬\
+            \ IM 優化' (建議)\n            * 查看這 12 個低流量 UE 的列表\n            * 重新查詢 UE\
+            \ 狀態」\n        * *範例 (SOP-Rule 2 觸發 - 使用者未提過略過)*:\n            「確認執行 QoE\
+            \ 優化。根據標準流程 (SOP-Rule 2)，建議先執行模擬以預覽效果。\n\n            您可以：\n         \
+            \   * 執行 '模擬 QoE 優化'\n            * 略過模擬，直接執行 '實際 QoE 優化'\n          \
+            \  * 取消操作」\n\n    * **情境 3：[上述情境均未觸發] (例如：一般流程)**\n        * *分析*: 意圖已滿足，SOP\
+            \ 未觸發，節點 A 回報成功。\n        * *行動*: 提出合乎邏輯的通用下一步。\n        * *範例*:\n   \
+            \         「已成功清除日誌。\n            您可以：\n            * 檢查目前系統負載\n      \
+            \      * 返回主選單」\n\n    * **情境 4：節點 A 回報錯誤**\n        * *分析*: 無論意圖或 SOP\
+            \ 如何，上一步操作失敗。\n        * *行動*: 提出解決錯誤的建議。\n        * *範例*:\n         \
+            \   「執行失敗：[節點A的錯誤訊息]。\n            您可以：\n            * 重試上一步操作\n     \
+            \       * 檢查網路連線狀態」\n\n# [輸出格式要求]\n\n* **絕對禁止**包含 `[思考]` 或 `[給使用者回覆]`\
+            \ 這樣的標籤。\n* 你的回覆**必須**是一個簡潔的引導語，後面跟著 2-3 個條列式的建議。\n* 如果執行了「情境 1」或「情境 2」的分析，分析內容**必須**放在引導語中，在條列建議之前。\n\
+            * 使用 Markdown 的 `*` 符號來條列建議。\n* 建議的措辭應為清晰的「祈使句」或「疑問句」。"
+        selected: false
+        title: LLM 4
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: '1761722661355'
+      position:
+        x: 3466.596299214832
+        y: 1042.5109540995327
+      positionAbsolute:
+        x: 3466.596299214832
+        y: 1042.5109540995327
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '
+
+          ## 下一步建議
+
+          {{#1761722661355.text#}}'
+        selected: false
+        title: 直接回覆 7
+        type: answer
+        variables: []
+      height: 105
+      id: '1761723507764'
+      position:
+        x: 3771.19109263482
+        y: 1042.5109540995327
+      positionAbsolute:
+        x: 3771.19109263482
+        y: 1042.5109540995327
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        is_team_authorization: true
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: tool_name
+            ja_JP: tool_name
+            pt_BR: tool_name
+            zh_Hans: tool_name
+          llm_description: ''
+          max: null
+          min: null
+          name: tool_name
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          label:
+            en_US: intent_description
+            ja_JP: intent_description
+            pt_BR: intent_description
+            zh_Hans: intent_description
+          llm_description: ''
+          max: null
+          min: null
+          name: intent_description
+          options: []
+          placeholder:
+            en_US: ''
+            ja_JP: ''
+            pt_BR: ''
+            zh_Hans: ''
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        params:
+          intent_description: ''
+          tool_name: ''
+        provider_id: 7801e577-9eb7-40e1-9828-17c9ef4f0bf7
+        provider_name: 1009_工具Payload對應_HengshaoYu
+        provider_type: workflow
+        selected: false
+        title: 1009_工具Payload對應_HengshaoYu
+        tool_configurations: {}
+        tool_description: ''
+        tool_label: 1009_工具Payload對應_HengshaoYu
+        tool_name: 1009_tool_payload_generator
+        tool_parameters:
+          intent_description:
+            type: mixed
+            value: '{{#1757060122470.intent_description#}}'
+          tool_name:
+            type: mixed
+            value: '{{#1757060122470.Tool#}}'
+        type: tool
+      height: 54
+      id: '1762226853937'
+      position:
+        x: 1668.1767266755276
+        y: 1035.6187639695504
+      positionAbsolute:
+        x: 1668.1767266755276
+        y: 1035.6187639695504
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: -449.6102249081896
+      y: -433.167302152837
+      zoom: 0.8705505632961249
