@@ -1,10 +1,10 @@
 from __future__ import annotations
-import os, sys, json, time, subprocess, requests, logging, mimetypes, re
+import os, sys, json, time, subprocess, requests, logging, re, base64
 from pathlib import Path
 from datetime import datetime
 from contextlib import contextmanager
 from dotenv import load_dotenv, set_key
-from typing import List, TypedDict
+from typing import List
 from tenacity import retry, stop_after_attempt, wait_fixed
 import docker
 from docker.errors import NotFound, APIError
@@ -36,8 +36,7 @@ def log_error(msg: str):
 # ────────────────── 共用工具 ──────────────────
 dotenv_path = os.path.abspath("./Backend/.env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-HTTP_DIFY_HOST = os.getenv("HTTP_DIFY_HOST")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 dotenv_path = os.path.abspath("./Dashboard/.env")
 load_dotenv(dotenv_path=dotenv_path, override=True)
@@ -77,28 +76,25 @@ DIFY_NAME = os.getenv("DIFY_NAME")
 DIFY_PASSWORD = os.getenv("DIFY_PASSWORD")
 DIFY_SETUP_URL = os.getenv("DIFY_SETUP_URL")
 DIFY_LOGIN_URL = os.getenv("DIFY_LOGIN_URL")
-DIFY_IMPORT_URL = os.getenv("DIFY_IMPORT_URL")
-DIFY_BRANCH = os.getenv("DIFY_BRANCH")
 API_KEY_BASE = os.getenv("API_KEY_BASE")
 
-DIFY_ADD_MODELS_VENDOR = os.getenv("DIFY_ADD_MODELS_VENDOR")
-DIFY_SET_OPENAI_API_KEY = os.getenv("DIFY_SET_OPENAI_API_KEY")
-DIFY_UPLOAD_TXT = os.getenv("DIFY_UPLOAD_TXT")
-DIFY_INIT_DB = os.getenv("DIFY_INIT_DB")
-DIFY_BASE = os.getenv("DIFY_BASE")
+# dify plugin
+PLUGIN_SCRIPTS_DIR = os.path.join(os.getcwd(), "dify-version", DIFY_TAG, "intent-agent", "scripts")
 
 DIFY_CONTAINERS: List[str] = [
     "docker-nginx-1",
     "docker-worker-1",
+    "docker-worker_beat-1",
     "docker-api-1",
     "docker-ssrf_proxy-1",
     "docker-weaviate-1",
     "docker-sandbox-1",
     "docker-web-1",
+    "docker-plugin_daemon-1",
 ]
 
 DIFY_CONTAINERS_HEALTHY: List[str] = [
-    "docker-db-1",
+    "docker-db_postgres-1",
     "docker-redis-1",
     "docker-sandbox-1",
 ]
@@ -109,14 +105,6 @@ BACKEND_CONTAINERS: List[str] = [
     "intent-redis-db",
     "intent-pgadmin"
 ]
-
-class JSONPayload(TypedDict):
-    mode: str
-    json_payload: dict[str]
-
-class YamlPayload(TypedDict):
-    mode: str
-    yaml_content: str
 
 @contextmanager
 def step_timer(label: str):
@@ -137,9 +125,10 @@ def _run_with_retry(fn, *args, **kwargs):
 
 def run_shell_script(script_name):
     try:
-        subprocess.run(["chmod", "+x", script_name], check=True)
-        subprocess.run(["./" + script_name], check=True, text=True, timeout=500)
-        logging.info(f"✅ {script_name} 執行成功")
+        script_path = script_name if os.path.isabs(script_name) else "./" + script_name
+        subprocess.run(["chmod", "+x", script_path], check=True)
+        subprocess.run([script_path], check=True, text=True, timeout=10500)
+        logging.info(f"✅ {script_path} 執行成功")
     except Exception as e:
         log_error(f"❗ 未預期錯誤：{e}")
 
@@ -380,115 +369,53 @@ def dify_setup_owner():
     except Exception as e:
         log_error(f"註冊錯誤：{e}")
 
-def dify_login_and_get_token() -> str:
+def dify_login_and_get_token() -> tuple:
     """
-    登入並取得 access_token
+    登入 Dify 1.13.3+，回傳 (token, session, csrf_headers)。
+    - token: Bearer access_token（用於 /apps, /api-keys 等 API）
+    - session: requests.Session（帶 Cookie，用於 model-providers 等需要 CSRF 的 API）
+    - csrf_headers: dict（帶 CSRF token 的 headers）
     """
+    encoded_password = base64.b64encode(DIFY_PASSWORD.encode("utf-8")).decode("utf-8")
     payload = {
         "email": DIFY_EMAIL,
-        "password": DIFY_PASSWORD,
+        "password": encoded_password,
         "language": "zh-Hant",
         "remember_me": True
     }
 
     try:
-        response = requests.post(DIFY_LOGIN_URL, json=payload)
+        session = requests.Session()
+        response = session.post(DIFY_LOGIN_URL, json=payload)
         response.raise_for_status()
         result = response.json()
 
         if result.get("result") == "success":
-            token = result["data"]["access_token"]
-            logging.info("✅ 成功登入")
-            logging.info("✅ 成功取得 access token")
-            return token
+            token = result.get("data", {}).get("access_token", "")
+            if not token:
+                token = response.cookies.get("access_token", "")
+            if token:
+                csrf = session.cookies.get("csrf_token", "")
+                csrf_headers = {"Content-Type": "application/json", "X-CSRF-Token": csrf}
+                logging.info("✅ 成功登入並取得 access token")
+                return token, session, csrf_headers
+            else:
+                log_error("❌ 登入成功但無法取得 token")
         else:
             log_error("❌ 登入失敗")
 
     except Exception as e:
         log_error(f"登入錯誤：{e}")
 
-def yaml_to_payload() -> YamlPayload:
+def get_workflow_token(app_id, session, csrf_headers) -> str:
     """
-    根據 DIFY_TAG 尋找 /dify-version/{DIFY_TAG}/ 的所有 YMAL 檔案，並將內容嵌入 YAML payload 中。
+    透過 app_id 拿到 workflow 的 API token（使用 session + CSRF）
     """
-    try:
-        yaml_file = None
-        tools_file = []
-        agents_file = None
-        yaml_dir = os.path.join(os.getcwd(), 'dify-version', DIFY_TAG)
-
-        for filename in os.listdir(yaml_dir):
-            if filename.endswith(('.yml', '.yaml')):
-                yaml_file = os.path.join(yaml_dir, filename)
-                with open(yaml_file, "r", encoding="utf-8") as f:
-                    yaml_content = f.read()
-                    yaml_content = re.sub("http://140.118.162.94:5678", N8N_BASE_URL, yaml_content, flags=re.IGNORECASE)
-                    yaml_content = re.sub("http://140.118.162.94:30000/api/v2/", f"http://{HTTP_DIFY_HOST}:30000/api/v2/", yaml_content, flags=re.IGNORECASE)
-                
-                logging.info(f"✨ 識別 YAML 檔案：{filename}")
-
-                payload = {
-                    "mode": "yaml-content",
-                    "yaml_content": yaml_content
-                }
-
-                if 'agent' in filename.lower():
-                    agents_file = payload
-                    logging.info(f"✨ 識別主要 YAML 檔案：{filename}")
-                else:
-                    tools_file.append(payload)
-
-        logging.info("✅ 獲取 yaml 成功")
-        return {
-            "tools_file": tools_file,
-            "agents_file": agents_file
-        }
-
-    except Exception as e:
-        log_error(f"獲取 yaml 錯誤：{e}")
-
-def dify_create_workflow(payload, token) -> str:
-    """
-    發送創建 workflow 的請求，回傳 app_id
-    """
-    try:
-        tools_file = payload["tools_file"]
-        agents_file = payload["agents_file"]
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
-
-        for content in tools_file:
-            response = requests.post(DIFY_IMPORT_URL, json=content, headers=headers)
-
-            if response.status_code == 200:
-                logging.info("✅ 創建 workflow 成功")
-
-        response = requests.post(DIFY_IMPORT_URL, json=agents_file, headers=headers)
-
-        if response.status_code == 200:
-            logging.info("✅ 創建 workflow 成功")
-            data = response.json()
-            return data.get("app_id")
-        else:
-            log_error("⚠️ 創建 workflow 失敗")
-
-    except Exception as e:
-        log_error(f"創建 workflow 錯誤：{e}")
-
-def get_workflow_token(app_id, token) -> str:
-    """
-    透過 app_id 拿到 workflow 的 token
-    """
-    url = f"{API_KEY_BASE}/{app_id}/api-keys"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
+    dify_url = DIFY_LOGIN_URL.replace("/console/api/login", "")
+    url = f"{dify_url}/console/api/apps/{app_id}/api-keys"
 
     try:
-        response = requests.post(url, headers=headers)
+        response = session.post(url, headers=csrf_headers, json={})
         response.raise_for_status()
         data = response.json()
         logging.info("✅ 取得 workflow token 成功")
@@ -518,71 +445,84 @@ def update_backend_api_key_base(new_api_key_base):
     except Exception as e:
         log_error(f"更新 DIFY_API_KEY 錯誤：{e}")
 
-def add_model_vendor(payload, token):
-    try:
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
-        response = requests.post(DIFY_ADD_MODELS_VENDOR, json=payload, headers=headers)
+    # 2026/04/07 移除 add_model_vendor()，改由 install_gemini_plugin() + set_gemini_api_key() 取代
 
-        if response.status_code == 200:
-            logging.info("✅ 安裝模型供應商成功")
-        else:
-            log_error("⚠️ 安裝模型供應商失敗")
+# Gemini plugin marketplace identifier
+GEMINI_PLUGIN_ID = "langgenius/gemini:0.7.20@de0063a630a6d1b2c025fb84f3462ba5151fb60618309cd595c3f4711b1df847"
 
-    except Exception as e:
-        log_error(f"安裝模型供應商錯誤：{e}")
+def install_gemini_plugin(session, csrf_headers) -> bool:
+    """
+    從 Dify Marketplace 安裝 Gemini model provider plugin（若尚未安裝）
+    """
+    dify_url = DIFY_LOGIN_URL.replace("/console/api/login", "")
 
-def set_openai_api_key(token) -> bool:
-    try:
-        payload = {
-            "config_from":"predefined-model",
-            "credentials":{"openai_api_key":OPENAI_API_KEY},
-            "load_balancing":{"enabled":"false","configs":[]}
-        }
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
+    # 檢查是否已安裝
+    r = session.get(f"{dify_url}/console/api/workspaces/current/plugin/list", headers=csrf_headers)
+    for p in r.json().get("plugins", []):
+        if "gemini" in p.get("plugin_id", ""):
+            logging.info("✅ Gemini plugin 已安裝，跳過")
+            return True
 
-        deadline = time.time() + 60
-        while time.time() < deadline:
-            try:
-                response = requests.post(DIFY_SET_OPENAI_API_KEY, json=payload, headers=headers)
-                if response.status_code == 201:
-                    logging.info("✅ 設定 OPENAI API KEY 成功")
-                    return True
-                
-                time.sleep(1)
-            except Exception as e:
-                log_error(f"設定 OPENAI API KEY 失敗：{e}")
-        log_error("⚠️ 設定 OPENAI API KEY 失敗")
+    # 從 marketplace 安裝
+    logging.info("📦 安裝 Gemini plugin...")
+    r = session.post(
+        f"{dify_url}/console/api/workspaces/current/plugin/install/marketplace",
+        headers=csrf_headers,
+        json={"plugin_unique_identifiers": [GEMINI_PLUGIN_ID]},
+    )
+    if r.status_code != 200:
+        log_error(f"安裝 Gemini plugin 失敗：{r.status_code} {r.text[:300]}")
+        return False
 
-    except Exception as e:
-        log_error(f"設定 OPENAI API KEY 錯誤：{e}")
+    task_id = r.json().get("all_installed", [{}])[0].get("task_id") or r.json().get("task_id", "")
+    logging.info(f"  Install task: {task_id}")
 
-def publish(token):
-    try:
-        payload = {"marked_name": "", "marked_comment": ""}
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
+    # 等待安裝完成
+    deadline = time.time() + 120
+    while time.time() < deadline:
+        r = session.get(f"{dify_url}/console/api/workspaces/current/plugin/list", headers=csrf_headers)
+        for p in r.json().get("plugins", []):
+            if "gemini" in p.get("plugin_id", ""):
+                logging.info("✅ Gemini plugin 安裝成功")
+                return True
+        logging.info("  等待 Gemini plugin 安裝中...")
+        time.sleep(5)
 
-        url = f"{DIFY_BASE}/apps/{APP_ID}/workflows/publish"
-        
+    log_error("⚠️ Gemini plugin 安裝超時")
+    return False
+
+def set_gemini_api_key(session, csrf_headers) -> bool:
+    """
+    設定 Gemini API Key（須在 install_gemini_plugin 之後呼叫）
+    """
+    dify_url = DIFY_LOGIN_URL.replace("/console/api/login", "")
+
+    payload = {
+        "config_from": "predefined-model",
+        "credentials": {"google_api_key": GEMINI_API_KEY},
+        "load_balancing": {"enabled": "false", "configs": []},
+    }
+
+    deadline = time.time() + 120
+    while time.time() < deadline:
         try:
-            response = requests.post(url, json=payload, headers=headers)
+            response = session.post(
+                f"{dify_url}/console/api/workspaces/current/model-providers/langgenius/gemini/google/credentials",
+                json=payload, headers=csrf_headers,
+            )
             if response.status_code == 201:
-                logging.info("✅ 發布 dify 工作流成功")
-        except Exception as e:
-            log_error(f"發布 dify 工作流失敗：{e}")
+                logging.info("✅ 設定 Gemini API Key 成功")
+                return True
 
-    except Exception as e:
-        log_error(f"發布 dify 工作流錯誤：{e}")
+            logging.info(f"  Gemini API Key 設定中... status={response.status_code} body={response.text[:200]}")
+            time.sleep(3)
+        except Exception as e:
+            log_error(f"設定 Gemini API Key 失敗：{e}")
+    log_error("⚠️ 設定 Gemini API Key 超時")
+    return False
+
+
+    # 2026/04/07 移除 publish()，已移入 setup_workflow.sh 內部
 
 # ────────────────── 主要步驟封裝成函式 ──────────────────
 def step_n8n():
@@ -601,14 +541,14 @@ def step_n8n():
         payloads = json_to_payload()
         n8n_create_workflow(payloads)
 
-    with step_timer("step_n8n_setup_container"):
-        _run_with_retry(step_n8n_setup_container)
+    # with step_timer("step_n8n_setup_container"):
+    #     _run_with_retry(step_n8n_setup_container)
 
-    with step_timer("step_n8n_get_api_key"):
-        _run_with_retry(step_n8n_get_api_key)
+    # with step_timer("step_n8n_get_api_key"):
+    #     _run_with_retry(step_n8n_get_api_key)
 
-    with step_timer("step_n8n_init_workflow"):
-        _run_with_retry(step_n8n_init_workflow)
+    # with step_timer("step_n8n_init_workflow"):
+    #     _run_with_retry(step_n8n_init_workflow)
 
 def step_dify():
     def step_dify_setup_container():
@@ -619,31 +559,42 @@ def step_dify():
     
     def step_dify_setup_owner():
         dify_setup_owner()
-        global DIFY_TOKEN
-        DIFY_TOKEN = dify_login_and_get_token()
+        global DIFY_TOKEN, DIFY_SESSION, DIFY_CSRF_HEADERS
+        DIFY_TOKEN, DIFY_SESSION, DIFY_CSRF_HEADERS = dify_login_and_get_token()
 
-    def step_dify_init_workflow():
-        dify_payload = yaml_to_payload()
+    # 2026/04/07 移除 "初始化 Workflow" 功能，包含 yaml_to_payload(), dify_create_workflow()
+    #            改為 Plugin Strategy 架構：install.sh 安裝 plugin → setup_workflow.sh 建立 App
+    # 2026/04/07 移除 "初始化 DB" 步驟（step_dify_init_db），publish() 移入 setup_workflow.sh 內部
+    # 2025/06/13 移除 "創建知識庫" 功能，包含 upload_file(), init_db()
+
+    def step_dify_install_gemini():
+        _run_with_retry(install_gemini_plugin, DIFY_SESSION, DIFY_CSRF_HEADERS)
+
+    def step_dify_set_gemini():
+        _run_with_retry(set_gemini_api_key, DIFY_SESSION, DIFY_CSRF_HEADERS)
+
+    def step_dify_install_plugin():
+        run_shell_script(os.path.join(PLUGIN_SCRIPTS_DIR, "install.sh"))
+
+    def step_dify_setup_strategy():
+        # 需要 capture stdout 擷取 App ID，故不使用 run_shell_script
+        script = os.path.join(PLUGIN_SCRIPTS_DIR, "setup_workflow.sh")
+        subprocess.run(["chmod", "+x", script], check=True)
+        result = subprocess.run(
+            [script], check=True, text=True, capture_output=True, timeout=300,
+        )
+        logging.info(result.stdout)
+
+        # 從 setup_workflow.sh 輸出擷取 App ID（格式：-> App ID: xxxx）
         global APP_ID
-        APP_ID = dify_create_workflow(dify_payload, DIFY_TOKEN)
-        workflow_token = get_workflow_token(APP_ID, DIFY_TOKEN)
+        match = re.search(r"App ID:\s*(\S+)", result.stdout)
+        if not match:
+            log_error("⚠️ 無法從 setup_workflow.sh 輸出取得 App ID")
+        APP_ID = match.group(1)
+        logging.info(f"✅ Strategy App ID: {APP_ID}")
+
+        workflow_token = get_workflow_token(APP_ID, DIFY_SESSION, DIFY_CSRF_HEADERS)
         update_backend_api_key_base(workflow_token)
-        
-    def step_dify_init_db():
-        payload = {
-            "plugin_unique_identifiers": [
-                "langgenius/openai:0.0.26@c1e643ac6a7732f6333a783320b4d3026fa5e31d8e7026375b98d44418d33f26"
-            ]
-        }
-        try:
-            add_model_vendor(payload, DIFY_TOKEN)
-        except Exception as e:
-            logging.warning(f"⚠️ add_model_vendor 失敗，跳過 DB 初始化：{e}")
-            return            # 直接結束本函式，主程式照常執行
-        with step_timer("dify_set_openai_api_key"):
-            _run_with_retry(set_openai_api_key, DIFY_TOKEN)
-        publish(DIFY_TOKEN)
-        # 2025/06/13 移除 "創建知識庫" 功能，包含 upload_file(), init_db() 
 
     with step_timer("dify_setup_container"):
         _run_with_retry(step_dify_setup_container)
@@ -651,11 +602,17 @@ def step_dify():
     with step_timer("dify_setup_owner"):
         _run_with_retry(step_dify_setup_owner)
 
-    with step_timer("dify_init_workflow"):
-        _run_with_retry(step_dify_init_workflow)
+    with step_timer("dify_install_gemini"):
+        step_dify_install_gemini()
 
-    with step_timer("dify_init_db"):
-        step_dify_init_db()
+    with step_timer("dify_set_gemini"):
+        step_dify_set_gemini()
+
+    with step_timer("dify_install_plugin"):
+        _run_with_retry(step_dify_install_plugin)
+
+    with step_timer("dify_setup_strategy"):
+        step_dify_setup_strategy()  # 不使用 retry，避免重複建立 App
 
 def step_backend():
     with step_timer("backend_init"):
@@ -672,18 +629,18 @@ def step_dashboard():
 
 # ────────────────── 主程式 ──────────────────
 if __name__ == "__main__":
-    if N8N_EXIST == "NO":
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            futs = [pool.submit(step_dify), pool.submit(step_n8n)]
-            for f in as_completed(futs): f.result()
-    elif N8N_EXIST == "YES":
-        pass
-    else:
-        log_error("⚠️ 請設定 .env N8N_EXIST 為 YES/NO")
+    # if N8N_EXIST == "NO":
+    #     with ThreadPoolExecutor(max_workers=2) as pool:
+    #         futs = [pool.submit(step_dify), pool.submit(step_n8n)]
+    #         for f in as_completed(futs): f.result()
+    # elif N8N_EXIST == "YES":
+    #     pass
+    # else:
+    #     log_error("⚠️ 請設定 .env N8N_EXIST 為 YES/NO")
 
-    ensure_docker_network()
-    with ThreadPoolExecutor(max_workers=2) as pool:
-        futs = [pool.submit(step_backend), pool.submit(step_dashboard)]
-        for f in as_completed(futs): f.result()
-        
+    # ensure_docker_network()
+    # with ThreadPoolExecutor(max_workers=2) as pool:
+    #     futs = [pool.submit(step_backend), pool.submit(step_dashboard)]
+    #     for f in as_completed(futs): f.result()
+    step_backend()
     logging.info("🎉 部屬全部成功！")
