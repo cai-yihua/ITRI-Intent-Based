@@ -17,7 +17,10 @@ cd "$DIFY_DIR/docker" || exit 1
 if [ -f "$ENV_SRC" ]; then
   echo "📄 偵測到自訂環境檔：$ENV_SRC"
   cp "$ENV_SRC" .env
-  echo "✅ 已複製 .env.dify 為 .env"
+  # 自動生成 SECRET_KEY（替換 placeholder）
+  GENERATED_KEY=$(openssl rand -base64 42)
+  sed -i "s|SECRET_KEY=PLACEHOLDER_AUTO_GENERATED|SECRET_KEY=${GENERATED_KEY}|" .env
+  echo "✅ 已複製 .env.dify 為 .env（SECRET_KEY 已自動生成）"
 else
   echo "⚠️ 找不到 $ENV_SRC，改用範例檔案"
   if [ ! -f ".env" ]; then

@@ -541,14 +541,14 @@ def step_n8n():
         payloads = json_to_payload()
         n8n_create_workflow(payloads)
 
-    # with step_timer("step_n8n_setup_container"):
-    #     _run_with_retry(step_n8n_setup_container)
+    with step_timer("step_n8n_setup_container"):
+        _run_with_retry(step_n8n_setup_container)
 
-    # with step_timer("step_n8n_get_api_key"):
-    #     _run_with_retry(step_n8n_get_api_key)
+    with step_timer("step_n8n_get_api_key"):
+        _run_with_retry(step_n8n_get_api_key)
 
-    # with step_timer("step_n8n_init_workflow"):
-    #     _run_with_retry(step_n8n_init_workflow)
+    with step_timer("step_n8n_init_workflow"):
+        _run_with_retry(step_n8n_init_workflow)
 
 def step_dify():
     def step_dify_setup_container():
@@ -629,18 +629,18 @@ def step_dashboard():
 
 # ────────────────── 主程式 ──────────────────
 if __name__ == "__main__":
-    # if N8N_EXIST == "NO":
-    #     with ThreadPoolExecutor(max_workers=2) as pool:
-    #         futs = [pool.submit(step_dify), pool.submit(step_n8n)]
-    #         for f in as_completed(futs): f.result()
-    # elif N8N_EXIST == "YES":
-    #     pass
-    # else:
-    #     log_error("⚠️ 請設定 .env N8N_EXIST 為 YES/NO")
+    if N8N_EXIST == "NO":
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            futs = [pool.submit(step_dify), pool.submit(step_n8n)]
+            for f in as_completed(futs): f.result()
+    elif N8N_EXIST == "YES":
+        pass
+    else:
+        log_error("⚠️ 請設定 .env N8N_EXIST 為 YES/NO")
 
-    # ensure_docker_network()
-    # with ThreadPoolExecutor(max_workers=2) as pool:
-    #     futs = [pool.submit(step_backend), pool.submit(step_dashboard)]
-    #     for f in as_completed(futs): f.result()
-    step_backend()
+    ensure_docker_network()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futs = [pool.submit(step_backend), pool.submit(step_dashboard)]
+        for f in as_completed(futs): f.result()
+
     logging.info("🎉 部屬全部成功！")

@@ -37,7 +37,7 @@ docker run --network $NETWORK --name intent-postgres-db \
     -e POSTGRES_USER=$HTTP_POSTGRES_DATABASE_HOST_USER \
     -p $HTTP_POSTGRES_DATABASE_HOST_PORT:5432 \
     -v ~/postgres_data:/var/lib/postgresql/data \
-    -d postgres:latest
+    -d postgres:17.9
 
 sleep 5
 
