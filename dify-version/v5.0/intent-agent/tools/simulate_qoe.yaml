@@ -1,0 +1,34 @@
+identity:
+  name: simulate_qoe
+  author: ITRI
+  label:
+    zh_Hans: 模擬 QoE 優化
+    en_US: Simulate QoE Optimization
+description:
+  human:
+    zh_Hans: 模擬 QoE 優化
+    en_US: Simulate QoE Optimization
+  llm: >-
+    模擬特定 UE 的 QoE 優化效果，不會實際啟用。執行前必須先調用 get_active_rapp_status 確認無優化正在執行。必須提供 ueid 參數。
+parameters:
+  - name: ueid
+    type: string
+    required: true
+    label:
+      zh_Hans: 目標 UE ID
+      en_US: Target UE ID
+    human_description:
+      zh_Hans: 目標 UE ID（純數字字串）
+      en_US: Target UE ID (numeric string)
+    form: llm
+  - name: optimization_inc_percent
+    type: number
+    required: false
+    default: 0.1
+    label:
+      zh_Hans: 提升比例
+      en_US: Optimization Increase Percent
+    human_description:
+      zh_Hans: 提升比例，0.1=10%
+      en_US: Optimization increase percent, 0.1 = 10%
+    form: llm

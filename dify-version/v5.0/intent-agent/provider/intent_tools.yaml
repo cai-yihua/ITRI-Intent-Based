@@ -1,0 +1,33 @@
+identity:
+  name: "intent_tools"
+  author: "yc"
+  label:
+    en_US: "ITRI O-RAN Tools"
+    zh_Hans: "ITRI O-RAN 工具集"
+  description:
+    en_US: "O-RAN network management tools for querying and controlling base stations"
+    zh_Hans: "O-RAN 網路管理工具，用於查詢與控制基站"
+  icon: "icon.svg"
+credentials:
+  - name: n8n_base_url
+    type: text-input
+    required: true
+    label:
+      en_US: "n8n Webhook Base URL"
+      zh_Hans: "n8n Webhook 基底 URL"
+    placeholder:
+      en_US: "http://172.27.94.1:5678/webhook/"
+      zh_Hans: "http://172.27.94.1:5678/webhook/"
+    help:
+      en_US: "Base URL for n8n webhook endpoints (must end with /)"
+      zh_Hans: "n8n webhook 端點的基底 URL（須以 / 結尾）"
+tools:
+  - "tools/get_ue_status.yaml"
+  - "tools/get_sinr_map.yaml"
+  - "tools/get_active_rapp_status.yaml"
+  - "tools/enable_im.yaml"
+  - "tools/disable_im.yaml"
+  - "tools/simulate_im.yaml"
+  - "tools/enable_qoe.yaml"
+  - "tools/disable_qoe.yaml"
+  - "tools/simulate_qoe.yaml"

@@ -1,0 +1,63 @@
+identity:
+  name: "intent_strategy"
+  author: "yc"
+  label:
+    en_US: "Intent-Based Strategy"
+    zh_Hans: "意圖導向策略"
+description:
+  en_US: "O-RAN intent-based agent strategy with multi-role dispatch and dual execution modes"
+  zh_Hans: "O-RAN 意圖導向代理策略，支援四角色調度與雙執行模式"
+parameters:
+  - name: model
+    type: model-selector
+    scope: tool-call&llm
+    required: true
+    label:
+      en_US: "Model"
+      zh_Hans: "模型"
+  - name: tools
+    type: array[tools]
+    required: false
+    label:
+      en_US: "Tools"
+      zh_Hans: "工具列表"
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: "Query"
+      zh_Hans: "用戶輸入"
+  - name: maximum_iterations
+    type: number
+    required: false
+    default: 5
+    min: 1
+    max: 10
+    label:
+      en_US: "Max Iterations"
+      zh_Hans: "最大迭代次數"
+  - name: n8n_base_url
+    type: string
+    required: false
+    default: "http://172.27.94.1:5678/webhook"
+    label:
+      en_US: "n8n Webhook Base URL"
+      zh_Hans: "n8n Webhook 基底 URL"
+    help:
+      en_US: "Base URL for n8n webhook endpoints"
+      zh_Hans: "n8n webhook 端點的基底 URL"
+  - name: execution_mode
+    type: string
+    required: false
+    default: "auto"
+    label:
+      en_US: "Execution Mode (auto or step-by-step)"
+      zh_Hans: "執行模式（auto 或 step-by-step）"
+    help:
+      en_US: "auto: execute tools directly; step-by-step: confirm before high-risk operations"
+      zh_Hans: "auto：直接執行工具；step-by-step：高風險操作前先確認"
+features:
+  - "history-messages"
+extra:
+  python:
+    source: "strategies/intent_strategy.py"

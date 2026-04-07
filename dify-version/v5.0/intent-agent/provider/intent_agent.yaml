@@ -1,0 +1,25 @@
+identity:
+  name: "intent_agent"
+  author: "yc"
+  label:
+    en_US: "ITRI O-RAN Intent Agent"
+    zh_Hans: "ITRI O-RAN 意圖導向代理人"
+  description:
+    en_US: "O-RAN network management agent with intent-based interaction"
+    zh_Hans: "O-RAN 網路管理意圖導向代理人"
+  icon: "icon.svg"
+credentials:
+  - name: n8n_base_url
+    type: text-input
+    required: true
+    label:
+      en_US: "n8n Webhook Base URL"
+      zh_Hans: "n8n Webhook 基底 URL"
+    placeholder:
+      en_US: "http://172.27.94.1:5678/webhook/"
+      zh_Hans: "http://172.27.94.1:5678/webhook/"
+    help:
+      en_US: "Base URL for n8n webhook endpoints (must end with /)"
+      zh_Hans: "n8n webhook 端點的基底 URL（須以 / 結尾）"
+strategies:
+  - "strategies/intent_strategy.yaml"

@@ -1,0 +1,23 @@
+identity:
+  name: disable_qoe
+  author: ITRI
+  label:
+    zh_Hans: 關閉 QoE 優化
+    en_US: Disable QoE Optimization
+description:
+  human:
+    zh_Hans: 關閉 QoE 優化
+    en_US: Disable QoE Optimization
+  llm: >-
+    關閉特定 UE 的 QoE 優化。必須提供 ueid 參數。
+parameters:
+  - name: ueid
+    type: string
+    required: true
+    label:
+      zh_Hans: 目標 UE ID
+      en_US: Target UE ID
+    human_description:
+      zh_Hans: 目標 UE ID（純數字字串）
+      en_US: Target UE ID (numeric string)
+    form: llm
