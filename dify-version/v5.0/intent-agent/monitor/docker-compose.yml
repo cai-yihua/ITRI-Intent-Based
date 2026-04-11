@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  intent-agent-monitor:
+    build: .
+    container_name: intent-agent-monitor
+    ports:
+      - "8765:8765"
+    environment:
+      # Strategy 結構化 log 檔案路徑（容器內）
+      STRUCTURED_LOG_PATH: /data/intent_strategy_events.jsonl
+      # /data 內即 plugin_daemon /app/storage，JSONL 位於其根目錄
+      # 想監控的 plugin daemon container 名稱（留空則停用）
+      PLUGIN_CONTAINER_NAME: "docker-plugin_daemon-1"
+    volumes:
+      # 掛載 Strategy 結構化 log 來源
+      # Plugin daemon 的 /app/storage 已掛載至此主機路徑
+      - /home/yihua/ITRI-Intent-Based/dify/docker/volumes/plugin_daemon:/data
+      # 掛載 docker socket 才能 tail container logs（如有需要才開啟）
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped

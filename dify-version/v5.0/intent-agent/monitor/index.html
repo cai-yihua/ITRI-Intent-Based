@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Intent Agent Log Monitor</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 12px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  header h1 { margin: 0; font-size: 16px; color: var(--accent); }
+  .badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+  }
+  .badge.live { background: rgba(63,185,80,0.15); color: var(--green); border-color: var(--green); }
+  .badge.disconnected { background: rgba(248,81,73,0.15); color: var(--red); border-color: var(--red); }
+  .controls {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .controls input[type=text] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+  .controls button {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .controls button:hover { background: var(--panel); border-color: var(--accent); }
+  .controls label { color: var(--muted); font-size: 12px; }
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 20px;
+  }
+  .event {
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-left: 3px solid var(--border);
+    background: var(--panel);
+    border-radius: 0 4px 4px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .event.request_start { border-left-color: var(--accent); }
+  .event.request_end { border-left-color: var(--accent); }
+  .event.llm_invoke_start, .event.llm_invoke_end { border-left-color: var(--purple); }
+  .event.tool_executed { border-left-color: var(--green); }
+  .event.tool_intercepted { border-left-color: var(--yellow); }
+  .event.mode_switched { border-left-color: var(--yellow); }
+  .event.fatal_error, .event.llm_invoke_error { border-left-color: var(--red); }
+  .event.container_log { border-left-color: #6e7681; opacity: 0.5; font-size: 11px; }
+  .event.container_log.hidden-raw { display: none !important; }
+  .event.pending_state_detected { border-left-color: var(--yellow); }
+  .event.image_download_start { border-left-color: #79c0ff; }
+  .event.image_download_done { border-left-color: var(--green); }
+  .event.image_download_failed { border-left-color: var(--red); }
+  .event.multimodal_file_added { border-left-color: #79c0ff; }
+  .event.user_message_built { border-left-color: var(--purple); }
+  .ts { color: var(--muted); white-space: nowrap; min-width: 90px; }
+  .name { color: var(--accent); font-weight: bold; min-width: 180px; }
+  .name.error { color: var(--red); }
+  .fields { color: var(--text); flex: 1; word-break: break-all; white-space: pre-wrap; }
+  footer { padding: 6px 20px; background: var(--panel); border-top: 1px solid var(--border); color: var(--muted); font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Intent Agent Log Monitor</h1>
+  <span id="status" class="badge disconnected">disconnected</span>
+  <div class="controls">
+    <label>Filter:</label>
+    <input id="filter" type="text" placeholder="event name or text...">
+    <button id="clear">Clear</button>
+    <label><input id="autoscroll" type="checkbox" checked> autoscroll</label>
+    <label><input id="hideraw" type="checkbox" checked> hide raw logs</label>
+  </div>
+</header>
+<main id="log"></main>
+<footer><span id="count">0</span> events</footer>
+
+<script>
+  const logEl = document.getElementById('log');
+  const statusEl = document.getElementById('status');
+  const filterEl = document.getElementById('filter');
+  const clearBtn = document.getElementById('clear');
+  const autoscrollEl = document.getElementById('autoscroll');
+  const hiderawEl = document.getElementById('hideraw');
+  const countEl = document.getElementById('count');
+
+  let totalCount = 0;
+  let filterText = '';
+
+  // 重要欄位優先顯示（其餘收折）
+  const PRIMARY_FIELDS = {
+    request_start:          ['query', 'mode', 'history_count'],
+    request_end:            ['status', 'iterations'],
+    llm_invoke_start:       ['iteration', 'messages_count', 'user_content_type', 'has_image', 'image_parts', 'has_audio', 'audio_parts'],
+    llm_invoke_end:         ['iteration', 'elapsed_ms', 'response_chars', 'response_preview', 'tool_calls'],
+    tool_executed:          ['tool_name', 'args', 'elapsed_ms', 'result_preview'],
+    tool_intercepted:       ['tool_name', 'args'],
+    mode_switched:          ['old_mode', 'new_mode'],
+    pending_state_detected: ['pending'],
+    fatal_error:            ['error'],
+    llm_invoke_error:       ['iteration', 'error'],
+    params_debug:           ['query_len', 'image_files_count', 'audio_files_count', 'mode', 'execution_mode'],
+    image_download_start:   ['index', 'url'],
+    image_download_done:    ['index', 'size_kb', 'elapsed_ms', 'url'],
+    image_download_failed:  ['index', 'error', 'url'],
+    multimodal_file_added:  ['kind', 'source', 'index'],
+    user_message_built:     ['text_chars', 'embedded_url_count', 'image_file_count', 'audio_count', 'total_parts'],
+    container_log:          ['line'],
+  };
+
+  function formatFields(eventName, rest) {
+    const keys = PRIMARY_FIELDS[eventName] || Object.keys(rest);
+    const primary = {};
+    const secondary = {};
+    for (const [k, v] of Object.entries(rest)) {
+      if (keys.includes(k)) primary[k] = v;
+      else secondary[k] = v;
+    }
+    let out = '';
+    // 主要欄位：k=v 格式
+    for (const [k, v] of Object.entries(primary)) {
+      const val = typeof v === 'object' ? JSON.stringify(v) : String(v);
+      out += `${k}=${val}  `;
+    }
+    // 次要欄位：收折顯示
+    if (Object.keys(secondary).length > 0) {
+      out += `  (+${Object.keys(secondary).length} more)`;
+    }
+    return out.trimEnd();
+  }
+
+  filterEl.addEventListener('input', (e) => {
+    filterText = e.target.value.toLowerCase();
+    reapplyVisibility();
+  });
+
+  hiderawEl.addEventListener('change', reapplyVisibility);
+
+  function reapplyVisibility() {
+    Array.from(logEl.children).forEach((el) => {
+      const isRaw = el.classList.contains('container_log');
+      const matchesFilter = !filterText || el.textContent.toLowerCase().includes(filterText);
+      const hiddenByRaw = isRaw && hiderawEl.checked;
+      el.style.display = (hiddenByRaw || !matchesFilter) ? 'none' : '';
+    });
+  }
+
+  clearBtn.addEventListener('click', () => {
+    logEl.innerHTML = '';
+    totalCount = 0;
+    countEl.textContent = '0';
+  });
+
+  function formatTs(ts) {
+    const d = new Date(ts * 1000);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    const ss = String(d.getSeconds()).padStart(2, '0');
+    const ms = String(d.getMilliseconds()).padStart(3, '0');
+    return `${hh}:${mm}:${ss}.${ms}`;
+  }
+
+  function appendEvent(record) {
+    const div = document.createElement('div');
+    const eventName = record.event || 'unknown';
+    div.className = 'event ' + eventName;
+
+    const tsSpan = document.createElement('span');
+    tsSpan.className = 'ts';
+    tsSpan.textContent = formatTs(record.ts || Date.now() / 1000);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'name';
+    if (eventName.includes('error')) nameSpan.classList.add('error');
+    nameSpan.textContent = eventName;
+
+    const fieldsSpan = document.createElement('span');
+    fieldsSpan.className = 'fields';
+    const { ts, event, ...rest } = record;
+    if (Object.keys(rest).length > 0) {
+      fieldsSpan.textContent = formatFields(eventName, rest);
+    }
+
+    div.appendChild(tsSpan);
+    div.appendChild(nameSpan);
+    div.appendChild(fieldsSpan);
+
+    // 決定初始可見性
+    const isRaw = eventName === 'container_log';
+    const matchesFilter = !filterText || (tsSpan.textContent + nameSpan.textContent + fieldsSpan.textContent).toLowerCase().includes(filterText);
+    const hiddenByRaw = isRaw && hiderawEl.checked;
+    if (hiddenByRaw || !matchesFilter) {
+      div.style.display = 'none';
+    }
+
+    logEl.appendChild(div);
+    totalCount++;
+    countEl.textContent = totalCount;
+
+    if (autoscrollEl.checked) {
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  }
+
+  function connect() {
+    const es = new EventSource('/api/events/sse');
+    es.onopen = () => {
+      statusEl.textContent = 'live';
+      statusEl.classList.remove('disconnected');
+      statusEl.classList.add('live');
+    };
+    es.onerror = () => {
+      statusEl.textContent = 'disconnected';
+      statusEl.classList.remove('live');
+      statusEl.classList.add('disconnected');
+      es.close();
+      setTimeout(connect, 2000);
+    };
+    es.onmessage = (e) => {
+      try {
+        const record = JSON.parse(e.data);
+        appendEvent(record);
+      } catch (err) {
+        console.error('parse error', err, e.data);
+      }
+    };
+  }
+
+  connect();
+</script>
+</body>
+</html>
