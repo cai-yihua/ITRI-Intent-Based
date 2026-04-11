@@ -447,14 +447,15 @@ def update_backend_api_key_base(new_api_key_base):
 
     # 2026/04/07 移除 add_model_vendor()，改由 install_gemini_plugin() + set_gemini_api_key() 取代
 
-# Gemini plugin marketplace identifier
-GEMINI_PLUGIN_ID = "langgenius/gemini:0.7.20@de0063a630a6d1b2c025fb84f3462ba5151fb60618309cd595c3f4711b1df847"
 
 def install_gemini_plugin(session, csrf_headers) -> bool:
     """
     從 Dify Marketplace 安裝 Gemini model provider plugin（若尚未安裝）
     """
     dify_url = DIFY_LOGIN_URL.replace("/console/api/login", "")
+    
+    # Gemini plugin marketplace identifier
+    GEMINI_PLUGIN_ID = "langgenius/gemini:0.7.20@de0063a630a6d1b2c025fb84f3462ba5151fb60618309cd595c3f4711b1df847"
 
     # 檢查是否已安裝
     r = session.get(f"{dify_url}/console/api/workspaces/current/plugin/list", headers=csrf_headers)
@@ -524,6 +525,48 @@ def set_gemini_api_key(session, csrf_headers) -> bool:
 
     # 2026/04/07 移除 publish()，已移入 setup_workflow.sh 內部
 
+# ────────────────── dify plugin YAML 動態注入 ──────────────────
+def patch_plugin_yamls_n8n_url():
+    """
+    將 plugin YAML 檔案中寫死的 n8n URL，替換為 .env 的 N8N_BASE_URL。
+    """
+    if not N8N_BASE_URL:
+        log_error("⚠️ N8N_BASE_URL 未設定，無法更新 plugin YAML")
+
+    base = N8N_BASE_URL.rstrip("/")
+    plugin_dir = os.path.join(os.getcwd(), "dify-version", DIFY_TAG, "intent-agent")
+
+    # (檔案路徑, 替換 pattern, 替換後的格式字串)
+    patches = [
+        (
+            os.path.join(plugin_dir, "strategies", "intent_strategy.yaml"),
+            # 匹配 default: "http://任何IP:port/webhook"（不含結尾斜線）
+            re.compile(r"""(default:\s*["'])https?://[^/'"]+/webhook(["'])"""),
+            lambda m: f'{m.group(1)}{base}/webhook{m.group(2)}',
+        ),
+        (
+            os.path.join(plugin_dir, "provider", "intent_agent.yaml"),
+            # 匹配 en_US/zh_Hans placeholder: "http://任何IP:port/webhook/"
+            re.compile(r"""((?:en_US|zh_Hans):\s*["'])https?://[^/'"]+/webhook/(["'])"""),
+            lambda m: f'{m.group(1)}{base}/webhook/{m.group(2)}',
+        ),
+    ]
+
+    for filepath, pattern, replacer in patches:
+        if not os.path.exists(filepath):
+            logging.warning(f"⚠️ 找不到 YAML：{filepath}")
+            continue
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
+        new_content = pattern.sub(replacer, content)
+        if new_content != content:
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write(new_content)
+            logging.info(f"✅ n8n URL 已更新 → {os.path.relpath(filepath)}")
+        else:
+            logging.info(f"ℹ️  n8n URL 無需更新（已是最新）→ {os.path.relpath(filepath)}")
+
+
 # ────────────────── 主要步驟封裝成函式 ──────────────────
 def step_n8n():
     def step_n8n_setup_container():
@@ -573,6 +616,9 @@ def step_dify():
     def step_dify_set_gemini():
         _run_with_retry(set_gemini_api_key, DIFY_SESSION, DIFY_CSRF_HEADERS)
 
+    def step_dify_patch_yamls():
+        patch_plugin_yamls_n8n_url()
+
     def step_dify_install_plugin():
         run_shell_script(os.path.join(PLUGIN_SCRIPTS_DIR, "install.sh"))
 
@@ -607,6 +653,9 @@ def step_dify():
 
     with step_timer("dify_set_gemini"):
         step_dify_set_gemini()
+
+    with step_timer("dify_patch_plugin_yamls"):
+        step_dify_patch_yamls()
 
     with step_timer("dify_install_plugin"):
         _run_with_retry(step_dify_install_plugin)

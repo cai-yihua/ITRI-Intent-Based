@@ -3,3 +3,5 @@
 dify/
 uv.lock
 /log
+__pycache__/
+*.pyc
