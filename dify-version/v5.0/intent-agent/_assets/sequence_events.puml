@@ -1,0 +1,94 @@
+@startuml
+' Figure 4: EventLogger — _emit_event 觸發點全覽
+!pragma teoz true
+title Figure 4: EventLogger — _emit_event 觸發點（對應 Figure 1 步驟）
+skinparam backgroundColor #fefefe
+skinparam roundcorner 10
+skinparam DefaultFontSize 12
+skinparam DefaultFontName Arial
+skinparam maxMessageSize 220
+skinparam NoteBackgroundColor #fffacd
+
+box "intent_agent_plugin [System]" #LightBlue
+    box "strategy [Module]" #LightGreen
+        participant IntentStrategy as "IntentStrategy\n(strategies/intent_strategy.py)"
+    end box
+    box "event_log [Module]" #LightGreen
+        participant EventLogger as "EventLogger\n(_emit_event)"
+    end box
+end box
+
+note over IntentStrategy, EventLogger
+  **EventLogger 說明**
+  _emit_event(event_type, **fields) 直接以 JSON Lines 寫入 stdout 與
+  /app/storage/intent_strategy_events.jsonl（fire-and-forget，無回傳）
+end note
+
+== _invoke 入口（_do_invoke 呼叫前） ==
+
+IntentStrategy -> EventLogger: params_debug\n{param_keys, image_files_type, image_files_repr[:500],\naudio_files_type, audio_files_repr[:500]}
+IntentStrategy -> EventLogger: request_start\n{query_preview[:200], execution_mode}
+
+== Step 2 — 執行模式判斷 ==
+
+opt 使用者 query 含切換關鍵字
+    IntentStrategy -> EventLogger: mode_switched\n{from_mode, to_mode, trigger="keyword_in_query"}
+end
+
+== Step 3 — Pending State 處理 ==
+
+opt 偵測到 pending_state（上一輪未確認的工具呼叫）
+    IntentStrategy -> EventLogger: pending_state_detected\n{pending: dict}
+end
+
+== Step 5 — 建立 User Message（_build_user_message） ==
+
+loop 每個 Dify 檔案（image / audio）
+    IntentStrategy -> EventLogger: multimodal_file_added\n{kind, source="dify_file", index}
+end
+
+loop 每個 embedded URL（image）
+    IntentStrategy -> EventLogger: image_download_start\n{index, url}
+    alt 下載成功
+        IntentStrategy -> EventLogger: image_download_done\n{index, url, size_kb, elapsed_ms}
+    else 下載失敗
+        IntentStrategy -> EventLogger: image_download_failed\n{index, url, error, elapsed_ms}
+    end
+end
+
+IntentStrategy -> EventLogger: user_message_built\n{text_chars, image_file_count, embedded_url_count,\naudio_count, total_parts}
+
+== Step 6 — LLM 呼叫 ＋ Tool 執行迴圈 ==
+
+loop 每次 LLM iteration
+    IntentStrategy -> EventLogger: llm_invoke_start\n{iteration, messages_count, user_content_type,\nimage_parts, audio_parts}
+
+    alt LLM 呼叫異常
+        IntentStrategy -> EventLogger: llm_invoke_error\n{iteration, error}
+        note right: 記錄後 raise／return
+    else LLM 回傳正常
+        IntentStrategy -> EventLogger: llm_invoke_end\n{iteration, elapsed_ms, response_chars,\nresponse_preview[:120], tool_calls[names]}
+
+        opt 回應含高風險工具（需使用者確認）
+            IntentStrategy -> EventLogger: tool_intercepted\n{iteration, risky_tools}
+            IntentStrategy -> EventLogger: request_end\n{status="awaiting_confirmation", iterations}
+            note right: 記錄後 return（等待下一輪 query 確認）
+        end
+
+        loop 每個工具呼叫（非攔截）
+            IntentStrategy -> EventLogger: tool_executed\n{tool, args, attempts, elapsed_ms,\nstatus_code, error}
+        end
+    end
+end
+
+== 請求結束 ==
+
+IntentStrategy -> EventLogger: request_end\n{status="completed", iterations}
+
+== Fatal Error（_invoke 例外處理） ==
+
+opt _invoke 捕捉到未預期例外
+    IntentStrategy -> EventLogger: fatal_error\n{error, traceback}
+end
+
+@enduml

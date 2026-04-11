@@ -1,0 +1,181 @@
+@startuml
+' Figure 2: IntentStrategy — Step-by-step 攔截與恢復（跨兩輪）
+!pragma teoz true
+title Figure 2: IntentStrategy — Step-by-step 攔截與恢復（跨兩輪）
+skinparam backgroundColor #fefefe
+skinparam roundcorner 10
+skinparam DefaultFontSize 12
+skinparam DefaultFontName Arial
+skinparam maxMessageSize 200
+
+actor User
+
+box "dify_host [System]" #LightBlue
+    box "plugin_runtime [Module]" #LightGreen
+        participant AgentInvoker as "AgentInvoker"
+    end box
+    box "llm_session [Module]" #LightGreen
+        participant LLMSession as "LLMSession"
+    end box
+end box
+
+box "intent_agent_plugin [System]" #LightBlue
+    box "strategy [Module]" #LightGreen
+        participant IntentStrategy as "IntentStrategy"
+    end box
+    box "tool_registry [Module]" #LightGreen
+        participant ToolRegistry as "ToolRegistry"
+    end box
+end box
+
+box "n8n [System]" #LightBlue
+    box "webhook [Module]" #LightGreen
+        participant N8nWebhook as "N8nWebhook"
+    end box
+end box
+
+== 第一輪：User 發出修改指令 ==
+
+User -> AgentInvoker: 送出 query\n(例如「開啟 131 區的 IM 優化」)
+activate AgentInvoker
+AgentInvoker -> IntentStrategy: _invoke(parameters)
+activate IntentStrategy
+
+note over IntentStrategy
+  **Step 1, 4, 5（略，同圖 1）**
+  _parse_history → _load_prompt → _build_user_message
+end note
+
+== Step 2. _detect_mode_override ==
+
+alt (i) execution_mode 參數 = step-by-step
+    note over IntentStrategy
+      直接採用參數
+      **effective_mode = step-by-step**
+    end note
+else (ii) execution_mode = auto 但 query 含關鍵字
+    note over IntentStrategy
+      命中 MODE_KEYWORDS_STEP
+      （「逐步確認 / 一步一步 / 先讓我看 / 我要確認每一步」）
+      **effective_mode = step-by-step**（覆寫）
+    end note
+end
+
+== Step 3. _detect_pending_state ==
+
+note over IntentStrategy
+  反向掃 history → **無 <pending_state>**
+  pending_was_seen = **false**
+end note
+
+== Step 6. Agent Loop（第一圈 → 攔截） ==
+
+IntentStrategy -> LLMSession: invoke(messages, tool_schemas, stream=True)
+activate LLMSession
+LLMSession --> IntentStrategy: response_text + tool_calls\n[ enable_im(location="131") ]
+deactivate LLMSession
+
+note over IntentStrategy
+  **攔截判斷**
+  risky_calls = tool_calls ∩ RISKY_TOOLS = [enable_im]
+  should_intercept =
+    (effective_mode == "step-by-step") ∧
+    bool(risky_calls) ∧
+    (pending_was_seen == false)
+  = **true** → 執行攔截（直接 return，不進工具執行）
+end note
+
+note over IntentStrategy
+  **組 pending_payload（寫入 <pending_state>）**
+  欄位：
+  - tool_calls: list[ {id: str, name: str, args: dict} ]
+  - created_at: float  (time.time())
+  序列化為 JSON，包進
+  <pending_state>...</pending_state>
+  附加在 response_text 末尾
+end note
+
+IntentStrategy --> AgentInvoker: yield text_message(\n  response_text + <pending_state>JSON</pending_state>\n)
+deactivate IntentStrategy
+AgentInvoker --> User: 顯示確認提示\n(含 <pending_state> 隱藏標籤)
+deactivate AgentInvoker
+
+== 第二輪：User 回覆確認 ==
+
+User -> AgentInvoker: 送出 query（例如「好，執行」）
+activate AgentInvoker
+AgentInvoker -> IntentStrategy: _invoke(parameters)
+activate IntentStrategy
+
+note over IntentStrategy
+  **Step 1, 4, 5（略，同圖 1）**
+  _parse_history 這次會把前一輪 assistant 訊息
+  （含 <pending_state> 標籤）納入 history
+end note
+
+note over IntentStrategy
+  **Step 2. _detect_mode_override**
+  同前：effective_mode = step-by-step
+end note
+
+== Step 3. _detect_pending_state（關鍵差異）==
+
+note over IntentStrategy
+  反向掃 history → 最近一則 assistant
+  含 <pending_state>...</pending_state>
+  PENDING_STATE_PATTERN 命中 → json.loads 成功
+  **pending_was_seen = true**
+end note
+
+== Step 6. Agent Loop（第二圈 → 執行） ==
+
+IntentStrategy -> LLMSession: invoke(messages, tool_schemas, stream=True)
+activate LLMSession
+note right of LLMSession
+  LLM 看到完整 history：
+  - 前輪 user: "開啟 131 區 IM"
+  - 前輪 assistant: 含 <pending_state>
+  - 本輪 user: "好，執行"
+  → LLM **重新**決定 tool_calls
+  （<pending_state> 只是 strategy 的旗標，
+   實際 tool_calls 每次都由 LLM 重算）
+end note
+LLMSession --> IntentStrategy: response_text + tool_calls\n[ enable_im(location="131") ]
+deactivate LLMSession
+
+note over IntentStrategy
+  **攔截判斷**
+  should_intercept =
+    (effective_mode == "step-by-step") ∧
+    bool(risky_calls) ∧
+    **(pending_was_seen == false)** ← 此次為 true
+  = **false** → 不攔截，進入工具執行
+end note
+
+loop 每個 tool_call
+    IntentStrategy -> ToolRegistry: build_payload(name, args)
+    activate ToolRegistry
+    ToolRegistry --> IntentStrategy: payload
+    deactivate ToolRegistry
+
+    IntentStrategy -> ToolRegistry: call_n8n_with_retry(name, payload)
+    activate ToolRegistry
+    ToolRegistry -> N8nWebhook: POST /webhook/{uuid}
+    activate N8nWebhook
+    N8nWebhook --> ToolRegistry: response
+    deactivate N8nWebhook
+    ToolRegistry --> IntentStrategy: (text, raw_bytes, meta)
+    deactivate ToolRegistry
+end
+
+IntentStrategy -> LLMSession: invoke(messages + tool_results)
+activate LLMSession
+LLMSession --> IntentStrategy: response_text (無 tool_calls → 結束 loop)
+deactivate LLMSession
+
+IntentStrategy --> AgentInvoker: yield text_message(response_text)
+deactivate IntentStrategy
+AgentInvoker --> User: 顯示執行結果
+deactivate AgentInvoker
+
+@enduml

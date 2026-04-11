@@ -1,0 +1,80 @@
+@startuml
+' Figure 3: Plugin Bootstrap
+!pragma teoz true
+title Figure 3: Plugin Bootstrap — DifyPluginDaemon → DifyPlugin → IntentStrategy 註冊路徑
+skinparam backgroundColor #fefefe
+skinparam roundcorner 10
+skinparam DefaultFontSize 12
+skinparam DefaultFontName Arial
+skinparam maxMessageSize 200
+
+box "dify_host [System]" #LightBlue
+    box "plugin_daemon [Module]" #LightGreen
+        participant DifyPluginDaemon as "DifyPluginDaemon"
+    end box
+end box
+
+box "intent_agent_plugin [System]" #LightBlue
+    box "entrypoint [Module]" #LightGreen
+        participant DifyPlugin as "DifyPlugin\n(main.py)"
+    end box
+    box "provider [Module]" #LightGreen
+        participant IntentAgentProvider as "IntentAgentProvider\n(provider/intent_agent.py)"
+    end box
+    box "strategy [Module]" #LightGreen
+        participant IntentStrategy as "IntentStrategy\n(strategies/intent_strategy.py)"
+    end box
+end box
+
+== Bootstrap ==
+
+DifyPluginDaemon -> DifyPlugin: exec process\n(inject DifyPluginEnv)
+activate DifyPlugin
+
+note over DifyPlugin
+  **Plugin(DifyPluginEnv())**
+  讀 manifest.yaml
+  plugins.agent_strategies:
+    provider/intent_agent.yaml
+end note
+
+DifyPlugin -> IntentAgentProvider: load provider
+activate IntentAgentProvider
+note over IntentAgentProvider
+  **IntentAgentProvider(ToolProvider)**
+  credentials 驗證入口
+  _validate_credentials: 檢查 n8n_base_url
+end note
+IntentAgentProvider --> DifyPlugin: provider registered
+deactivate IntentAgentProvider
+
+DifyPlugin -> IntentStrategy: load strategy
+activate IntentStrategy
+note over IntentStrategy
+  **IntentStrategy(AgentStrategy)**
+  掛載 _invoke() 為 agent 呼叫入口
+  掛載 TOOL_SCHEMAS（9 tools）
+end note
+IntentStrategy --> DifyPlugin: strategy registered
+deactivate IntentStrategy
+
+DifyPlugin --> DifyPluginDaemon: plugin ready\n(RPC loop started)
+
+== Invocation（Runtime） ==
+
+DifyPluginDaemon -> DifyPlugin: agent.invoke(request)
+activate DifyPlugin
+DifyPlugin -> IntentStrategy: _invoke(parameters)
+activate IntentStrategy
+
+note over IntentStrategy
+  parameters.pop("tools")
+  yield from _do_invoke(parameters)
+end note
+
+IntentStrategy --> DifyPlugin: yield (text / image)
+deactivate IntentStrategy
+DifyPlugin --> DifyPluginDaemon: yield (text / image)
+deactivate DifyPlugin
+
+@enduml
