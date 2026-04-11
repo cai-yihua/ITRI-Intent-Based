@@ -1,401 +1,469 @@
+"""
+ITRI O-RAN Intent Agent Strategy（v5.0 重構版）
+
+職責：
+1. 組裝 system prompt（單一 prompts/prompt.md）
+2. 接收多模態輸入（image_files + audio_files）
+3. 驅動 agent loop（LLM function calling）
+4. 透過 tool_registry 執行工具（含 3 次重試）
+5. Strategy 層判斷 step-by-step 模式（使用 <pending_state> 標籤跨輪次持久化）
+6. 偵測 mode 切換關鍵字（auto / step-by-step）
+7. 結構化日誌輸出（給日誌監控前端使用）
+"""
+import base64
 import json
 import logging
 import re
-from pathlib import Path
+import time
 from collections.abc import Generator
+from pathlib import Path
 from typing import Any
 
 import requests as http_requests
-
-logger = logging.getLogger(__name__)
-
-_DEBUG_LOG_PATH = "/tmp/intent_strategy_debug.log"
-def _debug_log(msg: str):
-    """寫入 debug log 到檔案（plugin subprocess 的 print/logger 不一定會顯示）"""
-    try:
-        with open(_DEBUG_LOG_PATH, "a") as f:
-            f.write(f"{msg}\n")
-    except Exception:
-        pass
 from pydantic import BaseModel
+
 from dify_plugin.entities.agent import AgentInvokeMessage
 from dify_plugin.entities.model.llm import LLMModelConfig
 from dify_plugin.entities.model.message import (
-    SystemPromptMessage,
-    UserPromptMessage,
     AssistantPromptMessage,
-    ToolPromptMessage,
     PromptMessageTool,
+    SystemPromptMessage,
+    ToolPromptMessage,
+    UserPromptMessage,
 )
 from dify_plugin.entities.tool import ToolInvokeMessage
-from dify_plugin.interfaces.agent import AgentStrategy, ToolEntity
+from dify_plugin.interfaces.agent import AgentStrategy
 
-# n8n base URL 預設值
+try:
+    from dify_plugin.entities.model.message import (
+        AudioPromptMessageContent,
+        ImagePromptMessageContent,
+        TextPromptMessageContent,
+    )
+    HAS_MULTIMODAL = True
+except ImportError:
+    HAS_MULTIMODAL = False
+
+from strategies.tool_registry import (
+    QUERY_TOOLS,
+    RISKY_TOOLS,
+    TOOL_SCHEMAS,
+    build_payload,
+    call_n8n_with_retry,
+)
+
+logger = logging.getLogger(__name__)
+
+# ─────────────────────────────────────────
+# 結構化日誌輸出（供 monitor 容器讀取）
+# ─────────────────────────────────────────
+_STRUCTURED_LOG_PATH = "/app/storage/intent_strategy_events.jsonl"
+
+
+def _emit_event(event_type: str, **fields: Any) -> None:
+    """寫入結構化事件日誌（JSON Lines）。"""
+    record = {
+        "ts": time.time(),
+        "event": event_type,
+        **fields,
+    }
+    try:
+        with open(_STRUCTURED_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+    except Exception:
+        pass
+    logger.info("[event] %s %s", event_type, json.dumps(fields, ensure_ascii=False, default=str)[:300])
+
+
+# ─────────────────────────────────────────
+# 預設常數
+# ─────────────────────────────────────────
 N8N_BASE_URL_DEFAULT = "http://172.27.94.1:5678/webhook"
 
+MODE_KEYWORDS_AUTO = ("自動執行", "不用確認", "直接做", "直接執行")
+MODE_KEYWORDS_STEP = ("逐步確認", "我要確認每一步", "先讓我看", "一步一步")
 
+PENDING_STATE_PATTERN = re.compile(
+    r"<pending_state>\s*(.*?)\s*</pending_state>", re.DOTALL
+)
+
+
+# ─────────────────────────────────────────
+# 參數
+# ─────────────────────────────────────────
 class Params(BaseModel):
-    model_config = {"extra": "allow"}  # 允許額外欄位（如 tools=None）被忽略
+    model_config = {"extra": "allow"}
     model: Any
     query: str
     maximum_iterations: int = 5
     n8n_base_url: str = N8N_BASE_URL_DEFAULT
     execution_mode: str = "auto"
+    image_files: Any = None
+    audio_files: Any = None
 
 
 # ─────────────────────────────────────────
-# 執行模式動態 Prompt 片段
+# Strategy 主體
 # ─────────────────────────────────────────
-MODE_PROMPT_AUTO = """
-## 當前執行模式：自動執行（auto）
-- 當意圖清晰且參數完整時，直接呼叫工具執行，不需額外向使用者確認。
-- 執行後仍須完整呈現執行過程與結果。
-- 若使用者在對話中說「逐步確認」或「我要確認每一步」，則切換為 step-by-step 行為。
-"""
-
-MODE_PROMPT_STEP_BY_STEP = """
-## 當前執行模式：逐步確認（step-by-step）
-- 所有高風險操作（enable_im, simulate_im, enable_qoe, simulate_qoe, disable_im, disable_qoe）執行前，必須先描述執行計畫並等使用者確認（是/否）。
-- 查詢類操作（get_ue_status, get_sinr_map, get_active_rapp_status）可直接執行。
-- 若使用者在對話中說「自動執行」或「不用確認」，則切換為 auto 行為。
-"""
-
-
-# ─────────────────────────────────────────
-# 內建工具定義（不依賴 Dify Tool System）
-# ─────────────────────────────────────────
-BUILTIN_TOOLS = [
-    {
-        "name": "get_ue_status",
-        "description": "查詢 UE 狀態。參數互斥，依優先級擇一使用：1. ueid（指定 UE ID，純數字字串）2. location（地點代碼：電梯前=131, 501走廊=132, 503會議室=135）3. all_edge=true（所有受干擾 UE）4. all_center=true（所有未受干擾 UE）5. worst_part（效能最差比例，0.1=最差10%）6. 全部不填=查詢所有 UE",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "ueid": {"type": "string", "description": "UE ID（純數字）"},
-                "location": {"type": "string", "description": "地點代碼：131=電梯前, 132=501走廊, 135=503會議室"},
-                "all_edge": {"type": "boolean", "description": "true=查詢所有受干擾 UE"},
-                "all_center": {"type": "boolean", "description": "true=查詢所有未受干擾 UE"},
-                "worst_part": {"type": "number", "description": "效能最差比例（0.1=最差10%）"},
-            },
-            "required": [],
-        },
-        "endpoint": "e8f1cc4d-7560-4ae6-8ec2-dece817160be",
-        "method": "POST",
-    },
-    {
-        "name": "get_sinr_map",
-        "description": "查詢場域的 SINR 熱力圖，無需任何參數。",
-        "parameters": {"type": "object", "properties": {}, "required": []},
-        "endpoint": "9a74bbcd-861d-4c03-b3b4-1410c6dddb08",
-        "method": "POST",
-    },
-    {
-        "name": "get_active_rapp_status",
-        "description": "查詢目前場域中正在執行的優化狀態（rApp）。用於確認是否有優化正在運行。執行 enable_im/simulate_im/enable_qoe/simulate_qoe 前必須先調用此工具檢查。無需任何參數。",
-        "parameters": {"type": "object", "properties": {}, "required": []},
-        "endpoint": "e36fcc1c-bf54-4590-a894-c00bcb5c318c",
-        "method": "POST",
-    },
-    {
-        "name": "enable_im",
-        "description": "開啟干擾管理(IM)優化。執行前必須先調用 get_active_rapp_status 確認無優化正在執行。參數互斥，依優先級擇一使用：1. location（地點代碼：電梯前=131, 501走廊=132, 503會議室=135）2. all_edge=true（所有受干擾 UE）3. all_center=true（所有未受干擾 UE）4. worst_part（效能最差比例，0.1=最差10%）5. 全部不填=優化整個場域。可選 optimization_inc_percent（提升比例，預設0.1即10%）。",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "location": {"type": "string", "description": "地點代碼：131=電梯前, 132=501走廊, 135=503會議室"},
-                "all_edge": {"type": "boolean", "description": "true=所有受干擾 UE"},
-                "all_center": {"type": "boolean", "description": "true=所有未受干擾 UE"},
-                "worst_part": {"type": "number", "description": "效能最差比例（0.1=最差10%）"},
-                "optimization_inc_percent": {"type": "number", "description": "提升比例，預設0.1即10%"},
-            },
-            "required": [],
-        },
-        "endpoint": "7aa374ea-d239-462c-987e-42872a27133e",
-        "method": "POST",
-        "build_payload": "im",
-    },
-    {
-        "name": "disable_im",
-        "description": "關閉干擾管理(IM)優化。無需任何參數。",
-        "parameters": {"type": "object", "properties": {}, "required": []},
-        "endpoint": "0ea63998-8332-4626-9452-34c923fa538e",
-        "method": "GET",
-    },
-    {
-        "name": "simulate_im",
-        "description": "模擬干擾管理(IM)優化效果，不會實際啟用。執行前必須先調用 get_active_rapp_status 確認無優化正在執行。參數同 enable_im。",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "location": {"type": "string", "description": "地點代碼：131=電梯前, 132=501走廊, 135=503會議室"},
-                "all_edge": {"type": "boolean", "description": "true=所有受干擾 UE"},
-                "all_center": {"type": "boolean", "description": "true=所有未受干擾 UE"},
-                "worst_part": {"type": "number", "description": "效能最差比例（0.1=最差10%）"},
-                "optimization_inc_percent": {"type": "number", "description": "提升比例，預設0.1即10%"},
-            },
-            "required": [],
-        },
-        "endpoint": "da0e5281-0fbc-4c30-adb6-76b23824ec28",
-        "method": "POST",
-        "build_payload": "im",
-    },
-    {
-        "name": "enable_qoe",
-        "description": "針對特定 UE 啟用 QoE 優化。執行前必須先調用 get_active_rapp_status 確認無優化正在執行。必須提供 ueid 參數。",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "ueid": {"type": "string", "description": "目標 UE ID（純數字字串）"},
-                "optimization_inc_percent": {"type": "number", "description": "提升比例，預設0.1即10%"},
-            },
-            "required": ["ueid"],
-        },
-        "endpoint": "fbc98177-6e62-4738-9e47-2312896ff5da",
-        "method": "POST",
-        "build_payload": "qoe",
-    },
-    {
-        "name": "disable_qoe",
-        "description": "關閉特定 UE 的 QoE 優化。必須提供 ueid 參數。",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "ueid": {"type": "string", "description": "目標 UE ID（純數字字串）"},
-            },
-            "required": ["ueid"],
-        },
-        "endpoint": "009cca49-effc-492a-b985-e14e0a95b133",
-        "method": "POST",
-        "build_payload": "qoe_disable",
-    },
-    {
-        "name": "simulate_qoe",
-        "description": "模擬特定 UE 的 QoE 優化效果，不會實際啟用。執行前必須先調用 get_active_rapp_status 確認無優化正在執行。必須提供 ueid 參數。",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "ueid": {"type": "string", "description": "目標 UE ID（純數字字串）"},
-                "optimization_inc_percent": {"type": "number", "description": "提升比例，預設0.1即10%"},
-            },
-            "required": ["ueid"],
-        },
-        "endpoint": "7aa374ea-d239-462c-987e-42872a27133e",
-        "method": "POST",
-        "build_payload": "qoe",
-    },
-]
-
-# IM payload 基礎模板
-IM_BASE_PAYLOAD = {
-    "manualNumOfNonInterferedRb": -1,
-    "percentOfEdgeUeNumForGtCaseBound": 0.5,
-    "percentOfEdgeUeNumForLtCaseBound": 0.3,
-    "percentOfCenterUeAvgTputForGtCase": 0.75,
-    "percentOfCenterUeAvgTputForEqCase": 0.75,
-    "percentOfCenterUeAvgTputForLtCase": 0.75,
-}
-
-LOCATION_MAP = {
-    "131": {"filter": {"location": "131"}, "optimization_method": 3},
-    "132": {"filter": {"location": "132"}, "optimization_method": 3},
-    "135": {"filter": {"location": "135"}, "optimization_method": 3},
-}
-
-
-def _build_payload(tool_def: dict, args: dict) -> dict | None:
-    """根據工具定義組裝 API payload。"""
-    build_type = tool_def.get("build_payload")
-    if not build_type:
-        # 直接用 args 作為 payload（get_ue_status 等）
-        return args if args else None
-
-    if build_type == "im":
-        payload = dict(IM_BASE_PAYLOAD)
-        payload["optimization_inc_percent"] = str(args.get("optimization_inc_percent", 0.1))
-        loc = args.get("location")
-        if loc and loc in LOCATION_MAP:
-            m = LOCATION_MAP[loc]
-            payload["filter"] = m["filter"]
-            payload["optimization_method"] = m["optimization_method"]
-            payload["optimization_param"] = None
-        elif args.get("all_edge"):
-            payload["filter"] = {"all_edge": True}
-            payload["optimization_method"] = 2
-            payload["optimization_param"] = None
-        elif args.get("all_center"):
-            payload["filter"] = {"all_center": True}
-            payload["optimization_method"] = 3
-            payload["optimization_param"] = None
-        elif args.get("worst_part") is not None:
-            wp = float(args["worst_part"])
-            payload["filter"] = {"worst_part": wp}
-            payload["optimization_method"] = 6
-            payload["optimization_param"] = {"worst_percent": wp}
-        else:
-            payload["filter"] = {}
-            payload["optimization_method"] = 4
-            payload["optimization_param"] = None
-        return payload
-
-    if build_type == "qoe":
-        return {
-            "ueid": str(args.get("ueid", "")),
-            "optimization_inc_percent": float(args.get("optimization_inc_percent", 0.1)),
-        }
-
-    if build_type == "qoe_disable":
-        return {"ueid": str(args.get("ueid", ""))}
-
-    return args
-
-
-def _call_n8n(endpoint: str, method: str, payload: dict | None, n8n_base_url: str) -> tuple[str, bytes | None]:
-    """直接 HTTP 呼叫 n8n webhook。回傳 (text_for_llm, raw_bytes_or_None)。"""
-    url = f"{n8n_base_url.rstrip('/')}/{endpoint}"
-    logger.info(f"[n8n] {method} {url} payload={json.dumps(payload, ensure_ascii=False)[:200] if payload else 'None'}")
-    try:
-        resp = http_requests.request(
-            method=method,
-            url=url,
-            json=payload if method.upper() in ("POST", "PUT", "PATCH") else None,
-            timeout=30,
-        )
-        content_type = resp.headers.get("Content-Type", "")
-        _debug_log(f"[_call_n8n] status={resp.status_code} Content-Type={content_type} size={len(resp.content)}")
-
-        # 圖片回傳：回傳描述文字 + raw bytes
-        if content_type.startswith("image/"):
-            _debug_log(f"[_call_n8n] image detected! returning raw bytes")
-            return "[圖片已回傳，請描述此圖片為 SINR 熱力圖，已直接顯示給使用者]", resp.content
-
-        return resp.text, None
-    except Exception as e:
-        logger.error(f"[n8n] Error calling {url}: {e}")
-        return f"Error calling n8n: {e}", None
-
-
 class IntentStrategy(AgentStrategy):
 
-    def _build_system_prompt(self, execution_mode: str) -> str:
+    # ─────────────────────────────────────
+    # Prompt 載入
+    # ─────────────────────────────────────
+    def _load_prompt(self) -> str:
         prompt_path = Path(__file__).parent.parent / "prompts" / "prompt.md"
-        base_prompt = prompt_path.read_text(encoding="utf-8") if prompt_path.exists() else "You are a helpful assistant."
-        mode_prompt = MODE_PROMPT_AUTO if execution_mode == "auto" else MODE_PROMPT_STEP_BY_STEP
-        return base_prompt + "\n\n" + mode_prompt
+        if prompt_path.exists():
+            return prompt_path.read_text(encoding="utf-8")
+        return "You are a helpful assistant."
 
-    # ─────────────────────────────────────────
-    # Trace
-    # ─────────────────────────────────────────
+    # ─────────────────────────────────────
+    # Mode 偵測
+    # ─────────────────────────────────────
     @staticmethod
-    def _trace_entry(seq: int, from_actor: str, to_actor: str, action: str, detail: str = "") -> dict:
-        entry = {"seq": seq, "from": from_actor, "to": to_actor, "action": action}
-        if detail:
-            entry["detail"] = detail
-        return entry
+    def _detect_mode_override(query: str, current_mode: str) -> str:
+        """偵測 query 中的 mode 切換關鍵字，回傳實際應使用的 mode。"""
+        if any(kw in query for kw in MODE_KEYWORDS_AUTO):
+            return "auto"
+        if any(kw in query for kw in MODE_KEYWORDS_STEP):
+            return "step-by-step"
+        return current_mode
+
+    # ─────────────────────────────────────
+    # Pending state 偵測（從 history 解析）
+    # ─────────────────────────────────────
+    @staticmethod
+    def _detect_pending_state(history_messages: list[Any]) -> dict | None:
+        """
+        從歷史訊息中找最近一則 assistant 訊息，檢查是否含 <pending_state> 標籤。
+        若有，回傳解析後的結構化資料；否則回傳 None。
+        """
+        for msg in reversed(history_messages):
+            content = ""
+            if isinstance(msg, dict):
+                if msg.get("role") != "assistant":
+                    continue
+                raw = msg.get("content", "")
+                if isinstance(raw, list):
+                    content = "".join(
+                        item.get("text", "") if isinstance(item, dict) else str(item)
+                        for item in raw
+                    )
+                else:
+                    content = str(raw)
+            else:
+                if not isinstance(msg, AssistantPromptMessage):
+                    continue
+                if isinstance(msg.content, str):
+                    content = msg.content
+                elif isinstance(msg.content, list):
+                    content = "".join(getattr(item, "data", "") for item in msg.content)
+
+            if not content:
+                continue
+
+            match = PENDING_STATE_PATTERN.search(content)
+            if match:
+                try:
+                    return json.loads(match.group(1))
+                except json.JSONDecodeError:
+                    return None
+            return None
+        return None
+
+    # ─────────────────────────────────────
+    # 檔案處理
+    # ─────────────────────────────────────
+    @staticmethod
+    def _file_to_content(file_obj: Any, kind: str) -> Any | None:
+        """
+        將 Dify File 物件轉為 PromptMessageContent。kind: 'image' | 'audio'
+
+        策略：
+        1. 優先使用 URL 模式（讓 Dify model provider 負責下載與編碼）
+        2. URL 不可用時，fallback 為 base64 模式（plugin daemon 自行處理）
+        """
+        if not HAS_MULTIMODAL:
+            return None
+        try:
+            mime_type = getattr(file_obj, "mime_type", None) or (
+                "image/png" if kind == "image" else "audio/mpeg"
+            )
+            extension = (getattr(file_obj, "extension", None) or "").lstrip(".")
+            fmt = extension or ("png" if kind == "image" else "mp3")
+            url = getattr(file_obj, "url", None)
+
+            # 優先使用 URL 模式
+            if url:
+                if kind == "image":
+                    return ImagePromptMessageContent(
+                        url=url,
+                        format=fmt,
+                        mime_type=mime_type,
+                        detail=ImagePromptMessageContent.DETAIL.HIGH,
+                    )
+                return AudioPromptMessageContent(
+                    url=url,
+                    format=fmt,
+                    mime_type=mime_type,
+                )
+
+            # Fallback：base64 模式
+            blob = getattr(file_obj, "blob", None)
+            if blob is None:
+                return None
+            b64 = base64.b64encode(blob).decode("utf-8")
+            if kind == "image":
+                return ImagePromptMessageContent(
+                    base64_data=b64,
+                    format=fmt,
+                    mime_type=mime_type,
+                    detail=ImagePromptMessageContent.DETAIL.HIGH,
+                )
+            return AudioPromptMessageContent(
+                base64_data=b64,
+                format=fmt,
+                mime_type=mime_type,
+            )
+        except Exception as e:
+            logger.error("[file_to_content] %s file failed: %s", kind, e)
+            return None
 
     @staticmethod
-    def _trace_to_text(trace: list[dict]) -> str:
-        lines = ["═══ Sequence Trace ═══"]
-        for t in trace:
-            line = f"  [{t['seq']:>3}] {t['from']} → {t['to']:<40} : {t['action']}"
-            if t.get("detail"):
-                line += f"  ({t['detail']})"
-            lines.append(line)
-        lines.append("═══ End Trace ═══")
-        return "\n".join(lines)
+    def _normalize_file_param(value: Any) -> list[Any]:
+        """
+        將 Dify 傳入的 files 參數正規化成 list。
+        過濾掉無效條目（None、空 dict、沒有 url 且沒有 blob 的假檔案）。
+        """
+        if value is None:
+            return []
+        items = value if isinstance(value, list) else [value]
 
-    # ─────────────────────────────────────────
-    # Agent 主流程
-    # ─────────────────────────────────────────
-    def _invoke(self, parameters: dict[str, Any]) -> Generator[AgentInvokeMessage]:
-        # 移除 tools 參數（工具已內建於 Strategy 中，不需要 Dify tool system）
+        result = []
+        for item in items:
+            if item is None:
+                continue
+            # 同時支援 File 物件和 dict
+            if isinstance(item, dict):
+                if not item:
+                    continue
+                has_url = bool(item.get("url"))
+                has_blob = bool(item.get("blob") or item.get("base64_data"))
+                if not (has_url or has_blob):
+                    continue
+            else:
+                has_url = bool(getattr(item, "url", None))
+                has_blob = getattr(item, "blob", None) is not None
+                if not (has_url or has_blob):
+                    continue
+            result.append(item)
+        return result
+
+    # ─────────────────────────────────────
+    # 歷史訊息解析
+    # ─────────────────────────────────────
+    @staticmethod
+    def _parse_history(model_data: dict) -> list[Any]:
+        history: list[Any] = []
+        if not isinstance(model_data, dict):
+            return history
+        for msg in model_data.get("history_prompt_messages", []) or []:
+            if not isinstance(msg, dict):
+                history.append(msg)
+                continue
+            role = msg.get("role", "")
+            content = msg.get("content", "")
+            if role == "user":
+                history.append(UserPromptMessage(content=content))
+            elif role == "assistant":
+                history.append(AssistantPromptMessage(content=content))
+            elif role == "system":
+                history.append(SystemPromptMessage(content=content))
+        return history
+
+    # ─────────────────────────────────────
+    # 工具呼叫包裝
+    # ─────────────────────────────────────
+    def _execute_tool(
+        self,
+        tool_name: str,
+        args: dict,
+        n8n_base_url: str,
+    ) -> tuple[str, bytes | None, dict]:
+        payload = build_payload(tool_name, args)
+        text, raw_bytes, meta = call_n8n_with_retry(tool_name, payload, n8n_base_url)
+        _emit_event(
+            "tool_executed",
+            tool=tool_name,
+            args=args,
+            attempts=meta.get("attempts"),
+            elapsed_ms=meta.get("elapsed_ms"),
+            status_code=meta.get("status_code"),
+            error=meta.get("error"),
+        )
+        return text, raw_bytes, meta
+
+    def _upload_image(self, raw_bytes: bytes, name: str) -> str | None:
+        """將圖片上傳至 Dify file storage，回傳 preview URL。"""
+        try:
+            import os as _os
+            from dify_plugin.core.entities.invocation import InvokeType
+
+            api_base = (
+                _os.environ.get("DIFY_INNER_API_URL", "").rstrip("/")
+                or _os.environ.get("PLUGIN_DIFY_INNER_API_URL", "").rstrip("/")
+                or "http://api:5001"
+            )
+            signed_url = None
+            for resp_chunk in self.session.file._backwards_invoke(
+                InvokeType.UploadFile, dict,
+                {"filename": f"{name}.png", "mimetype": "image/png"},
+            ):
+                signed_url = resp_chunk.get("url", "")
+                break
+
+            if not signed_url:
+                return None
+            if signed_url.startswith("/"):
+                signed_url = f"{api_base}{signed_url}"
+
+            upload_resp = http_requests.post(
+                signed_url,
+                files={"file": (f"{name}.png", raw_bytes, "image/png")},
+                timeout=30,
+            )
+            if upload_resp.status_code != 201:
+                return None
+            file_data = upload_resp.json()
+            preview_url = file_data.get("preview_url", "")
+            if preview_url.startswith("/"):
+                preview_url = f"{api_base}{preview_url}"
+            return preview_url or None
+        except Exception as e:
+            logger.error("[upload_image] failed: %s", e)
+            return None
+
+    # ─────────────────────────────────────
+    # 主入口
+    # ─────────────────────────────────────
+    def _invoke(self, parameters: dict[str, Any]) -> Generator[AgentInvokeMessage, None, None]:
         parameters.pop("tools", None)
-        logger.info(f"[IntentStrategy] _invoke called with keys={list(parameters.keys())}")
         try:
             yield from self._do_invoke(parameters)
         except Exception as e:
             import traceback
             tb = traceback.format_exc()
-            logger.error(f"[IntentStrategy] FATAL: {e}\n{tb}")
-            yield self.create_text_message(text=f"Agent 執行錯誤：{e}\n\n```\n{tb}\n```")
+            logger.error("[IntentStrategy] FATAL: %s\n%s", e, tb)
+            _emit_event("fatal_error", error=str(e), traceback=tb)
+            yield self.create_text_message(text=f"Agent 執行錯誤：{e}")
 
-    def _do_invoke(self, parameters: dict[str, Any]) -> Generator[AgentInvokeMessage]:
-        try:
-            params = Params(**parameters)
-        except Exception as e:
-            logger.error(f"[IntentStrategy] Params validation failed: {e}")
-            raise
+    def _do_invoke(self, parameters: dict[str, Any]) -> Generator[AgentInvokeMessage, None, None]:
+        # 診斷：記錄 Dify 實際傳入的 files 參數原貌
+        raw_image = parameters.get("image_files")
+        raw_audio = parameters.get("audio_files")
+        _emit_event(
+            "params_debug",
+            param_keys=list(parameters.keys()),
+            image_files_type=type(raw_image).__name__,
+            image_files_repr=str(raw_image)[:500],
+            audio_files_type=type(raw_audio).__name__,
+            audio_files_repr=str(raw_audio)[:500],
+        )
 
-        trace: list[dict] = []
-        seq = 0
-        A_USER, A_DIFY, A_PLUGIN, A_LLM, A_N8N = "User", "Dify/AgentNode", "客服部門/客服人員", "LLM", "n8n/API"
-
-        seq += 1; trace.append(self._trace_entry(seq, A_USER, A_DIFY, "發送查詢", params.query[:60]))
-        seq += 1; trace.append(self._trace_entry(seq, A_DIFY, A_PLUGIN, "請處理用戶查詢"))
-
-        # ── 解析歷史訊息 ──
-        history_messages = []
-        model_data = params.model if isinstance(params.model, dict) else params.model.model_dump(mode="json") if hasattr(params.model, "model_dump") else {}
-        if isinstance(model_data, dict):
-            for msg in model_data.get("history_prompt_messages", []):
-                if isinstance(msg, dict):
-                    role = msg.get("role", "")
-                    content = msg.get("content", "")
-                    if role == "user":
-                        history_messages.append(UserPromptMessage(content=content))
-                    elif role == "assistant":
-                        history_messages.append(AssistantPromptMessage(content=content))
-                else:
-                    history_messages.append(msg)
-
-        # ── n8n base URL（從參數或預設）──
+        params = Params(**parameters)
         n8n_base_url = params.n8n_base_url or N8N_BASE_URL_DEFAULT
 
+        _emit_event(
+            "request_start",
+            query_preview=params.query[:200],
+            execution_mode=params.execution_mode,
+        )
+
+        # ── 解析模型參數與歷史 ──
+        model_data = (
+            params.model
+            if isinstance(params.model, dict)
+            else params.model.model_dump(mode="json")
+            if hasattr(params.model, "model_dump")
+            else {}
+        )
+        history_messages = self._parse_history(model_data)
+
+        # ── 偵測 mode 切換關鍵字 ──
+        effective_mode = self._detect_mode_override(params.query, params.execution_mode)
+        if effective_mode != params.execution_mode:
+            _emit_event(
+                "mode_switched",
+                from_mode=params.execution_mode,
+                to_mode=effective_mode,
+                trigger="keyword_in_query",
+            )
+
+        # ── 偵測 history 中的 pending state ──
+        pending_state = self._detect_pending_state(history_messages)
+        pending_was_seen = pending_state is not None
+        if pending_was_seen:
+            _emit_event("pending_state_detected", pending=pending_state)
+
+        # ── 組裝 system prompt（單一 prompt.md）──
+        system_prompt = self._load_prompt()
+
+        # ── 組裝 user message（含圖片 + 音訊）──
+        user_message = self._build_user_message(params)
+
+        messages: list[Any] = [
+            SystemPromptMessage(content=system_prompt),
+            *history_messages,
+            user_message,
+        ]
+
+        # ── 工具定義 ──
+        prompt_tools = [
+            PromptMessageTool(
+                name=schema["name"],
+                description=schema["description"],
+                parameters=schema["parameters"],
+            )
+            for schema in TOOL_SCHEMAS
+        ]
+
         log_main = self.create_log_message(
-            label=f"[{A_DIFY} → {A_PLUGIN}] 請處理用戶查詢",
-            data={"query": params.query[:200], "歷史訊息數": len(history_messages), "執行模式": params.execution_mode},
+            label="[Strategy] 處理用戶查詢",
+            data={
+                "query_preview": params.query[:200],
+                "history_count": len(history_messages),
+                "execution_mode": effective_mode,
+                "pending_was_seen": pending_was_seen,
+                "image_files": len(self._normalize_file_param(params.image_files)),
+                "audio_files": len(self._normalize_file_param(params.audio_files)),
+            },
             status=ToolInvokeMessage.LogMessage.LogStatus.START,
         )
         yield log_main
 
-        # ── System Prompt ──
-        system_prompt = self._build_system_prompt(params.execution_mode)
-
-        # ── 建立內建工具的 PromptMessageTool 列表（直接從 BUILTIN_TOOLS 定義）──
-        prompt_tools = []
-        tool_def_map: dict[str, dict] = {}
-        for t in BUILTIN_TOOLS:
-            tool_def_map[t["name"]] = t
-            prompt_tools.append(PromptMessageTool(
-                name=t["name"],
-                description=t["description"],
-                parameters=t["parameters"],
-            ))
-
-        # ── 初始化對話 ──
-        messages = [
-            SystemPromptMessage(content=system_prompt),
-            *history_messages,
-            UserPromptMessage(content=params.query),
-        ]
-
-        # ── Agent Loop ──
         response_text = ""
         iteration = 0
 
         for iteration in range(params.maximum_iterations):
-            seq += 1
-            trace.append(self._trace_entry(seq, A_PLUGIN, A_LLM, "請分析意圖並決定行動", f"{len(messages)} messages"))
+            _emit_event(
+                "llm_invoke_start",
+                iteration=iteration + 1,
+                **self._inspect_messages(messages),
+            )
 
             log_iter = self.create_log_message(
-                label=f"[{A_PLUGIN} → {A_LLM}] 迭代 {iteration + 1}",
-                data={"迭代": iteration + 1, "messages_count": len(messages), "tools": [t.name for t in prompt_tools]},
+                label=f"[LLM] 迭代 {iteration + 1}",
+                data={"iteration": iteration + 1, "messages_count": len(messages)},
                 status=ToolInvokeMessage.LogMessage.LogStatus.START,
             )
             yield log_iter
 
             try:
-                model_config_data = params.model if isinstance(params.model, dict) else params.model.model_dump(mode="json")
-                logger.info(f"[IntentStrategy] Calling LLM with model={model_config_data.get('model','?')}, tools={len(prompt_tools)}")
+                model_config_data = (
+                    params.model
+                    if isinstance(params.model, dict)
+                    else params.model.model_dump(mode="json")
+                )
+                t0 = time.time()
                 chunks = self.session.model.llm.invoke(
                     model_config=LLMModelConfig(**model_config_data),
                     prompt_messages=messages,
@@ -403,29 +471,26 @@ class IntentStrategy(AgentStrategy):
                     stream=True,
                 )
             except Exception as e:
-                logger.error(f"[IntentStrategy] LLM invoke failed: {e}")
+                _emit_event("llm_invoke_error", iteration=iteration + 1, error=str(e))
                 yield self.create_text_message(text=f"LLM 呼叫失敗：{e}")
                 return
 
-            if chunks is None:
-                logger.error("[IntentStrategy] LLM invoke returned None")
-                yield self.create_text_message(text="LLM 回應為空，請檢查模型設定。")
-                return
-
             response_text = ""
-            tool_calls = []
+            tool_calls: list[tuple[str, str, dict]] = []
 
             for chunk in chunks:
                 if chunk.delta.message and chunk.delta.message.content:
                     c = chunk.delta.message.content
                     if isinstance(c, list):
                         for item in c:
-                            response_text += item.data
+                            response_text += getattr(item, "data", "")
                     else:
                         response_text += str(c)
-                if (chunk.delta.message
-                        and hasattr(chunk.delta.message, "tool_calls")
-                        and chunk.delta.message.tool_calls):
+                if (
+                    chunk.delta.message
+                    and hasattr(chunk.delta.message, "tool_calls")
+                    and chunk.delta.message.tool_calls
+                ):
                     for tc in chunk.delta.message.tool_calls:
                         tool_calls.append((
                             tc.id,
@@ -433,111 +498,265 @@ class IntentStrategy(AgentStrategy):
                             json.loads(tc.function.arguments) if tc.function.arguments else {},
                         ))
 
-            logger.info(f"[IntentStrategy] Iteration {iteration+1}: text={len(response_text)} chars, tool_calls={[n for _,n,_ in tool_calls]}")
+            elapsed_ms = int((time.time() - t0) * 1000)
+            _emit_event(
+                "llm_invoke_end",
+                iteration=iteration + 1,
+                elapsed_ms=elapsed_ms,
+                response_chars=len(response_text),
+                response_preview=response_text[:120],
+                tool_calls=[name for _, name, _ in tool_calls],
+            )
 
+            # ── 沒有 tool_calls：結束 ──
             if not tool_calls:
-                seq += 1; trace.append(self._trace_entry(seq, A_LLM, A_PLUGIN, "回傳最終回覆", f"{len(response_text)} 字元"))
-                seq += 1; trace.append(self._trace_entry(seq, A_PLUGIN, A_DIFY, "回傳最終回覆"))
-                seq += 1; trace.append(self._trace_entry(seq, A_DIFY, A_USER, "顯示回覆"))
-                yield self.finish_log_message(log=log_iter, data={"回覆預覽": response_text[:300]})
+                yield self.finish_log_message(log=log_iter, data={"reply_preview": response_text[:300]})
                 break
 
-            # ── LLM 要求呼叫工具 → 直接呼叫 n8n ──
-            tool_names_called = [name for _, name, _ in tool_calls]
-            seq += 1; trace.append(self._trace_entry(seq, A_LLM, A_PLUGIN, "需要呼叫工具", ", ".join(tool_names_called)))
+            # ── 有 tool_calls：判斷是否需攔截確認 ──
+            risky_calls = [
+                (tc_id, name, args) for tc_id, name, args in tool_calls if name in RISKY_TOOLS
+            ]
 
-            yield self.finish_log_message(log=log_iter, data={
-                "結果": f"需呼叫 {len(tool_calls)} 個工具", "工具": tool_names_called,
-            })
+            should_intercept = (
+                effective_mode == "step-by-step"
+                and bool(risky_calls)
+                and not pending_was_seen
+            )
 
-            messages.append(AssistantPromptMessage(
-                content=response_text,
-                tool_calls=[{
-                    "id": tc_id, "type": "function",
-                    "function": {"name": name, "arguments": json.dumps(args)},
-                } for tc_id, name, args in tool_calls],
-            ))
+            if should_intercept:
+                # 第一次：產生 <pending_state> 並回覆，不執行
+                pending_payload = {
+                    "tool_calls": [
+                        {"id": tc_id, "name": name, "args": args}
+                        for tc_id, name, args in tool_calls
+                    ],
+                    "created_at": time.time(),
+                }
+                pending_text = (
+                    response_text
+                    + f"\n\n<pending_state>\n{json.dumps(pending_payload, ensure_ascii=False)}\n</pending_state>"
+                )
+                _emit_event(
+                    "tool_intercepted",
+                    iteration=iteration + 1,
+                    risky_tools=[name for _, name, _ in risky_calls],
+                )
+                yield self.finish_log_message(
+                    log=log_iter,
+                    data={"action": "intercepted", "tools": [name for _, name, _ in risky_calls]},
+                )
+                yield self.finish_log_message(
+                    log=log_main,
+                    data={"status": "awaiting_confirmation"},
+                )
+                yield self.create_text_message(text=pending_text)
+                _emit_event("request_end", status="awaiting_confirmation")
+                return
+
+            # ── 執行工具 ──
+            messages.append(
+                AssistantPromptMessage(
+                    content=response_text,
+                    tool_calls=[
+                        {
+                            "id": tc_id,
+                            "type": "function",
+                            "function": {"name": name, "arguments": json.dumps(args)},
+                        }
+                        for tc_id, name, args in tool_calls
+                    ],
+                )
+            )
+
+            yield self.finish_log_message(
+                log=log_iter,
+                data={"action": "execute", "tools": [name for _, name, _ in tool_calls]},
+            )
 
             for tc_id, name, args in tool_calls:
-                tool_def = tool_def_map.get(name)
-                if not tool_def:
-                    result = f"Tool not found: {name}"
-                    seq += 1; trace.append(self._trace_entry(seq, A_PLUGIN, A_N8N, "回傳錯誤", result))
-                    messages.append(ToolPromptMessage(content=result, tool_call_id=tc_id, name=name))
-                    continue
-
-                seq += 1; trace.append(self._trace_entry(
-                    seq, A_PLUGIN, A_N8N, f"請執行 {name}",
-                    json.dumps(args, ensure_ascii=False)[:80],
-                ))
+                # Strategy 主動插入 [呼叫工具] 標籤給前端顯示
+                args_str = json.dumps(args, ensure_ascii=False)
+                tool_call_marker = f"\n[呼叫工具]\n工具：{name}\n參數：{args_str}\n"
+                yield self.create_text_message(text=tool_call_marker)
 
                 log_tool = self.create_log_message(
-                    label=f"[系統執行員 → n8n] {name}",
-                    data={"工具": name, "參數": args},
+                    label=f"[Tool] {name}",
+                    data={"tool": name, "args": args},
                     status=ToolInvokeMessage.LogMessage.LogStatus.START,
                 )
                 yield log_tool
 
-                # 組裝 payload 並呼叫 n8n
-                payload = _build_payload(tool_def, args)
-                result, raw_bytes = _call_n8n(tool_def["endpoint"], tool_def["method"], payload, n8n_base_url)
+                result, raw_bytes, meta = self._execute_tool(name, args, n8n_base_url)
 
-                # 若回傳圖片，上傳至 Dify file storage 並輸出 image message
                 if raw_bytes is not None:
-                    _debug_log(f"raw_bytes detected, size={len(raw_bytes)}")
-                    try:
-                        # SDK file.upload() 的 signed URL 缺少 host（SDK bug）
-                        # signed URL 的目標是 Dify API（非 daemon），用 DIFY_INNER_API_URL
-                        import os as _os
-                        from dify_plugin.core.entities.invocation import InvokeType
-                        api_base = _os.environ.get("DIFY_INNER_API_URL", "").rstrip("/") or _os.environ.get("PLUGIN_DIFY_INNER_API_URL", "").rstrip("/") or "http://api:5001"
-                        signed_url = None
-                        for resp_chunk in self.session.file._backwards_invoke(
-                            InvokeType.UploadFile, dict,
-                            {"filename": f"{name}.png", "mimetype": "image/png"},
-                        ):
-                            signed_url = resp_chunk.get("url", "")
-                            break
+                    preview_url = self._upload_image(raw_bytes, name)
+                    if preview_url:
+                        yield self.create_image_message(image_url=preview_url)
 
-                        if not signed_url:
-                            _debug_log("upload failed: no signed URL")
-                        else:
-                            # 若 URL 是相對路徑，補上 Dify API base URL
-                            if signed_url.startswith("/"):
-                                signed_url = f"{api_base}{signed_url}"
-                            _debug_log(f"uploading to: {signed_url[:120]}")
+                yield self.finish_log_message(
+                    log=log_tool,
+                    data={
+                        "result_preview": result[:500],
+                        "attempts": meta.get("attempts"),
+                        "elapsed_ms": meta.get("elapsed_ms"),
+                    },
+                )
+                messages.append(
+                    ToolPromptMessage(content=result, tool_call_id=tc_id, name=name)
+                )
 
-                            upload_resp = http_requests.post(
-                                signed_url,
-                                files={"file": (f"{name}.png", raw_bytes, "image/png")},
-                                timeout=30,
-                            )
-                            _debug_log(f"upload response: status={upload_resp.status_code} body={upload_resp.text[:300]}")
-
-                            if upload_resp.status_code == 201:
-                                file_data = upload_resp.json()
-                                preview_url = file_data.get("preview_url", "")
-                                # preview_url 是相對路徑，需補上完整 URL 讓 Dify 能下載
-                                if preview_url.startswith("/"):
-                                    preview_url = f"{api_base}{preview_url}"
-                                _debug_log(f"upload OK: id={file_data.get('id')} preview_url={preview_url}")
-                                if preview_url:
-                                    yield self.create_image_message(image_url=preview_url)
-                    except Exception as e:
-                        import traceback
-                        _debug_log(f"圖片上傳失敗：{e}\n{traceback.format_exc()}")
-
-                seq += 1; trace.append(self._trace_entry(seq, A_N8N, A_PLUGIN, f"回傳 {name} 結果", result[:60]))
-                yield self.finish_log_message(log=log_tool, data={"結果": result[:500]})
-                messages.append(ToolPromptMessage(content=result, tool_call_id=tc_id, name=name))
-
-        # ── 完成 ──
-        trace_text = self._trace_to_text(trace)
-        yield self.finish_log_message(log=log_main, data={
-            "總迭代": iteration + 1,
-            "回覆長度": f"{len(response_text)} 字元",
-            "執行模式": params.execution_mode,
-            "狀態": "完成",
-            "sequence_trace": trace_text,
-        })
+        yield self.finish_log_message(
+            log=log_main,
+            data={
+                "total_iterations": iteration + 1,
+                "response_chars": len(response_text),
+                "execution_mode": effective_mode,
+                "status": "completed",
+            },
+        )
         yield self.create_text_message(text=response_text)
+        _emit_event("request_end", status="completed", iterations=iteration + 1)
+
+    # ─────────────────────────────────────
+    # ─────────────────────────────────────
+    # LLM 輸入訊息結構診斷
+    # ─────────────────────────────────────
+    @staticmethod
+    def _inspect_messages(messages: list[Any]) -> dict[str, Any]:
+        """
+        檢查送入 LLM 的 messages 結構，回傳診斷資訊：
+        - messages_count：總訊息數
+        - user_content_type：user message 的 content 類型（str / list）
+        - user_parts：若為 list，各 part 的類型名稱列表
+        - image_parts / audio_parts：多模態 part 數量
+        """
+        result: dict[str, Any] = {"messages_count": len(messages)}
+        for msg in messages:
+            if not isinstance(msg, UserPromptMessage):
+                continue
+            content = msg.content
+            if isinstance(content, str):
+                result["user_content_type"] = "str"
+                result["image_parts"] = 0
+                result["audio_parts"] = 0
+            elif isinstance(content, list):
+                type_names = [type(p).__name__ for p in content]
+                image_parts = sum(1 for n in type_names if "Image" in n)
+                audio_parts = sum(1 for n in type_names if "Audio" in n)
+                text_parts  = sum(1 for n in type_names if "Text" in n)
+                result["user_content_type"] = "multimodal"
+                result["text_parts"]  = text_parts
+                result["image_parts"] = image_parts
+                result["audio_parts"] = audio_parts
+                result["has_image"] = image_parts > 0
+                result["has_audio"] = audio_parts > 0
+            break
+        return result
+
+    # ─────────────────────────────────────
+    # 從 query 文字中解析並下載嵌入的圖片 URL
+    # 格式：[IMAGE_URL_N]http://...[/IMAGE_URL_N]
+    # ─────────────────────────────────────
+    _IMAGE_URL_TAG_RE = re.compile(r"\[IMAGE_URL_\d+\](.*?)\[/IMAGE_URL_\d+\]")
+
+    @classmethod
+    def _extract_image_urls(cls, query: str) -> tuple[str, list[str]]:
+        """
+        從 query 中提取所有 [IMAGE_URL_N]...[/IMAGE_URL_N] 標籤，
+        回傳 (乾淨的 query 文字, [url, ...])。
+        """
+        urls = cls._IMAGE_URL_TAG_RE.findall(query)
+        clean_query = cls._IMAGE_URL_TAG_RE.sub("", query).strip()
+        return clean_query, urls
+
+    @staticmethod
+    def _url_to_image_content(url: str) -> "tuple[ImagePromptMessageContent | None, int, str | None]":
+        """
+        從 URL 下載圖片並轉成 base64 ImagePromptMessageContent。
+        回傳 (content_or_None, bytes_size, error_or_None)。
+        """
+        if not HAS_MULTIMODAL:
+            return None, 0, "HAS_MULTIMODAL=False"
+        t0 = time.time()
+        try:
+            resp = http_requests.get(url, timeout=15)
+            resp.raise_for_status()
+            raw = resp.content
+            mime = resp.headers.get("Content-Type", "image/png").split(";")[0].strip()
+            fmt = mime.split("/")[-1] if "/" in mime else "png"
+            b64 = base64.b64encode(raw).decode("utf-8")
+            elapsed_ms = int((time.time() - t0) * 1000)
+            content = ImagePromptMessageContent(
+                base64_data=b64,
+                format=fmt,
+                mime_type=mime,
+                detail=ImagePromptMessageContent.DETAIL.HIGH,
+            )
+            return content, len(raw), None
+        except Exception as e:
+            logger.warning("[image_url] Failed to download %s: %s", url, e)
+            return None, 0, str(e)
+
+    # User message 組裝（含多模態檔案）
+    # ─────────────────────────────────────
+    def _build_user_message(self, params: Params) -> UserPromptMessage:
+        image_files = self._normalize_file_param(params.image_files)
+        audio_files = self._normalize_file_param(params.audio_files)
+
+        # 從 query 文字中解析嵌入的 [IMAGE_URL_N] 標籤（Backend 嵌入路徑）
+        clean_query, embedded_urls = self._extract_image_urls(params.query)
+
+        has_any = image_files or audio_files or embedded_urls
+        if not has_any or not HAS_MULTIMODAL:
+            return UserPromptMessage(content=params.query)
+
+        parts: list[Any] = [TextPromptMessageContent(data=clean_query)]
+
+        # 優先處理 Dify File 物件（image_files 參數）
+        for idx, f in enumerate(image_files):
+            content = self._file_to_content(f, "image")
+            if content is not None:
+                parts.append(content)
+                _emit_event("multimodal_file_added", kind="image", source="dify_file", index=idx)
+
+        # 處理 query 中嵌入的圖片 URL（下載並轉 base64）
+        for idx, url in enumerate(embedded_urls):
+            _emit_event("image_download_start", index=idx, url=url)
+            t0 = time.time()
+            content, size_bytes, error = self._url_to_image_content(url)
+            elapsed_ms = int((time.time() - t0) * 1000)
+            if content is not None:
+                parts.append(content)
+                _emit_event(
+                    "image_download_done",
+                    index=idx,
+                    url=url,
+                    size_kb=round(size_bytes / 1024, 1),
+                    elapsed_ms=elapsed_ms,
+                )
+            else:
+                _emit_event(
+                    "image_download_failed",
+                    index=idx,
+                    url=url,
+                    error=error,
+                    elapsed_ms=elapsed_ms,
+                )
+
+        # 處理音訊檔案
+        for idx, f in enumerate(audio_files):
+            content = self._file_to_content(f, "audio")
+            if content is not None:
+                parts.append(content)
+                _emit_event("multimodal_file_added", kind="audio", source="dify_file", index=idx)
+
+        _emit_event(
+            "user_message_built",
+            text_chars=len(clean_query),
+            image_file_count=len(image_files),
+            embedded_url_count=len(embedded_urls),
+            audio_count=len(audio_files),
+            total_parts=len(parts),
+        )
+        return UserPromptMessage(content=parts)

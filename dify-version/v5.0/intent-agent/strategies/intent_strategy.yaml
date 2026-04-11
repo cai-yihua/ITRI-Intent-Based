@@ -21,12 +21,33 @@ parameters:
     label:
       en_US: "Tools"
       zh_Hans: "工具列表"
+    help:
+      en_US: "Not used by this strategy (built-in tools only), but declared to satisfy Dify framework"
+      zh_Hans: "此策略不使用（使用內建工具），僅為相容 Dify 框架而宣告"
   - name: query
     type: string
     required: true
     label:
       en_US: "Query"
       zh_Hans: "用戶輸入"
+  - name: image_files
+    type: files
+    required: false
+    label:
+      en_US: "Image Files"
+      zh_Hans: "圖片檔案"
+    help:
+      en_US: "Image files uploaded by user (Dify File objects, multimodal input)"
+      zh_Hans: "使用者上傳的圖片檔案（Dify File 物件，多模態輸入）"
+  - name: audio_files
+    type: files
+    required: false
+    label:
+      en_US: "Audio Files"
+      zh_Hans: "音訊檔案"
+    help:
+      en_US: "Audio files uploaded by user (Dify File objects, multimodal input)"
+      zh_Hans: "使用者上傳的音訊檔案（Dify File 物件，多模態輸入）"
   - name: maximum_iterations
     type: number
     required: false
