@@ -179,8 +179,10 @@ class IntentStrategy(AgentStrategy):
         將 Dify File 物件轉為 PromptMessageContent。kind: 'image' | 'audio'
 
         策略：
-        1. 優先使用 URL 模式（讓 Dify model provider 負責下載與編碼）
-        2. URL 不可用時，fallback 為 base64 模式（plugin daemon 自行處理）
+        1. 優先使用 blob（已有二進位資料）→ base64 模式
+        2. 有 URL（Dify 內部路徑）→ plugin daemon 下載後轉 base64
+        3. 以上皆失敗 → 回傳 None
+        注意：不直接將 Dify 內部 URL 傳給外部 LLM（Gemini 無法存取）
         """
         if not HAS_MULTIMODAL:
             return None
@@ -190,40 +192,61 @@ class IntentStrategy(AgentStrategy):
             )
             extension = (getattr(file_obj, "extension", None) or "").lstrip(".")
             fmt = extension or ("png" if kind == "image" else "mp3")
-            url = getattr(file_obj, "url", None)
 
-            # 優先使用 URL 模式
-            if url:
+            # 1. 優先使用 blob（直接二進位）
+            blob = getattr(file_obj, "blob", None)
+            if blob is not None:
+                b64 = base64.b64encode(blob).decode("utf-8")
                 if kind == "image":
                     return ImagePromptMessageContent(
-                        url=url,
+                        base64_data=b64,
                         format=fmt,
                         mime_type=mime_type,
                         detail=ImagePromptMessageContent.DETAIL.HIGH,
                     )
                 return AudioPromptMessageContent(
-                    url=url,
+                    base64_data=b64,
                     format=fmt,
                     mime_type=mime_type,
                 )
 
-            # Fallback：base64 模式
-            blob = getattr(file_obj, "blob", None)
-            if blob is None:
-                return None
-            b64 = base64.b64encode(blob).decode("utf-8")
-            if kind == "image":
-                return ImagePromptMessageContent(
-                    base64_data=b64,
-                    format=fmt,
-                    mime_type=mime_type,
-                    detail=ImagePromptMessageContent.DETAIL.HIGH,
-                )
-            return AudioPromptMessageContent(
-                base64_data=b64,
-                format=fmt,
-                mime_type=mime_type,
-            )
+            # 2. 有 URL：plugin daemon 在 Dify 內網，可下載後轉 base64
+            try:
+                url = getattr(file_obj, "url", None)
+            except Exception as url_err:
+                logger.warning("[file_to_content] file_obj.url raised: %s", url_err)
+                url = None
+            if url:
+                try:
+                    # 若是相對路徑，補上 Dify 內部 API base
+                    if url.startswith("/"):
+                        import os as _os
+                        api_base = (
+                            _os.environ.get("DIFY_INNER_API_URL", "").rstrip("/")
+                            or _os.environ.get("PLUGIN_DIFY_INNER_API_URL", "").rstrip("/")
+                            or "http://api:5001"
+                        )
+                        url = f"{api_base}{url}"
+                    resp = http_requests.get(url, timeout=15)
+                    resp.raise_for_status()
+                    raw = resp.content
+                    b64 = base64.b64encode(raw).decode("utf-8")
+                    if kind == "image":
+                        return ImagePromptMessageContent(
+                            base64_data=b64,
+                            format=fmt,
+                            mime_type=mime_type,
+                            detail=ImagePromptMessageContent.DETAIL.HIGH,
+                        )
+                    return AudioPromptMessageContent(
+                        base64_data=b64,
+                        format=fmt,
+                        mime_type=mime_type,
+                    )
+                except Exception as e:
+                    logger.warning("[file_to_content] URL download failed (%s): %s", url, e)
+
+            return None
         except Exception as e:
             logger.error("[file_to_content] %s file failed: %s", kind, e)
             return None
@@ -251,7 +274,10 @@ class IntentStrategy(AgentStrategy):
                 if not (has_url or has_blob):
                     continue
             else:
-                has_url = bool(getattr(item, "url", None))
+                try:
+                    has_url = bool(getattr(item, "url", None))
+                except Exception:
+                    has_url = True  # url property 拋 exception 仍保留，讓 _file_to_content 處理
                 has_blob = getattr(item, "blob", None) is not None
                 if not (has_url or has_blob):
                     continue

@@ -86,18 +86,28 @@ if not plugin_uid:
     sys.exit(1)
 print(f"  -> Plugin: {plugin_uid}")
 
-# ── Step 3: 建立 App ──
-print(f"[3/5] 建立 App: {app_name}...")
-r = session.post(f"{dify_url}/console/api/apps", headers=headers, json={
-    "name": app_name, "mode": "advanced-chat",
-    "icon_type": "emoji", "icon": "📡", "icon_background": "#D5F5F6",
-})
-app_data = r.json()
-app_id = app_data.get("id", "")
+# ── Step 3: 建立或取得 App ──
+print(f"[3/5] 搜尋既有 App: {app_name}...")
+app_id = ""
+apps_r = session.get(f"{dify_url}/console/api/apps?page=1&limit=100&mode=advanced-chat", headers=headers)
+for a in apps_r.json().get("data", []):
+    if a.get("name") == app_name:
+        app_id = a["id"]
+        print(f"  -> 已存在 App ID: {app_id}，直接更新")
+        break
+
 if not app_id:
-    print(f"  [ERROR] Failed to create app: {r.text[:200]}")
-    sys.exit(1)
-print(f"  -> App ID: {app_id}")
+    print(f"  -> 新建 App: {app_name}...")
+    r = session.post(f"{dify_url}/console/api/apps", headers=headers, json={
+        "name": app_name, "mode": "advanced-chat",
+        "icon_type": "emoji", "icon": "📡", "icon_background": "#D5F5F6",
+    })
+    app_data = r.json()
+    app_id = app_data.get("id", "")
+    if not app_id:
+        print(f"  [ERROR] Failed to create app: {r.text[:200]}")
+        sys.exit(1)
+    print(f"  -> App ID: {app_id}")
 
 # ── Step 4: 設定 Workflow ──
 print("[4/5] 設定 Workflow...")
@@ -148,6 +158,8 @@ payload = {
                         "execution_mode": {"type": "constant", "value": "auto"},
                         "maximum_iterations": {"type": "constant", "value": 5},
                         "tools": {"type": "constant", "value": []},
+                        "image_files": {"type": "variable", "value": ["sys", "files"]},
+                        "audio_files": {"type": "constant", "value": []},
                     },
                 },
                 "position": {"x": 380, "y": 282},
@@ -181,7 +193,15 @@ payload = {
         ],
         "viewport": {"x": 0, "y": 0, "zoom": 1},
     },
-    "features": {},
+    "features": {
+        "file_upload": {
+            "image": {
+                "enabled": True,
+                "number_limits": 3,
+                "transfer_methods": ["local_file", "remote_url"],
+            }
+        }
+    },
     "environment_variables": [],
     "conversation_variables": [],
 }
