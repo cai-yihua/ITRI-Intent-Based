@@ -61,14 +61,14 @@ else (ii) execution_mode = auto 但 query 含關鍵字
     end note
 end
 
-== Step 3. _detect_pending_state ==
+== Step 3. _normalize_pending_state ==
 
 note over IntentStrategy
   反向掃 history → **無 <pending_state>**
-  pending_was_seen = **false**
+  runtime_state = {mode: "step-by-step", queue: [], reason: ""}
 end note
 
-== Step 6. Agent Loop（第一圈 → 攔截） ==
+== Step 6. Agent Loop（第一圈 → queue 構建 + 門控） ==
 
 IntentStrategy -> LLMSession: invoke(messages, tool_schemas, stream=True)
 activate LLMSession
@@ -76,26 +76,27 @@ LLMSession --> IntentStrategy: response_text + tool_calls\n[ enable_im(location=
 deactivate LLMSession
 
 note over IntentStrategy
-  **攔截判斷**
-  risky_calls = tool_calls ∩ RISKY_TOOLS = [enable_im]
-  should_intercept =
-    (effective_mode == "step-by-step") ∧
-    bool(risky_calls) ∧
-    (pending_was_seen == false)
-  = **true** → 執行攔截（直接 return，不進工具執行）
+  **隊列構建與合併**
+  _merge_queue_items: 將 tool_calls 轉成 queue item\n  - tool_name = "enable_im"
+  - args = {"location": "131"}
+  - requires_confirmation = true（enable_im ∈ RISKY_TOOLS）
+  - status = "pending"
 end note
 
 note over IntentStrategy
-  **組 pending_payload（寫入 <pending_state>）**
-  欄位：
-  - tool_calls: list[ {id: str, name: str, args: dict} ]
-  - created_at: float  (time.time())
-  序列化為 JSON，包進
-  <pending_state>...</pending_state>
-  附加在 response_text 末尾
+  **per-queue-item 門控判斷**
+  找到 enable_im 的 queue item（idx=0）
+  
+  effective_mode == "step-by-step" ✓
+  requires_confirmation == true ✓
+  queue_item.status == "pending" ✓
+  
+  → **將 status 改為 blocked_confirmation**
+  → **request_end 狀態 = awaiting_confirmation**
+  → 返回確認提示（含 <pending_state> 標籤）
 end note
 
-IntentStrategy --> AgentInvoker: yield text_message(\n  response_text + <pending_state>JSON</pending_state>\n)
+IntentStrategy --> AgentInvoker: yield text_message(\n  <task_confirmation>\n  請確認是否執行高風險操作：enable_im\n  若確認請回覆「確認」；若取消請回覆「取消」。\n  </task_confirmation> +\n  <pending_state>JSON</pending_state>\n)
 deactivate IntentStrategy
 AgentInvoker --> User: 顯示確認提示\n(含 <pending_state> 隱藏標籤)
 deactivate AgentInvoker
@@ -108,9 +109,8 @@ AgentInvoker -> IntentStrategy: _invoke(parameters)
 activate IntentStrategy
 
 note over IntentStrategy
-  **Step 1, 4, 5（略，同圖 1）**
-  _parse_history 這次會把前一輪 assistant 訊息
-  （含 <pending_state> 標籤）納入 history
+  **Step 1, 4, 5（略）**
+  _parse_history 這次會把前一輪 assistant 訊息\n（含 <pending_state> 標籤）納入 history
 end note
 
 note over IntentStrategy
@@ -118,16 +118,23 @@ note over IntentStrategy
   同前：effective_mode = step-by-step
 end note
 
-== Step 3. _detect_pending_state（關鍵差異）==
+== Step 3. _normalize_pending_state（關鍵差異）==
 
 note over IntentStrategy
   反向掃 history → 最近一則 assistant
-  含 <pending_state>...</pending_state>
-  PENDING_STATE_PATTERN 命中 → json.loads 成功
-  **pending_was_seen = true**
+  含 <pending_state>...</pending_state> **PENDING_STATE_PATTERN 命中 → json.loads 成功**
+  runtime_state = 從 JSON 反序列化
+  狀態恢復：queue[0].status = "blocked_confirmation"
 end note
 
-== Step 6. Agent Loop（第二圈 → 執行） ==
+note over IntentStrategy
+  **Step 3b. _detect_user_decision（新步驟）**
+  掃描本輪 query → "好，執行" → "confirm"
+  blocked_confirmation_index(state) = 0 → 找到被擋的 queue item\n  queue[0].status = "pending"（恢復）
+  queue[0].reason = "user_confirmed"
+end note
+
+== Step 6. Agent Loop（第二圈 → LLM 重估 + 執行） ==
 
 IntentStrategy -> LLMSession: invoke(messages, tool_schemas, stream=True)
 activate LLMSession
@@ -137,19 +144,22 @@ note right of LLMSession
   - 前輪 assistant: 含 <pending_state>
   - 本輪 user: "好，執行"
   → LLM **重新**決定 tool_calls
-  （<pending_state> 只是 strategy 的旗標，
-   實際 tool_calls 每次都由 LLM 重算）
+  （<pending_state> 只是策略旗標，
+  實際 tool_calls 每次都由 LLM 重算）
 end note
 LLMSession --> IntentStrategy: response_text + tool_calls\n[ enable_im(location="131") ]
 deactivate LLMSession
 
 note over IntentStrategy
-  **攔截判斷**
-  should_intercept =
-    (effective_mode == "step-by-step") ∧
-    bool(risky_calls) ∧
-    **(pending_was_seen == false)** ← 此次為 true
-  = **false** → 不攔截，進入工具執行
+  **queue item 恢復檢查**
+  隊列中 enable_im 仍為 pending（用戶已確認）
+  
+  per-queue-item 門控判斷：
+  queue_item.status == "pending" ✓（已恢復）
+  effective_mode == "step-by-step" ✓
+  requires_confirmation == true ✓
+  
+  → **status 保持 pending，進入執行**
 end note
 
 loop 每個 tool_call

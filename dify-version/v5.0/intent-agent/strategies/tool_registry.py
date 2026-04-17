@@ -282,14 +282,14 @@ DEFAULT_TIMEOUT = 60
 # 工具專屬 timeout（覆蓋預設值）
 TOOL_TIMEOUTS: dict[str, int] = {
     # 圖片回傳類工具，n8n 可能需要較久才能產圖
-    "get_sinr_map": 180,
+    "get_sinr_map": 30,
     # 優化類工具，n8n 可能需要呼叫多個外部 API
-    "enable_im": 180,
-    "simulate_im": 180,
-    "enable_qoe": 180,
-    "simulate_qoe": 180,
-    "disable_im": 60,
-    "disable_qoe": 60,
+    "enable_im": 30,
+    "simulate_im": 30,
+    "enable_qoe": 30,
+    "simulate_qoe": 30,
+    "disable_im": 30,
+    "disable_qoe": 30,
 }
 
 

@@ -69,13 +69,22 @@ loop 每次 LLM iteration
     else LLM 回傳正常
         IntentStrategy -> EventLogger: llm_invoke_end\n{iteration, elapsed_ms, response_chars,\nresponse_preview[:120], tool_calls[names]}
 
-        opt 回應含高風險工具（需使用者確認）
-            IntentStrategy -> EventLogger: tool_intercepted\n{iteration, risky_tools}
-            IntentStrategy -> EventLogger: request_end\n{status="awaiting_confirmation", iterations}
-            note right: 記錄後 return（等待下一輪 query 確認）
+        opt queue 無 pending item 但 LLM 無 tool_calls
+            IntentStrategy -> EventLogger: queue_forced_tool_call\n{iteration, tool}
+            note right: 強制執行下一個 pending queue item
+        end
+        
+        opt 偵測到 intent_clarification 標籤
+            IntentStrategy -> EventLogger: request_end\n{status="awaiting_clarification", iterations}
+            note right: 等待使用者補充參數
         end
 
-        loop 每個工具呼叫（非攔截）
+        opt per-queue-item 確認門控
+            IntentStrategy -> EventLogger: request_end\n{status="awaiting_confirmation", iterations}
+            note right: 等待使用者確認高風險操作
+        end
+
+        loop 每個工具呼叫（已門控通過）
             IntentStrategy -> EventLogger: tool_executed\n{tool, args, attempts, elapsed_ms,\nstatus_code, error}
         end
     end

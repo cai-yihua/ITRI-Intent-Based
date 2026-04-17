@@ -147,9 +147,24 @@ loop maximum_iterations
                 AgentInvoker --> User: 顯示圖片
             end
         end
-    else 無 tool_calls
+    else 無 tool_calls 但 runtime_state.queue 有 pending
+        note right of IntentStrategy: **queue_forced_tool_call**\n強制執行下一個 pending item\n無需等待 LLM 產生
+    else 無 tool_calls 且無 pending
         break
     end
+end
+
+alt runtime_state.queue 全部完成
+    note over IntentStrategy
+        **final_status = "completed"**
+        所有 queue 項目 done/cancelled/failed
+    end note
+else runtime_state.queue 有未完成項目
+    note over IntentStrategy
+        **final_status = "unfinished_queue"**
+        附加 <pending_state> 標籤
+        待下一輪用戶確認或補充
+    end note
 end
 
 == Response ==

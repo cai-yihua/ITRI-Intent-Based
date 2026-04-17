@@ -159,7 +159,7 @@ payload = {
                         "maximum_iterations": {"type": "constant", "value": 5},
                         "tools": {"type": "constant", "value": []},
                         "image_files": {"type": "variable", "value": ["sys", "files"]},
-                        "audio_files": {"type": "constant", "value": []},
+                        "audio_files": {"type": "variable", "value": ["sys", "files"]},
                     },
                 },
                 "position": {"x": 380, "y": 282},
@@ -195,11 +195,11 @@ payload = {
     },
     "features": {
         "file_upload": {
-            "image": {
-                "enabled": True,
-                "number_limits": 3,
-                "transfer_methods": ["local_file", "remote_url"],
-            }
+            "enabled": True,
+            "number_limits": 3,
+            "allowed_file_types": ["image", "audio"],
+            "allowed_file_upload_methods": ["local_file", "remote_url"],
+            "allowed_file_extensions": [],
         }
     },
     "environment_variables": [],

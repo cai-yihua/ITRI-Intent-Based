@@ -86,6 +86,11 @@ MODE_KEYWORDS_STEP = ("逐步確認", "我要確認每一步", "先讓我看", "
 PENDING_STATE_PATTERN = re.compile(
     r"<pending_state>\s*(.*?)\s*</pending_state>", re.DOTALL
 )
+INTENT_CLARIFICATION_PATTERN = re.compile(
+    r"<intent_clarification>\s*(.*?)\s*</intent_clarification>", re.DOTALL
+)
+
+
 
 
 # ─────────────────────────────────────────
@@ -106,6 +111,194 @@ class Params(BaseModel):
 # Strategy 主體
 # ─────────────────────────────────────────
 class IntentStrategy(AgentStrategy):
+    # 類級別常數：預先解析 API base URL，避免重複環境變數查詢
+    _API_BASE_CACHE: str = ""
+
+    @classmethod
+    def _get_api_base(cls) -> str:
+        """取得並快取 Dify 內部 API Base URL。"""
+        if not cls._API_BASE_CACHE:
+            import os as _os
+            cls._API_BASE_CACHE = (
+                _os.environ.get("DIFY_INNER_API_URL", "").rstrip("/")
+                or _os.environ.get("PLUGIN_DIFY_INNER_API_URL", "").rstrip("/")
+                or "http://api:5001"
+            )
+        return cls._API_BASE_CACHE
+
+    @staticmethod
+    def _build_queue_item(
+        intent_name: str,
+        tool_name: str,
+        args: dict[str, Any] | None = None,
+        status: str = "pending",
+        clarification_question: str = "",
+        reason: str = "",
+    ) -> dict[str, Any]:
+        return {
+            "intent_name": intent_name,
+            "tool_name": tool_name,
+            "args": args or {},
+            "status": status,
+            "clarification_question": clarification_question,
+            "reason": reason,
+        }
+
+    @staticmethod
+    def _queue_item_key(tool_name: str, args: dict[str, Any]) -> str:
+        return f"{tool_name}:{json.dumps(args or {}, sort_keys=True, ensure_ascii=False)}"
+
+    @staticmethod
+    def _extract_clarification_question(text: str) -> str:
+        match = INTENT_CLARIFICATION_PATTERN.search(text or "")
+        if not match:
+            return ""
+        return match.group(1).strip()
+
+
+
+    @staticmethod
+    def _normalize_pending_state(
+        pending_state: dict[str, Any] | None,
+        mode: str,
+        query: str,
+    ) -> dict[str, Any]:
+        default_state: dict[str, Any] = {"mode": mode, "queue": [], "reason": ""}
+        if not isinstance(pending_state, dict):
+            return default_state
+
+        queue = pending_state.get("queue")
+        if isinstance(queue, list):
+            normalized_queue: list[dict[str, Any]] = []
+            for item in queue:
+                if not isinstance(item, dict):
+                    continue
+                tool_name = str(item.get("tool_name", "")).strip()
+                intent_name = str(item.get("intent_name", tool_name or "未命名意圖")).strip()
+                if not tool_name:
+                    continue
+                normalized_queue.append(
+                    IntentStrategy._build_queue_item(
+                        intent_name=intent_name,
+                        tool_name=tool_name,
+                        args=item.get("args") if isinstance(item.get("args"), dict) else {},
+                        status=str(item.get("status", "pending") or "pending"),
+                        clarification_question=str(item.get("clarification_question", "") or ""),
+                        reason=str(item.get("reason", "") or ""),
+                    )
+                )
+            return {
+                "mode": str(pending_state.get("mode", mode) or mode),
+                "queue": normalized_queue,
+                "reason": str(pending_state.get("reason", "") or ""),
+            }
+
+        # backward compatible: 舊格式 pending_state.tool_calls
+        tool_calls = pending_state.get("tool_calls")
+        if isinstance(tool_calls, list):
+            converted: list[dict[str, Any]] = []
+            for call in tool_calls:
+                if not isinstance(call, dict):
+                    continue
+                name = str(call.get("name", "")).strip()
+                if not name:
+                    continue
+                converted.append(
+                    IntentStrategy._build_queue_item(
+                        intent_name=f"執行 {name}",
+                        tool_name=name,
+                        args=call.get("args") if isinstance(call.get("args"), dict) else {},
+                        status="pending",
+                        clarification_question="",
+                        reason="converted_from_legacy_pending_state",
+                    )
+                )
+            return {
+                "mode": mode,
+                "queue": converted,
+                "reason": "converted_from_legacy_pending_state",
+            }
+
+        # 既非新格式 queue，也非旧格式 tool_calls；不推断，返回空队列
+        # 完全依赖 LLM 通过 function calling 生成意图
+        return {
+            "mode": mode,
+            "queue": [],
+            "reason": "",
+        }
+
+    @staticmethod
+    def _merge_queue_items(state: dict[str, Any], new_items: list[dict[str, Any]]) -> None:
+        queue = state.setdefault("queue", [])
+        existing: dict[str, dict[str, Any]] = {}
+        for item in queue:
+            if not isinstance(item, dict):
+                continue
+            key = IntentStrategy._queue_item_key(item.get("tool_name", ""), item.get("args", {}))
+            existing[key] = item
+
+        for item in new_items:
+            if not isinstance(item, dict):
+                continue
+            tool_name = item.get("tool_name", "")
+            args = item.get("args", {})
+            key = IntentStrategy._queue_item_key(tool_name, args)
+            if key in existing:
+                old = existing[key]
+                if (not old.get("intent_name")) and item.get("intent_name"):
+                    old["intent_name"] = item["intent_name"]
+                continue
+            queue.append(item)
+            existing[key] = item
+
+    @staticmethod
+    def _find_queue_item_index(
+        state: dict[str, Any],
+        tool_name: str,
+        args: dict[str, Any],
+        allowed_statuses: tuple[str, ...] = ("pending", "running", "blocked_confirmation"),
+    ) -> int | None:
+        queue = state.get("queue") or []
+        target_key = IntentStrategy._queue_item_key(tool_name, args)
+        for idx, item in enumerate(queue):
+            if not isinstance(item, dict):
+                continue
+            if item.get("status") not in allowed_statuses:
+                continue
+            key = IntentStrategy._queue_item_key(item.get("tool_name", ""), item.get("args", {}))
+            if key == target_key:
+                return idx
+        return None
+
+    @staticmethod
+    def _next_pending_index(state: dict[str, Any]) -> int | None:
+        queue = state.get("queue") or []
+        for idx, item in enumerate(queue):
+            if isinstance(item, dict) and item.get("status") == "pending":
+                return idx
+        return None
+
+
+
+    @staticmethod
+    def _queue_has_unfinished(state: dict[str, Any]) -> bool:
+        queue = state.get("queue") or []
+        for item in queue:
+            if not isinstance(item, dict):
+                continue
+            if item.get("status") not in ("done", "cancelled", "failed"):
+                return True
+        return False
+
+    @staticmethod
+    def _pending_state_tag(state: dict[str, Any]) -> str:
+        return (
+            "\n\n<pending_state>\n"
+            + json.dumps(state, ensure_ascii=False)
+            + "\n</pending_state>"
+        )
+
+
 
     # ─────────────────────────────────────
     # Prompt 載入
@@ -188,27 +381,13 @@ class IntentStrategy(AgentStrategy):
             return None
         try:
             mime_type = getattr(file_obj, "mime_type", None) or (
-                "image/png" if kind == "image" else "audio/mpeg"
+                "image/png" if kind == "image" else "audio/wav"
             )
-            extension = (getattr(file_obj, "extension", None) or "").lstrip(".")
-            fmt = extension or ("png" if kind == "image" else "mp3")
 
             # 1. 優先使用 blob（直接二進位）
             blob = getattr(file_obj, "blob", None)
             if blob is not None:
-                b64 = base64.b64encode(blob).decode("utf-8")
-                if kind == "image":
-                    return ImagePromptMessageContent(
-                        base64_data=b64,
-                        format=fmt,
-                        mime_type=mime_type,
-                        detail=ImagePromptMessageContent.DETAIL.HIGH,
-                    )
-                return AudioPromptMessageContent(
-                    base64_data=b64,
-                    format=fmt,
-                    mime_type=mime_type,
-                )
+                return IntentStrategy._encode_bytes_to_content(blob, mime_type, kind)
 
             # 2. 有 URL：plugin daemon 在 Dify 內網，可下載後轉 base64
             try:
@@ -220,35 +399,45 @@ class IntentStrategy(AgentStrategy):
                 try:
                     # 若是相對路徑，補上 Dify 內部 API base
                     if url.startswith("/"):
-                        import os as _os
-                        api_base = (
-                            _os.environ.get("DIFY_INNER_API_URL", "").rstrip("/")
-                            or _os.environ.get("PLUGIN_DIFY_INNER_API_URL", "").rstrip("/")
-                            or "http://api:5001"
-                        )
+                        api_base = IntentStrategy._get_api_base()
                         url = f"{api_base}{url}"
                     resp = http_requests.get(url, timeout=15)
                     resp.raise_for_status()
                     raw = resp.content
-                    b64 = base64.b64encode(raw).decode("utf-8")
-                    if kind == "image":
-                        return ImagePromptMessageContent(
-                            base64_data=b64,
-                            format=fmt,
-                            mime_type=mime_type,
-                            detail=ImagePromptMessageContent.DETAIL.HIGH,
-                        )
-                    return AudioPromptMessageContent(
-                        base64_data=b64,
-                        format=fmt,
-                        mime_type=mime_type,
-                    )
+                    return IntentStrategy._encode_bytes_to_content(raw, mime_type, kind)
                 except Exception as e:
                     logger.warning("[file_to_content] URL download failed (%s): %s", url, e)
 
             return None
         except Exception as e:
             logger.error("[file_to_content] %s file failed: %s", kind, e)
+            return None
+
+    @staticmethod
+    def _encode_bytes_to_content(raw_bytes: bytes, mime_type: str, kind: str) -> Any:
+        """
+        將原始位元組轉為 base64 並包裝為對應的 PromptMessageContent。
+        kind: 'image' | 'audio'
+        """
+        if not HAS_MULTIMODAL or not raw_bytes:
+            return None
+        try:
+            fmt = mime_type.split("/")[-1] if "/" in mime_type else ("png" if kind == "image" else "mp3")
+            b64 = base64.b64encode(raw_bytes).decode("utf-8")
+            if kind == "image":
+                return ImagePromptMessageContent(
+                    base64_data=b64,
+                    format=fmt,
+                    mime_type=mime_type,
+                    detail=ImagePromptMessageContent.DETAIL.HIGH,
+                )
+            return AudioPromptMessageContent(
+                base64_data=b64,
+                format=fmt,
+                mime_type=mime_type,
+            )
+        except Exception as e:
+            logger.error("[encode_bytes_to_content] failed: %s", e)
             return None
 
     @staticmethod
@@ -414,6 +603,10 @@ class IntentStrategy(AgentStrategy):
         )
         history_messages = self._parse_history(model_data)
 
+        # ── 預先正規化檔案參數（避免重複調用）──
+        normalized_image_files = self._normalize_file_param(params.image_files)
+        normalized_audio_files = self._normalize_file_param(params.audio_files)
+
         # ── 偵測 mode 切換關鍵字 ──
         effective_mode = self._detect_mode_override(params.query, params.execution_mode)
         if effective_mode != params.execution_mode:
@@ -426,6 +619,7 @@ class IntentStrategy(AgentStrategy):
 
         # ── 偵測 history 中的 pending state ──
         pending_state = self._detect_pending_state(history_messages)
+        runtime_state = self._normalize_pending_state(pending_state, effective_mode, params.query)
         pending_was_seen = pending_state is not None
         if pending_was_seen:
             _emit_event("pending_state_detected", pending=pending_state)
@@ -434,7 +628,7 @@ class IntentStrategy(AgentStrategy):
         system_prompt = self._load_prompt()
 
         # ── 組裝 user message（含圖片 + 音訊）──
-        user_message = self._build_user_message(params)
+        user_message = self._build_user_message(params, normalized_image_files, normalized_audio_files)
 
         messages: list[Any] = [
             SystemPromptMessage(content=system_prompt),
@@ -452,6 +646,9 @@ class IntentStrategy(AgentStrategy):
             for schema in TOOL_SCHEMAS
         ]
 
+        # 記錄原始 user message 的索引，後續迭代可避免重複發送多模態內容
+        user_msg_index = len(messages) - 1
+
         log_main = self.create_log_message(
             label="[Strategy] 處理用戶查詢",
             data={
@@ -459,8 +656,9 @@ class IntentStrategy(AgentStrategy):
                 "history_count": len(history_messages),
                 "execution_mode": effective_mode,
                 "pending_was_seen": pending_was_seen,
-                "image_files": len(self._normalize_file_param(params.image_files)),
-                "audio_files": len(self._normalize_file_param(params.audio_files)),
+                "queue_size": len(runtime_state.get("queue", [])),
+                "image_files": len(normalized_image_files),
+                "audio_files": len(normalized_audio_files),
             },
             status=ToolInvokeMessage.LogMessage.LogStatus.START,
         )
@@ -483,6 +681,22 @@ class IntentStrategy(AgentStrategy):
             )
             yield log_iter
 
+            # 優化：在第二次及以後迭代，移除多模態內容以減少 Token 成本
+            # 第一次迭代保留完整的 user message；後續迭代只保留文本部分
+            messages_to_send = messages
+            if iteration > 0 and user_msg_index < len(messages):
+                msg = messages[user_msg_index]
+                if isinstance(msg, UserPromptMessage) and isinstance(msg.content, list):
+                    # 只保留文本部分，移除圖片和音訊
+                    text_only_parts = [
+                        p for p in msg.content
+                        if isinstance(p, TextPromptMessageContent)
+                    ]
+                    if text_only_parts:
+                        messages_to_send = messages[:user_msg_index] + [
+                            UserPromptMessage(content=text_only_parts)
+                        ] + messages[user_msg_index + 1:]
+
             try:
                 model_config_data = (
                     params.model
@@ -492,7 +706,7 @@ class IntentStrategy(AgentStrategy):
                 t0 = time.time()
                 chunks = self.session.model.llm.invoke(
                     model_config=LLMModelConfig(**model_config_data),
-                    prompt_messages=messages,
+                    prompt_messages=messages_to_send,
                     tools=prompt_tools if prompt_tools else None,
                     stream=True,
                 )
@@ -534,51 +748,84 @@ class IntentStrategy(AgentStrategy):
                 tool_calls=[name for _, name, _ in tool_calls],
             )
 
-            # ── 沒有 tool_calls：結束 ──
+            # 將 LLM 產生的工具呼叫寫入 queue
+            if tool_calls:
+                queue_items = [
+                    self._build_queue_item(
+                        intent_name=f"執行 {name}",
+                        tool_name=name,
+                        args=args,
+                        status="pending",
+                        clarification_question="",
+                        reason="from_llm_tool_call",
+                    )
+                    for _, name, args in tool_calls
+                ]
+                self._merge_queue_items(runtime_state, queue_items)
+
+            # 沒有 tool_calls 時，若 queue 還有 pending，改由 queue 接續執行
             if not tool_calls:
-                yield self.finish_log_message(log=log_iter, data={"reply_preview": response_text[:300]})
-                break
+                pending_idx = self._next_pending_index(runtime_state)
+                clarification_question = self._extract_clarification_question(response_text)
+                if clarification_question and pending_idx is not None:
+                    queue_item = runtime_state["queue"][pending_idx]
+                    queue_item["status"] = "blocked_clarification"
+                    queue_item["clarification_question"] = clarification_question
+                    queue_item["reason"] = "awaiting_user_clarification"
+                    runtime_state["reason"] = "awaiting_user_clarification"
+                    pending_text = response_text + self._pending_state_tag(runtime_state)
+                    yield self.finish_log_message(
+                        log=log_iter,
+                        data={"action": "blocked_clarification", "tool": queue_item.get("tool_name")},
+                    )
+                    yield self.finish_log_message(log=log_main, data={"status": "awaiting_clarification"})
+                    yield self.create_text_message(text=pending_text)
+                    _emit_event("request_end", status="awaiting_clarification")
+                    return
 
-            # ── 有 tool_calls：判斷是否需攔截確認 ──
-            risky_calls = [
-                (tc_id, name, args) for tc_id, name, args in tool_calls if name in RISKY_TOOLS
-            ]
+                if pending_idx is not None:
+                    queue_item = runtime_state["queue"][pending_idx]
+                    tool_calls = [
+                        (
+                            f"queue-{iteration + 1}-{pending_idx}",
+                            queue_item["tool_name"],
+                            queue_item.get("args", {}),
+                        )
+                    ]
+                    _emit_event(
+                        "queue_forced_tool_call",
+                        iteration=iteration + 1,
+                        tool=queue_item["tool_name"],
+                    )
+                else:
+                    yield self.finish_log_message(log=log_iter, data={"reply_preview": response_text[:300]})
+                    break
 
-            should_intercept = (
-                effective_mode == "step-by-step"
-                and bool(risky_calls)
-                and not pending_was_seen
-            )
+            calls_to_execute: list[tuple[str, str, dict]] = []
+            for tc_id, name, args in tool_calls:
+                idx = self._find_queue_item_index(runtime_state, name, args)
+                if idx is None:
+                    self._merge_queue_items(
+                        runtime_state,
+                        [
+                            self._build_queue_item(
+                                intent_name=f"執行 {name}",
+                                tool_name=name,
+                                args=args,
+                                status="pending",
+                                clarification_question="",
+                                reason="auto_merged_before_execute",
+                            )
+                        ],
+                    )
+                    idx = self._find_queue_item_index(runtime_state, name, args)
 
-            if should_intercept:
-                # 第一次：產生 <pending_state> 並回覆，不執行
-                pending_payload = {
-                    "tool_calls": [
-                        {"id": tc_id, "name": name, "args": args}
-                        for tc_id, name, args in tool_calls
-                    ],
-                    "created_at": time.time(),
-                }
-                pending_text = (
-                    response_text
-                    + f"\n\n<pending_state>\n{json.dumps(pending_payload, ensure_ascii=False)}\n</pending_state>"
-                )
-                _emit_event(
-                    "tool_intercepted",
-                    iteration=iteration + 1,
-                    risky_tools=[name for _, name, _ in risky_calls],
-                )
-                yield self.finish_log_message(
-                    log=log_iter,
-                    data={"action": "intercepted", "tools": [name for _, name, _ in risky_calls]},
-                )
-                yield self.finish_log_message(
-                    log=log_main,
-                    data={"status": "awaiting_confirmation"},
-                )
-                yield self.create_text_message(text=pending_text)
-                _emit_event("request_end", status="awaiting_confirmation")
-                return
+                queue_item = runtime_state["queue"][idx] if idx is not None else None
+                calls_to_execute.append((tc_id, name, args))
+
+            if not calls_to_execute:
+                yield self.finish_log_message(log=log_iter, data={"action": "noop"})
+                continue
 
             # ── 執行工具 ──
             messages.append(
@@ -590,21 +837,26 @@ class IntentStrategy(AgentStrategy):
                             "type": "function",
                             "function": {"name": name, "arguments": json.dumps(args)},
                         }
-                        for tc_id, name, args in tool_calls
+                        for tc_id, name, args in calls_to_execute
                     ],
                 )
             )
 
             yield self.finish_log_message(
                 log=log_iter,
-                data={"action": "execute", "tools": [name for _, name, _ in tool_calls]},
+                data={"action": "execute", "tools": [name for _, name, _ in calls_to_execute]},
             )
 
-            for tc_id, name, args in tool_calls:
+            for tc_id, name, args in calls_to_execute:
                 # Strategy 主動插入 [呼叫工具] 標籤給前端顯示
                 args_str = json.dumps(args, ensure_ascii=False)
                 tool_call_marker = f"\n[呼叫工具]\n工具：{name}\n參數：{args_str}\n"
                 yield self.create_text_message(text=tool_call_marker)
+
+                q_idx = self._find_queue_item_index(runtime_state, name, args)
+                if q_idx is not None:
+                    runtime_state["queue"][q_idx]["status"] = "running"
+                    runtime_state["queue"][q_idx]["reason"] = "executing"
 
                 log_tool = self.create_log_message(
                     label=f"[Tool] {name}",
@@ -628,9 +880,22 @@ class IntentStrategy(AgentStrategy):
                         "elapsed_ms": meta.get("elapsed_ms"),
                     },
                 )
+
+                if q_idx is not None:
+                    if meta.get("error"):
+                        runtime_state["queue"][q_idx]["status"] = "failed"
+                        runtime_state["queue"][q_idx]["reason"] = str(meta.get("error"))
+                    else:
+                        runtime_state["queue"][q_idx]["status"] = "done"
+                        runtime_state["queue"][q_idx]["reason"] = "executed_successfully"
+
                 messages.append(
                     ToolPromptMessage(content=result, tool_call_id=tc_id, name=name)
                 )
+
+        unfinished = self._queue_has_unfinished(runtime_state)
+        final_status = "completed" if not unfinished else "unfinished_queue"
+        runtime_state["reason"] = final_status
 
         yield self.finish_log_message(
             log=log_main,
@@ -638,13 +903,20 @@ class IntentStrategy(AgentStrategy):
                 "total_iterations": iteration + 1,
                 "response_chars": len(response_text),
                 "execution_mode": effective_mode,
-                "status": "completed",
+                "queue_size": len(runtime_state.get("queue", [])),
+                "status": final_status,
             },
         )
+
+        if unfinished:
+            final_text = (response_text or "[給使用者的回覆]\n目前仍有未完成任務，請繼續。") + self._pending_state_tag(runtime_state)
+            yield self.create_text_message(text=final_text)
+            _emit_event("request_end", status="unfinished_queue", iterations=iteration + 1)
+            return
+
         yield self.create_text_message(text=response_text)
         _emit_event("request_end", status="completed", iterations=iteration + 1)
 
-    # ─────────────────────────────────────
     # ─────────────────────────────────────
     # LLM 輸入訊息結構診斷
     # ─────────────────────────────────────
@@ -710,15 +982,9 @@ class IntentStrategy(AgentStrategy):
             resp.raise_for_status()
             raw = resp.content
             mime = resp.headers.get("Content-Type", "image/png").split(";")[0].strip()
-            fmt = mime.split("/")[-1] if "/" in mime else "png"
-            b64 = base64.b64encode(raw).decode("utf-8")
-            elapsed_ms = int((time.time() - t0) * 1000)
-            content = ImagePromptMessageContent(
-                base64_data=b64,
-                format=fmt,
-                mime_type=mime,
-                detail=ImagePromptMessageContent.DETAIL.HIGH,
-            )
+            content = IntentStrategy._encode_bytes_to_content(raw, mime, "image")
+            if content is None:
+                return None, 0, "encoding failed"
             return content, len(raw), None
         except Exception as e:
             logger.warning("[image_url] Failed to download %s: %s", url, e)
@@ -726,9 +992,10 @@ class IntentStrategy(AgentStrategy):
 
     # User message 組裝（含多模態檔案）
     # ─────────────────────────────────────
-    def _build_user_message(self, params: Params) -> UserPromptMessage:
-        image_files = self._normalize_file_param(params.image_files)
-        audio_files = self._normalize_file_param(params.audio_files)
+    def _build_user_message(self, params: Params, normalized_image_files: list[Any], normalized_audio_files: list[Any]) -> UserPromptMessage:
+        # 外部呼叫者必須負責檔案正規化，避免重複執行
+        image_files = normalized_image_files
+        audio_files = normalized_audio_files
 
         # 從 query 文字中解析嵌入的 [IMAGE_URL_N] 標籤（Backend 嵌入路徑）
         clean_query, embedded_urls = self._extract_image_urls(params.query)

@@ -31,6 +31,18 @@ else
   fi
 fi
 
+# 從根目錄 .env 讀取 DIFY_LOGIN_URL，推導 FILES_URL
+ROOT_ENV="$SCRIPT_DIR/.env"
+if [ -f "$ROOT_ENV" ]; then
+  DIFY_LOGIN_URL_VAL=$(grep -E "^DIFY_LOGIN_URL=" "$ROOT_ENV" | cut -d'=' -f2- | tr -d '"'"'"' ')
+  FILES_URL_VAL="${DIFY_LOGIN_URL_VAL%/console/api/login}"
+  if [ -n "$FILES_URL_VAL" ]; then
+    sed -i "s|^FILES_URL=.*|FILES_URL=${FILES_URL_VAL}|" .env
+    sed -i "s|^INTERNAL_FILES_URL=.*|INTERNAL_FILES_URL=http://api:5001|" .env
+    echo "✅ 已設定 FILES_URL=${FILES_URL_VAL}"
+  fi
+fi
+
 echo "🐳 使用 docker compose 啟動 dify 容器..."
 docker compose up -d
 

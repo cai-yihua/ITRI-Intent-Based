@@ -1,0 +1,255 @@
+<mxGraphModel dx="1638" dy="705" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#333333;strokeWidth=2;fontSize=14;fontStyle=1;fontColor=#333333;" value="&lt;b&gt;USER INPUT&lt;/b&gt;" vertex="1">
+      <mxGeometry height="55" width="300" x="459.97" y="40" as="geometry" />
+    </mxCell>
+    <mxCell id="100" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#4472C4;strokeWidth=3;verticalAlign=top;" value="" vertex="1">
+      <mxGeometry height="510" width="1000" x="109.97" y="115" as="geometry" />
+    </mxCell>
+    <mxCell id="101" parent="1" style="text;html=1;strokeColor=none;fillColor=#4472C4;align=left;verticalAlign=middle;spacingLeft=10;fontSize=13;fontColor=#ffffff;fontStyle=1;" value="&lt;b&gt;LAYER 1：客服人員&lt;/b&gt;" vertex="1">
+      <mxGeometry height="30" width="1000" x="109.97" y="115" as="geometry" />
+    </mxCell>
+    <mxCell id="110" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 等待 ] 等待輸入&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#5a3d6b&#39;&gt;USER INPUT 進入系統&lt;/span&gt;" vertex="1">
+      <mxGeometry height="50" width="960" x="129.97" y="160" as="geometry" />
+    </mxCell>
+    <mxCell id="120" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=6;align=left;spacingLeft=10;" value="&lt;b&gt;[ 處理 ] 意圖辨識中&lt;/b&gt;" vertex="1">
+      <mxGeometry height="205" width="960" x="129.97" y="225" as="geometry" />
+    </mxCell>
+    <mxCell id="121" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=1;fontSize=10;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;" value="&lt;b&gt;ARQ 框架&lt;/b&gt;&lt;br&gt;A = {查詢, 開啟, 關閉, 預測}&lt;br&gt;R = {UE, SINR MAP, 場域, IM, QoE}&lt;br&gt;Q = {狀態, 資訊}&lt;hr/&gt;&lt;b&gt;ARQ 決策樹（A 維度決定 Type + Chain）&lt;/b&gt;&lt;br&gt;A:查詢 [T2, ChainA] → R:UE→get_ue_status ／ R:SINR→get_sinr_map ／ R:場域→get_rapp_status&lt;br&gt;A:關閉 [T2, ChainB] → R:IM→disable_im ／ R:QoE→disable_qoe&lt;br&gt;A:開啟 [T3, ChainA] → R:IM→enable_im ／ R:QoE→enable_qoe  [Pre-Check]&lt;br&gt;A:預測 [T3, ChainA] → R:IM→simulate_im ／ R:QoE→simulate_qoe  [Pre-Check]" vertex="1">
+      <mxGeometry height="160" width="600" x="149.97" y="255" as="geometry" />
+    </mxCell>
+    <mxCell id="122" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=1;fontSize=10;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;" value="&lt;b&gt;非業務偵測（平行）&lt;/b&gt;&lt;br&gt;&lt;br&gt;• 超出服務範圍&lt;br&gt;• 問候 / 閒聊&lt;br&gt;&lt;br&gt;→ 直接到 L4 輸出" vertex="1">
+      <mxGeometry height="160" width="300" x="769.97" y="255" as="geometry" />
+    </mxCell>
+    <mxCell id="130" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 等待 ] 等待意圖釐清&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#5a3d6b&#39;&gt;送出 &amp;lt;intent_clarification&amp;gt;　｜　等待使用者回覆　↺ 回到「意圖辨識中」&lt;/span&gt;" vertex="1">
+      <mxGeometry height="50" width="960" x="129.97" y="460" as="geometry" />
+    </mxCell>
+    <mxCell id="140" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 等待 ] 等待參數補充&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#5a3d6b&#39;&gt;送出 &amp;lt;intent_clarification&amp;gt;　｜　等待使用者回覆　↺ 回到「等待參數補充」&lt;/span&gt;" vertex="1">
+      <mxGeometry height="50" width="960" x="129.97" y="545" as="geometry" />
+    </mxCell>
+    <mxCell id="200" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#ED7D31;strokeWidth=3;" value="" vertex="1">
+      <mxGeometry height="290" width="1000" x="109.97" y="650" as="geometry" />
+    </mxCell>
+    <mxCell id="201" parent="1" style="text;html=1;strokeColor=none;fillColor=#ED7D31;align=left;verticalAlign=middle;spacingLeft=10;fontSize=13;fontColor=#ffffff;fontStyle=1;" value="&lt;b&gt;LAYER 2：路由判斷&lt;/b&gt;" vertex="1">
+      <mxGeometry height="30" width="1000" x="109.97" y="650" as="geometry" />
+    </mxCell>
+    <mxCell id="210" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=6;align=left;spacingLeft=10;" value="&lt;b&gt;[ 處理 ] 路由分類中&lt;/b&gt;" vertex="1">
+      <mxGeometry height="150" width="960" x="129.97" y="695" as="geometry" />
+    </mxCell>
+    <mxCell id="211" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=1;fontSize=10;" value="&lt;b&gt;非業務意圖&lt;/b&gt;&lt;br&gt;超出範圍・問候&lt;br&gt;&lt;br&gt;↓ L4 直接輸出" vertex="1">
+      <mxGeometry height="105" width="215" x="149.97" y="725" as="geometry" />
+    </mxCell>
+    <mxCell id="212" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1;fontSize=10;" value="&lt;b&gt;Type 1 (FAQ)&lt;/b&gt;&lt;br&gt;O-RAN 知識問答&lt;br&gt;無需工具&lt;br&gt;↓ L4 直接輸出" vertex="1">
+      <mxGeometry height="105" width="215" x="379.97" y="725" as="geometry" />
+    </mxCell>
+    <mxCell id="213" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontSize=10;" value="&lt;b&gt;Type 2&lt;/b&gt;&lt;br&gt;A:查詢 / A:關閉&lt;br&gt;無 Pre-Check&lt;br&gt;↓ L3 調度鏈" vertex="1">
+      <mxGeometry height="105" width="215" x="609.97" y="725" as="geometry" />
+    </mxCell>
+    <mxCell id="214" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0e6ff;strokeColor=#9673a6;strokeWidth=1;fontSize=10;" value="&lt;b&gt;Type 3&lt;/b&gt;&lt;br&gt;A:開啟 / A:預測&lt;br&gt;需 Pre-Check [!]&lt;br&gt;↓ Pre-Check 中" vertex="1">
+      <mxGeometry height="105" width="230" x="839.97" y="725" as="geometry" />
+    </mxCell>
+    <mxCell id="220" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 決策 ] Pre-Check 中&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#7d6608&#39;&gt;呼叫 get_active_rapp_status 確認目前無優化運行　｜　Pass → L3 Type 3　｜　Fail → L4 直接輸出（條件不符說明）&lt;/span&gt;" vertex="1">
+      <mxGeometry height="55" width="960" x="129.97" y="865" as="geometry" />
+    </mxCell>
+    <mxCell id="300" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#548235;strokeWidth=3;" value="" vertex="1">
+      <mxGeometry height="590" width="1000" x="109.97" y="960" as="geometry" />
+    </mxCell>
+    <mxCell id="301" parent="1" style="text;html=1;strokeColor=none;fillColor=#548235;align=left;verticalAlign=middle;spacingLeft=10;fontSize=13;fontColor=#ffffff;fontStyle=1;" value="&lt;b&gt;LAYER 3：調度鏈&lt;/b&gt;" vertex="1">
+      <mxGeometry height="30" width="1000" x="109.97" y="960" as="geometry" />
+    </mxCell>
+    <mxCell id="310" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf3e0;strokeColor=#548235;strokeWidth=1;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=5;align=left;spacingLeft=8;" value="&lt;b&gt;Type 2&lt;/b&gt;" vertex="1">
+      <mxGeometry height="235" width="960" x="129.97" y="1000" as="geometry" />
+    </mxCell>
+    <mxCell id="311" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 處理 ] 網管規劃中&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px&#39;&gt;接收調度，制定一輪執行方案，依 SOP 決定工具呼叫順序&lt;/span&gt;" vertex="1">
+      <mxGeometry height="45" width="920" x="149.97" y="1035" as="geometry" />
+    </mxCell>
+    <mxCell id="312" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 處理 ] 工具執行中&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px&#39;&gt;Chain A (A:查詢)：執行員呼叫工具，回報原始結果 → 進入數據分析&lt;br&gt;Chain B (A:關閉)：執行員呼叫工具，回報結果，完成（無分析師）&lt;/span&gt;" vertex="1">
+      <mxGeometry height="60" width="920" x="149.97" y="1095" as="geometry" />
+    </mxCell>
+    <mxCell id="313" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 處理 ] 數據分析中&lt;/b&gt; &lt;span style=&#39;font-size:9px;color:#666&#39;&gt;（Chain A 專屬）&lt;/span&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px&#39;&gt;分析師接收結果，產出 &amp;lt;brief_summary&amp;gt; / &amp;lt;detailed_summary&amp;gt;，依 SOP-Rules 提下一步建議&lt;/span&gt;" vertex="1">
+      <mxGeometry height="45" width="920" x="149.97" y="1170" as="geometry" />
+    </mxCell>
+    <mxCell id="320" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eaf3e0;strokeColor=#548235;strokeWidth=1;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=5;align=left;spacingLeft=8;" value="&lt;b&gt;Type 3&lt;/b&gt;" vertex="1">
+      <mxGeometry height="280" width="960" x="129.97" y="1250" as="geometry" />
+    </mxCell>
+    <mxCell id="321" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 處理 ] 網管規劃中&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px&#39;&gt;接收調度，依 SOP 制定多步驟執行方案&lt;/span&gt;" vertex="1">
+      <mxGeometry height="45" width="920" x="149.97" y="1285" as="geometry" />
+    </mxCell>
+    <mxCell id="322" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 處理 ] 工具執行中&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px&#39;&gt;執行員執行當前步驟，回報原始結果給網管專家&lt;/span&gt;" vertex="1">
+      <mxGeometry height="45" width="920" x="149.97" y="1345" as="geometry" />
+    </mxCell>
+    <mxCell id="323" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 決策 ] 網管評估中&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#7d6608&#39;&gt;queue 全完成？　No ↺ → 回到「工具執行中」繼續指派執行員　｜　Yes → 數據分析中　｜　Unfinished ⚠ → 暫停（待下輪確認）&lt;/span&gt;" vertex="1">
+      <mxGeometry height="45" width="920" x="149.97" y="1405" as="geometry" />
+    </mxCell>
+    <mxCell id="324" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 處理 ] 數據分析中&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px&#39;&gt;分析師接收原始數據，產出 &amp;lt;brief_summary&amp;gt; / &amp;lt;detailed_summary&amp;gt;，依 SOP-Rules 提下一步建議&lt;/span&gt;" vertex="1">
+      <mxGeometry height="45" width="920" x="149.97" y="1465" as="geometry" />
+    </mxCell>
+    <mxCell id="400" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#C00000;strokeWidth=3;" value="" vertex="1">
+      <mxGeometry height="280" width="1000" x="109.97" y="1580" as="geometry" />
+    </mxCell>
+    <mxCell id="401" parent="1" style="text;html=1;strokeColor=none;fillColor=#C00000;align=left;verticalAlign=middle;spacingLeft=10;fontSize=13;fontColor=#ffffff;fontStyle=1;" value="&lt;b&gt;LAYER 4：輸出&lt;/b&gt;" vertex="1">
+      <mxGeometry height="30" width="1000" x="109.97" y="1580" as="geometry" />
+    </mxCell>
+    <mxCell id="410" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 輸出 ] 直接輸出&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#2d6a2d&#39;&gt;來源：非業務 / Type 1 / Pre-Check Fail　標籤：[給使用者的回覆]　&amp;lt;intent_clarification&amp;gt;（模糊時）&lt;/span&gt;" vertex="1">
+      <mxGeometry height="55" width="960" x="129.97" y="1625" as="geometry" />
+    </mxCell>
+    <mxCell id="420" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 輸出 ] 調度輸出&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#2d6a2d&#39;&gt;來源：Type 2 / Type 3 每次調度　標籤：&amp;lt;dispatch&amp;gt;　[思考]（Type 3 必加）　&amp;lt;task_confirmation&amp;gt;（高風險操作）　[給使用者的回覆]&lt;/span&gt;" vertex="1">
+      <mxGeometry height="55" width="960" x="129.97" y="1695" as="geometry" />
+    </mxCell>
+    <mxCell id="430" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=middle;" value="&lt;b&gt;[ 輸出 ] 分析輸出&lt;/b&gt;&lt;br&gt;&lt;span style=&#39;font-size:10px;color:#2d6a2d&#39;&gt;來源：數據分析師完成後　標籤：&amp;lt;brief_summary&amp;gt;　&amp;lt;detailed_summary&amp;gt;　&amp;lt;history&amp;gt;（歷史頁面）　[給使用者的回覆]&lt;/span&gt;" vertex="1">
+      <mxGeometry height="55" width="960" x="129.97" y="1765" as="geometry" />
+    </mxCell>
+    <mxCell id="440" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#9673a6;" value="↩ 輸出完成後回到 L1「等待輸入」" vertex="1">
+      <mxGeometry height="20" width="960" x="129.97" y="1830" as="geometry" />
+    </mxCell>
+    <mxCell id="500" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#f0c419;strokeWidth=2;fontSize=11;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;" value="&lt;b&gt;【角色職責參考】&lt;/b&gt;&lt;br&gt;&lt;table border=&quot;1&quot; cellpadding=&quot;5&quot; style=&quot;font-size:10px;border-collapse:collapse;width:100%&quot;&gt;&lt;tr style=&quot;background-color:#e0e0e0&quot;&gt;&lt;th width=&quot;120&quot;&gt;角色&lt;/th&gt;&lt;th&gt;職責&lt;/th&gt;&lt;th width=&quot;420&quot;&gt;關鍵限制&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;客服人員&lt;/td&gt;&lt;td&gt;意圖辨識、釐清、調度&lt;/td&gt;&lt;td&gt;不呼叫工具、不分析數據&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;網管專家&lt;/td&gt;&lt;td&gt;規劃執行方案、指示執行員、做最終決策&lt;/td&gt;&lt;td&gt;不直接呼叫工具&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;系統執行員&lt;/td&gt;&lt;td&gt;工具呼叫（Function Calling）、如實回報原始結果&lt;/td&gt;&lt;td&gt;不做分析、不做決策&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;數據分析師&lt;/td&gt;&lt;td&gt;分析數據、產出報告、依 SOP-Rules 提建議&lt;/td&gt;&lt;td&gt;分析 100% 基於實際數據，嚴禁推測&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+      <mxGeometry height="170" width="1000" x="109.97" y="1880" as="geometry" />
+    </mxCell>
+    <mxCell id="600" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;" value="&lt;b&gt;狀態類型圖例&lt;/b&gt;" vertex="1">
+      <mxGeometry height="25" width="200" x="109.97" y="2060" as="geometry" />
+    </mxCell>
+    <mxCell id="601" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=10;" value="[ 等待 ]　等待狀態（系統停留，等待使用者輸入）" vertex="1">
+      <mxGeometry height="35" width="485" x="109.97" y="2090" as="geometry" />
+    </mxCell>
+    <mxCell id="602" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=10;" value="[ 處理 ]　處理中狀態（系統主動處理）" vertex="1">
+      <mxGeometry height="35" width="485" x="624.97" y="2090" as="geometry" />
+    </mxCell>
+    <mxCell id="603" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;fontSize=10;" value="[ 決策 ]　決策 / 檢查狀態（有條件分支）" vertex="1">
+      <mxGeometry height="35" width="485" x="109.97" y="2135" as="geometry" />
+    </mxCell>
+    <mxCell id="604" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=10;" value="[ 輸出 ]　輸出狀態（產生回覆給使用者）" vertex="1">
+      <mxGeometry height="35" width="485" x="624.97" y="2135" as="geometry" />
+    </mxCell>
+    <mxCell id="e1" edge="1" parent="1" source="10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;" target="110" value="">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e2" edge="1" parent="1" source="110" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="120" value="">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e3" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#9673a6;fontColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="模糊">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="609.97" y="430" as="sourcePoint" />
+        <mxPoint x="609.97" y="460" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e4" edge="1" parent="1" source="130" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#9673a6;dashed=1;fontColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" target="120" value="使用者回覆">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1129.97" y="485" />
+          <mxPoint x="1129.97" y="328" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e5" edge="1" parent="1" source="130" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#9673a6;fontColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="140" value="意圖明確">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e6" edge="1" parent="1" source="140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#9673a6;dashed=1;fontColor=#9673a6;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.75;entryX=1;entryY=0.25;" target="140" value="使用者回覆">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1129.97" y="582" />
+          <mxPoint x="1129.97" y="558" />
+          <mxPoint x="1089.97" y="558" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e7" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" value="意圖明確 + 參數完整">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="609.97" y="595" as="sourcePoint" />
+        <mxPoint x="609.97" y="695" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e12" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#b85450;dashed=1;fontColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;exitX=0;exitY=0.5;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="410" value="非業務 / Type 1">
+      <mxGeometry relative="1" x="-0.2067" as="geometry">
+        <mxPoint as="offset" />
+        <Array as="points">
+          <mxPoint x="40" y="766" />
+          <mxPoint x="40" y="1653" />
+          <mxPoint x="130" y="1653" />
+        </Array>
+        <mxPoint x="109.97" y="766.25" as="sourcePoint" />
+        <mxPoint x="109.97" y="1618.75" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e11" edge="1" parent="1" source="213" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#548235;fontColor=#548235;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.612;entryY=0;" target="310" value="Type 2">
+      <mxGeometry relative="1" x="0.1765" y="2" as="geometry">
+        <mxPoint as="offset" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e8" edge="1" parent="1" source="214" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#d6b656;fontColor=#d6b656;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.86;entryY=0;" target="220" value="Type 3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e9" edge="1" parent="1" source="220" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#548235;fontColor=#548235;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.9;exitY=1;entryX=0.9;entryY=0;" target="320" value="Pass">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e10" edge="1" parent="1" source="220" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#b85450;dashed=1;fontColor=#b85450;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" target="410" value="Fail">
+      <mxGeometry relative="1" x="0.0506" as="geometry">
+        <mxPoint as="offset" />
+        <Array as="points">
+          <mxPoint x="1170" y="892" />
+          <mxPoint x="1170" y="1653" />
+          <mxPoint x="1090" y="1653" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e19" edge="1" parent="1" source="313" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#82b366;exitX=0;exitY=0.5;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="430" value="">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="90" y="1192" />
+          <mxPoint x="90" y="1793" />
+          <mxPoint x="130" y="1793" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e20" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#82b366;exitX=0.902;exitY=0.94;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="979.8100000000002" y="1510.3" as="sourcePoint" />
+        <mxPoint x="980" y="1765" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e21" edge="1" parent="1" source="312" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#82b366;dashed=1;fontColor=#82b366;fontSize=10;labelBackgroundColor=#ffffff;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" target="420" value="Chain B">
+      <mxGeometry relative="1" x="-0.6564" as="geometry">
+        <mxPoint as="offset" />
+        <Array as="points">
+          <mxPoint x="60" y="1125" />
+          <mxPoint x="60" y="1723" />
+          <mxPoint x="130" y="1723" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e22" edge="1" parent="1" source="321" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#82b366;dashed=1;fontColor=#2d6a2d;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="420" value="發送調度意圖 [思考]">
+      <mxGeometry relative="1" x="-0.5723" as="geometry">
+        <mxPoint as="offset" />
+        <Array as="points">
+          <mxPoint x="1150" y="1308" />
+          <mxPoint x="1150" y="1723" />
+          <mxPoint x="1090" y="1723" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="e13" edge="1" parent="1" source="311" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="312" value="">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e14" edge="1" parent="1" source="312" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#6c8ebf;fontColor=#6c8ebf;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="313" value="Chain A">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e15" edge="1" parent="1" source="321" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="322" value="">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e16" edge="1" parent="1" source="322" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#6c8ebf;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="323" value="">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e18" edge="1" parent="1" source="323" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#548235;fontColor=#548235;fontSize=10;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="324" value="Yes">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e17" edge="1" parent="1" source="323" style="edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=block;endFill=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;fontColor=#d6b656;fontSize=10;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" target="322" value="No : 繼續指派">
+      <mxGeometry relative="1" as="geometry">
+        <Array as="points">
+          <mxPoint x="1129.97" y="1428" />
+          <mxPoint x="1129.97" y="1368" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+  </root>
+</mxGraphModel>
