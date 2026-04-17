@@ -349,7 +349,7 @@ jsondata = {
 ""conversation_uid"": <uuid>
 }","1. 檢查 payload（必填欄位）
 2. 透過 conversation_uid 找對應的 conversation metadata
-3. 創建 audios/{conversation_uid}/{audio_uid}.webm 路徑
+3. 創建 audios/{conversation_uid}/{audio_uid}.wav 路徑
 4. 創建 audio metadata","{
 ""status_code"": <int>,
 ""message"": ""Audio 建立成功"",
@@ -655,6 +655,20 @@ jsondata = {
 }","1. 檢查 payload（必填欄位）
 2. 建構圖片路徑
 3. 檢查圖片路徑是否存在",二進制檔案,,,,,,,,,,,,,,,,
+上傳 Image,,,,conversation_mgt,ImageManager,upload_image,"headers = { ""Content-Type"": ""multipart/form-data"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 檢查檔案大小與格式
+3. conversation_mgt 呼叫 metadata_mgt/ImageManager 創建 image metadata (create_image_metadata)
+4. 在 images/{conversation_uid}/ 新增 {image_uid}.png","{
+""status_code"": <int>,
+""message"": ""Image uploaded successfully"",
+""data"": {
+""image_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
 audio manager,,,,,,,,,,,,,,,,,,,,,,,,,
 建立 Audio,,,,conversation_mgt,AudioManager,upload_audio,"headers = { ""Content-Type"": ""multipart/form-data"" }
 
@@ -662,7 +676,7 @@ jsondata = {
 ""conversation_uid"": <uuid>
 }","1. 檢查 payload（必填欄位）
 2. conversation_mgt 呼叫 metadata_mgt/AudioManager 創建 audio metadata (create_audio_metadata)
-3. 在 audios/{conversation_uid}/ 新增 {audio_uid}.webm","{
+3. 在 audios/{conversation_uid}/ 新增 {audio_uid}.wav","{
 ""status_code"": <int>,
 ""message"": ""Audio 建立成功"",
 ""data"": {
@@ -675,7 +689,7 @@ jsondata = {
 ""conversation_uid"": <uuid>
 }","1. 檢查 payload（必填欄位）
 2. conversation_mgt 呼叫 metadata_mgt/AudioManager 取得 audio(s) metatada (get_audio_metadata_list)
-3. 透過 audio_path(s) 取得 audios/{conversation_uid}/{audio_uid}.webm(s)","{
+3. 透過 audio_path(s) 取得 audios/{conversation_uid}/{audio_uid}.wav(s)","{
 ""status_code"": <int>,
 ""message"": ""Audio 查詢清單成功"",
 ""data"": [
@@ -693,8 +707,8 @@ jsondata = {
 ""audio_uid"": <uuid>
 }","1. 檢查 payload（必填欄位）
 2. conversation_mgt 呼叫 metadata_mgt/AudioManager 取得 audio metadata (get_audio_metadata)
-3. 透過 audio_path 取得 audios/{conversation_uid}/{audio_uid}.webm
-4. 透過 audio_path 刪除 audios/{conversation_uid}/{audio_uid}.webm
+3. 透過 audio_path 取得 audios/{conversation_uid}/{audio_uid}.wav
+4. 透過 audio_path 刪除 audios/{conversation_uid}/{audio_uid}.wav
 5. conversation_mgt 呼叫 metadata_mgt/AudioManager 刪除 audio metadata (delete_audio_metadata)","{
 ""status_code"": <int>,
 ""message"": ""Audio 刪除成功""

@@ -34,7 +34,7 @@ text,json,"{
   ""retry"": <string> // 只有user會有，llm沒有
 }",texts/{conversation_uid}/{text_uid}.json,
 image,png,,media/images/{conversation_uid}/{image_uid}.png,
-audio,webm,,media/audios/{conversation_uid}/{audio_uid}.webm,
+audio,webm,,media/audios/{conversation_uid}/{audio_uid}.wav,
 event,json,"{
   ""conversation_uid"": <uuid>,
   ""text_content"": <text_content>

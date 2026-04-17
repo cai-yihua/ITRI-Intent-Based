@@ -6,9 +6,10 @@ text_content:[
   type:<string>,
   content:<視type而定>
 },
-retry:<string>
 ...
-]}","{
+],
+retry:<string>
+}","{
 event_type:<string>,
 conversation_uid:<string>,
 text_content:[  
@@ -16,9 +17,11 @@ text_content:[
   type:<string>,
   content:<視type而定>
 },
-text_uid:<string>
 ...
-]}"
+],
+text_uid:<string>,
+role:<string>
+}"
 ,,
 ,,
 ,,
