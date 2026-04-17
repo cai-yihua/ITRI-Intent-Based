@@ -5,3 +5,9 @@ uv.lock
 /log
 __pycache__/
 *.pyc
+
+# DAC script outputs
+dac/.diff_data.json
+dac/diff_report.md
+dac/docs_map.yaml
+dac/summary.md
