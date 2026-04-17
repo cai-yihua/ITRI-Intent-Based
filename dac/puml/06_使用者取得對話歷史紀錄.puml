@@ -1,0 +1,40 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者取得對話歷史紀錄
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_TM as "TextManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_TM as "TextManager [Actor]"
+end box
+
+autonumber 1
+FE -> Conv_TM: /get_text_list
+activate Conv_TM
+Conv_TM -> Meta_TM: /get_conversation_metadata
+activate Meta_TM
+Meta_TM -> Meta_TM: 驗證 conversation metadata 是否存在
+Meta_TM -> Meta_TM: 找對應的 text(s) metadata
+Meta_TM --> Conv_TM: 回傳 text(s) metadata
+deactivate Meta_TM
+
+Conv_TM -> Conv_TM: 找 text(s) 對應 JSON
+Conv_TM --> FE: 回傳對話歷史紀錄
+
+@enduml

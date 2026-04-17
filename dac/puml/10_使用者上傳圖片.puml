@@ -1,0 +1,60 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者上傳圖片
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_IM as "ImageManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_IM as "ImageManager [Actor]"
+end box
+
+
+' STEP 0: FE 上傳圖片
+group step 0: FE 上傳圖片
+autonumber 0.0
+note over FE: multipart/form-data\n(conversation_uid + image 檔案 PNG，上限 10MB)
+FE -> Conv_IM: /upload_image
+activate Conv_IM
+Conv_IM -> Conv_IM: 驗證 conversation_uid 存在\n檢查檔案大小 ≤ 10MB\n檢查格式 = PNG
+end group
+
+
+' STEP 1: 建立 image metadata
+group step 1: 建立 image metadata
+autonumber 1.0
+Conv_IM -> Meta_IM: /create_image_metadata\n{conversation_uid}
+activate Meta_IM
+Meta_IM -> Meta_IM: 建立 image metadata\n產生 image_uid
+Meta_IM --> Conv_IM: 建立成功 {image_uid}
+deactivate Meta_IM
+end group
+
+
+' STEP 2: 儲存圖片檔案
+group step 2: 儲存圖片檔案
+autonumber 2.0
+Conv_IM -> Conv_IM: 儲存至 media/images/{conversation_uid}/{image_uid}.png
+end group
+
+
+autonumber 3
+Conv_IM --> FE: 上傳成功 {image_uid}
+deactivate Conv_IM
+
+@enduml

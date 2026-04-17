@@ -1,0 +1,129 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者刪除對話
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_CM as "ConversationManager [Actor]"
+	participant Conv_TM as "TextManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_CM as "ConversationManager [Actor]"
+	participant Meta_TM as "TextManager [Actor]"
+end box
+
+' ─ Topic Management ─
+box "Topic Mgt Module [Module]" #LightGreen
+	participant Topic_B  as "Broker [Actor]"
+end box
+
+' STEP 0: FE 刪除對話
+group step 0: FE 刪除對話
+autonumber 0.0
+FE -> Conv_CM: /delete_conversation
+activate Conv_CM
+end group
+
+
+' STEP 1: 取得 conversation metadata 和 text_uid
+group step 1: 取得 conversation metadata
+autonumber 1.0
+Conv_CM -> Meta_CM: /get_conversation_metadata
+activate Meta_CM
+Meta_CM -> Meta_CM: 找對應 conversation metadata
+Meta_CM --> Conv_CM: 取得成功
+deactivate Meta_CM
+Conv_CM -> Conv_CM: 取得 text_uid(s)
+end group
+
+
+' STEP 2: 刪除 texts（逐一刪除每筆 text_uid）
+group step 2: 刪除 texts
+autonumber 2.0
+loop 對每個 text_uid
+	Conv_CM -> Conv_TM: /delete_text
+	activate Conv_TM
+	Conv_TM -> Meta_TM: /get_text_metadata
+	activate Meta_TM
+	Meta_TM -> Meta_TM: 找對應 text metadata
+	Meta_TM --> Conv_TM: 取得成功
+	deactivate Meta_TM
+
+	Conv_TM -> Conv_TM: 刪除 texts/{conversation_uid}/{text_uid}.json
+
+	Conv_TM -> Meta_TM: /delete_text_metadata
+	activate Meta_TM
+	Meta_TM -> Meta_TM: 刪除 text metadata
+	Meta_TM --> Conv_TM: 刪除成功
+	deactivate Meta_TM
+	Conv_TM --> Conv_CM: 刪除成功
+	deactivate Conv_TM
+end
+end group
+
+
+' STEP 3: 清理圖片資料夾
+group step 3: 清理圖片資料夾
+autonumber 3.0
+Conv_CM -> Conv_CM: 刪除 media/images/{conversation_uid}/ 資料夾
+note right: 如資料夾不存在則跳過，不阻斷主流程
+end group
+
+
+' STEP 4: 清理音訊資料夾
+group step 4: 清理音訊資料夾
+autonumber 4.0
+Conv_CM -> Conv_CM: 刪除 media/audios/{conversation_uid}/ 資料夾
+note right: 如資料夾不存在則跳過，不阻斷主流程
+end group
+
+
+' STEP 5: 刪除 conversation metadata
+group step 5: 刪除 conversation metadata
+autonumber 5.0
+Conv_CM -> Meta_CM: /delete_conversation_metadata
+activate Meta_CM
+Meta_CM -> Meta_CM: 刪除 conversation metadata
+Meta_CM --> Conv_CM: 刪除成功
+deactivate Meta_CM
+end group
+
+
+' STEP 6: 刪除其餘檔案
+group step 6: 刪除其餘檔案
+autonumber 6.0
+Conv_CM -> Conv_CM: 刪除 texts/{conversation_uid} 資料夾
+Conv_CM -> Conv_CM: 刪除 conversations/{user_uid}/{conversation_uid}.csv
+end group
+
+
+' STEP 7: 刪除 topic
+group step 7: 刪除 topic
+autonumber 7.0
+Conv_CM -> Topic_B: /delete_topic
+activate Topic_B
+Topic_B -> Topic_B: 刪除 topic
+Topic_B --> Conv_CM: 刪除成功
+deactivate Topic_B
+end group
+
+
+autonumber 8
+Conv_CM --> FE: 刪除成功
+deactivate Conv_CM
+
+@enduml

@@ -1,0 +1,39 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者獲取所有對話清單
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_CM as "ConversationManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_CM as "ConversationManager [Actor]"
+end box
+
+autonumber 1
+FE -> Conv_CM: /get_conversation_list
+activate Conv_CM
+Conv_CM -> Meta_CM: /get_conversation_metadata_list
+activate Meta_CM
+Meta_CM -> Meta_CM: 驗證 user_uid 存在
+Meta_CM -> Meta_CM: 找對應 conversation(s) metadata
+Meta_CM --> Conv_CM: 回傳對話列表
+deactivate Meta_CM
+Conv_CM --> FE: 回傳對話列表
+deactivate Conv_CM
+
+@enduml

@@ -1,0 +1,78 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者取得音訊與清單
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_AM as "AudioManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_AM as "AudioManager [Actor]"
+end box
+
+
+== 取得單筆音訊檔案 ==
+' STEP 0: FE 請求音訊串流
+group step 0: FE 請求音訊串流
+autonumber 0.0
+note over FE: GET endpoint，可直接作為 <audio src> 使用
+FE -> Conv_AM: GET /get_audio/{audio_uid}
+activate Conv_AM
+end group
+
+
+' STEP 1: 查詢 audio metadata 取得路徑
+group step 1: 查詢 audio metadata
+autonumber 1.0
+Conv_AM -> Meta_AM: /get_audio_metadata\n{audio_uid}
+activate Meta_AM
+Meta_AM -> Meta_AM: 找對應 audio metadata\n取得 audio_path
+Meta_AM --> Conv_AM: 取得成功 {audio_path}
+deactivate Meta_AM
+end group
+
+
+autonumber 2
+Conv_AM --> FE: FileResponse (audio/webm 串流)
+deactivate Conv_AM
+
+
+== 取得對話音訊清單 ==
+' STEP 0: FE 請求清單
+group step 0: FE 請求清單
+autonumber 0.0
+FE -> Conv_AM: /get_audio_list\n{conversation_uid}
+activate Conv_AM
+end group
+
+
+' STEP 1: 查詢 audio metadata 清單
+group step 1: 查詢 audio metadata 清單
+autonumber 1.0
+Conv_AM -> Meta_AM: /get_audio_metadata_list\n{conversation_uid}
+activate Meta_AM
+Meta_AM -> Meta_AM: 查詢該對話所有 audio metadata
+Meta_AM --> Conv_AM: 取得成功 [{audio_uid, audio_path, ...}]
+deactivate Meta_AM
+end group
+
+
+autonumber 2
+Conv_AM --> FE: 清單回傳成功 [{audio_uid, ...}]
+deactivate Conv_AM
+
+@enduml

@@ -1,0 +1,60 @@
+﻿物件,檔案格式,物件格式,檔案路徑,
+conversation,csv,"text_uid
+<text_uid>
+<text_uid>
+...",conversations/{user_uid}/{conversation_uid}.csv,
+text,json,"{
+  ""role"": <string>,
+  ""text_content"": [
+    {
+      ""type"": ""message"",
+      ""content"": ""這是一段文字訊息""
+    },
+    {
+      ""type"": ""image"",
+      ""content"": <image uid>
+    },
+    {
+      ""type"": ""audio"",
+      ""content"": <audio uid>
+    },
+    {
+      ""type"": ""table"",
+      ""content"": {
+        ""columns"": [""Name"", ""Age"", ""City""],
+        ""data"": [
+          [""Alice"", ""30"", ""Taipei""],
+          [""Bob"", ""25"", ""Tokyo""],
+          [""Chris"", ""22"", ""New York""]
+        ]
+      }
+    }
+  ],
+  ""reward"": <string>,  // good, bad, """"
+  ""retry"": <string> // 只有user會有，llm沒有
+}",texts/{conversation_uid}/{text_uid}.json,
+image,png,,media/images/{conversation_uid}/{image_uid}.png,
+audio,webm,,media/audios/{conversation_uid}/{audio_uid}.webm,
+event,json,"{
+  ""conversation_uid"": <uuid>,
+  ""text_content"": <text_content>
+}",,
+text_content,json,"{
+  ""type"": ""message"",
+  ""content"": ""這是一段文字訊息""
+},
+{
+  ""type"": ""image"",
+  ""content"": <image uid>
+},
+{
+  ""type"": ""table"",
+  ""content"": {
+    ""columns"": [""Name"", ""Age"", ""City""],
+    ""data"": [
+      [""Alice"", ""30"", ""Taipei""],
+      [""Bob"", ""25"", ""Tokyo""],
+      [""Chris"", ""22"", ""New York""]
+    ]
+  }
+}",,

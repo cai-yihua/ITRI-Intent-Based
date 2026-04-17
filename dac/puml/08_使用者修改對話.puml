@@ -1,0 +1,80 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者修改對話
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_TM as "TextManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_TM as "TextManager [Actor]"
+end box
+
+
+' STEP 0: FE 修改 Text
+group step 0: FE 修改 Text
+autonumber 0.0
+FE -> Conv_TM: /update_text
+activate Conv_TM
+end group
+
+
+' STEP 1: 取得 text(s) 紀錄
+group step 1: 取得 text(s) 歷史紀錄
+autonumber 1.0
+Conv_TM -> Conv_TM: 取得 conversations/{user_uid}/{conversation_uid}.csv
+Conv_TM -> Meta_TM: /get_text_metadata_list
+activate Meta_TM
+Meta_TM -> Meta_TM: 驗證 conversation metadata 是否存在
+Meta_TM -> Meta_TM: 找對應的 text(s) metadata
+Meta_TM --> Conv_TM: 回傳 text(s) metadata
+deactivate Meta_TM
+Conv_TM -> Conv_TM: 找需要刪除的 text(s) metadata
+end group
+
+
+' STEP 2: 刪除相關 text(s) 紀錄
+group step 2: 刪除相關 text(s) 紀錄
+autonumber 2.0
+loop
+Conv_TM -> Conv_TM: 刪除 conversations/{user_uid}/{conversation_uid}.csv 對應的 text_uid
+Conv_TM -> Conv_TM: 刪除 texts/{conversation_uid}/{text_uid}.json
+Conv_TM -> Meta_TM: /delete_text_metadata
+activate Meta_TM
+Meta_TM -> Meta_TM: 刪除 text metadata
+Meta_TM --> Conv_TM: 刪除成功
+deactivate Meta_TM
+end loop
+end group
+
+
+' STEP 3: 更新 text metadata
+group step 3: 更新 text metadata
+autonumber 3.0
+Conv_TM -> Meta_TM: /update_text_metadata
+activate Meta_TM
+Meta_TM -> Meta_TM: 更新 text metadata
+Meta_TM --> Conv_TM: 更新成功
+deactivate Meta_TM
+end group
+
+
+autonumber 4
+Conv_TM --> FE: 更新成功
+deactivate Conv_TM
+
+@enduml

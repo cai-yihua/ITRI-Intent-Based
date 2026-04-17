@@ -1,0 +1,29 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者註冊
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_UM as "UserManager [Actor]"
+end box
+
+autonumber 1
+FE -> Meta_UM: /create_user_metadata
+activate Meta_UM
+Meta_UM -> Meta_UM: 創建使用者
+Meta_UM --> FE: 註冊成功
+deactivate Meta_UM
+
+@enduml

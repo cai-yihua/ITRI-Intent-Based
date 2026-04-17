@@ -1,0 +1,60 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者上傳音訊
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_AM as "AudioManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_AM as "AudioManager [Actor]"
+end box
+
+
+' STEP 0: FE 上傳音訊
+group step 0: FE 上傳音訊
+autonumber 0.0
+note over FE: multipart/form-data\n(conversation_uid + audio 檔案 webm，上限 5MB)
+FE -> Conv_AM: /upload_audio
+activate Conv_AM
+Conv_AM -> Conv_AM: 驗證 conversation_uid 存在\n檢查檔案大小 ≤ 5MB
+end group
+
+
+' STEP 1: 建立 audio metadata
+group step 1: 建立 audio metadata
+autonumber 1.0
+Conv_AM -> Meta_AM: /create_audio_metadata\n{conversation_uid}
+activate Meta_AM
+Meta_AM -> Meta_AM: 建立 audio metadata\n產生 audio_uid
+Meta_AM --> Conv_AM: 建立成功 {audio_uid}
+deactivate Meta_AM
+end group
+
+
+' STEP 2: 儲存音訊檔案
+group step 2: 儲存音訊檔案
+autonumber 2.0
+Conv_AM -> Conv_AM: 儲存至 media/audios/{conversation_uid}/{audio_uid}.webm
+end group
+
+
+autonumber 3
+Conv_AM --> FE: 上傳成功 {audio_uid}
+deactivate Conv_AM
+
+@enduml

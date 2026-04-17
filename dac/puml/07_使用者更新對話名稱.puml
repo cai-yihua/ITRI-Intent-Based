@@ -1,0 +1,29 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者更新對話名稱
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_CM as "ConversationManager [Actor]"
+end box
+
+autonumber 1
+FE -> Meta_CM: /update_conversation_name
+activate Meta_CM
+Meta_CM -> Meta_CM: 找對應的 conversation metadata 並更新
+Meta_CM --> FE: 更新成功
+deactivate Meta_CM
+
+@enduml

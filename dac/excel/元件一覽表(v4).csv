@@ -1,0 +1,823 @@
+﻿,階層 Layer,平台 Platform,系統 System,模組 Module,組件 Actor,元件 Function / API,輸入 Input,處理 Process,輸出 Output,,,,,,,,,,,,,,,,
+[Module] metadata management,,,,,,,,,,,,,,,,,,,,,,,,,
+conversation manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立對話 metadata,,,,metadata_mgt,"ConversationManager	",create_conversation_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"" : <uuid>,
+""conversation_name"" : <string>,
+""agent_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 驗證 user_uid 是否存在對應的 user metadata
+3. 驗證 agent_uid 是否存在對應的 agent metadata
+4. 創建 conversation metadata
+5. 創建 conversations/{user_uid}/{conversation_uid}.csv 路徑並存入 conversation metadata","{
+""status_code""  : <int>,
+""message"" : ""成功創建對話"",
+""data"": {
+""conversation_uid"": <uuid>,
+""user_uid"": <uuid>,
+""conversation_path"": <string>,
+""conversation_name"": <string>,
+""created_at"": <string>,
+""updated_at"": <string>
+}
+}",,,,,,,,,,,,,,,,
+取得單一對話 metadata,,,,metadata_mgt,ConversationManager,get_conversation_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata","{
+""status_code"": <int>,
+""message"": ""成功取得對話"",
+""data"": {
+""conversation_uid"": <uuid>,
+""conversation_path"": <string>,
+""conversation_name"": <string>,
+""created_at"": <string>,
+""updated_at"": <string>,
+""user_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
+取得使用者對話列表 metadata,,,,metadata_mgt,ConversationManager,get_conversation_metadata_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <uuid>,
+""agent_uid"": <uuid> // 可選
+}","1. 檢查 payload（必填欄位）
+2. 驗證 user_uid 是否存在對應的 user medatada
+3. 透過 user_uid、agent_uid 找對應的 conversation(s) metadata","{
+""status_code"": <intl>,
+""message"": ""成功取得使用者所有對話"",
+""data"": [
+{
+""conversation_uid"": <uuid>,
+""conversation_path"": <string>,
+""conversation_name"": <string>,
+""created_at"": <string>,
+""updated_at"": <string>,
+""user_uid"": <uuid>,
+""agent_uid"": <uuid>
+}, 
+{...}
+]
+}",,,,,,,,,,,,,,,,
+更新對話名稱,,,,metadata_mgt,ConversationManager,update_conversation_name,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""conversation_name"":<string>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata 並更新 conversation_name","{
+""status_code"": <int>,
+""message"": ""成功更新對話名稱""
+}",,,,,,,,,,,,,,,,
+刪除單一對話 metadata,,,,metadata_mgt,ConversationManager,delete_conversation_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata 並刪除 conversation metadata","{
+""status_code"": <int>,
+""message"": ""成功刪除對話""
+}",,,,,,,,,,,,,,,,
+驗證對話存在,,,,metadata_mgt,ConversationManager,verify_conversation_exist,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata","{
+""status_code"": <int>,
+""message"": ""Conversation exist""
+}",,,,,,,,,,,,,,,,
+text manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 text metadata,,,,metadata_mgt,TextManager,create_text_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+}","1. 檢查 payload（必填欄位）
+2. 驗證 conversation_uid 是否存在對應的 conversation metadata
+3. 透過 conversation metadata 找對應的 user metadata
+4. 創建 texts/{conversation_uid}/{text_uid}.json 路徑
+5. 創建 text metadata","{
+""status_code"": <int>,
+""message"": ""創建成功"",
+""data"": {
+""text_uid"": <uuid>,
+""user_uid"": <uuid>,
+""conversation_uid"": <uuid>,
+""text_path"": <string>,
+""created_at"": <string>
+}
+}",,,,,,,,,,,,,,,,
+取得單一 text metadata,,,,metadata_mgt,TextManager,get_text_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""text_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 text_uid 找對應的 text metadata","{
+""status_code"": <int>,
+""message"": ""Text 查詢成功"",
+""data"": {
+""text_uid"": <uuid>,
+""text_path"": <string>,
+""created_at"": <string>,
+}
+}",,,,,,,,,,,,,,,,
+取得對話下 text 列表 metadata,,,,metadata_mgt,TextManager,get_text_metadata_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 驗證 conversation_uid 是否存在對應的 conversation metadata
+2. 透過 conversation metadata 找對應的 text(s) metadata","{
+""status_code"": <int>,
+""message"": ""成功取得對話下的 Text 清單"",
+""data"": [
+{
+""text_uid"": <uuid>,
+""text_path"": <string>,
+""created_at"": <string>,
+""user_uid"": <uuid>
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+刪除單一 text metadata,,,,metadata_mgt,TextManager,delete_text_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""text_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 text_uid 找對應的 text metadata 並刪除 text metadata","{
+""status_code"": <int>,
+""message"": ""Text 刪除成功""
+}",,,,,,,,,,,,,,,,
+user manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立使用者 metadata,,,,metadata_mgt,UserManager,create_user,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uname"": <string>,
+""user_password"": <string>,
+""user_uemail"": <string>
+}","1. 檢查 payload（必填欄位）
+2. 創建 user metadata
+3. 創建 agent matadata","{
+""status_code"": <int>,
+""message"": ""使用者建立成功"",
+""data"": {
+""user_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
+使用者登入,,,,metadata_mgt,UserManager,login_user,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uname"": <string>,
+""user_password"": <string>
+}","1. 檢查 payload（必填欄位）
+2. 透過 user_uname 找對應的 user metadata
+3. 驗證 user_password
+4. 更新最後登入時間","{
+""status_code"": <int>,
+""message"": ""使用者登入成功"",
+""data"": {
+""user_uid"": <uuid>,
+""last_login_time"": <string>
+}
+}",,,,,,,,,,,,,,,,
+取得使用者 metadata,,,,metadata_mgt,UserManager,get_user,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uname"": <string>
+}","1. 檢查 payload（必填欄位）
+2. 透過 user_uname 找對應的 user metadata","{
+""status_code"": <int>,
+""message"": ""使用者查詢成功"",
+""data"": {
+""user_uid"": <uuid>,
+""user_uname"": <string>,
+""user_uemail"": <string>,
+""last_login_time"": <string>
+}
+}",,,,,,,,,,,,,,,,
+更新使用者,,,,metadata_mgt,UserManager,update_user,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <string>,
+""user_uname"": <string>, // 可選
+""user_uemail"": <string>, // 可選
+...
+}","1. 檢查 payload（必填欄位）
+2. 透過 user_uid 找對應的 user metadata 並更新","{
+""status_code"": <int>,
+""message"": ""使用者更新成功""
+}",,,,,,,,,,,,,,,,
+刪除使用者 metadata,,,,metadata_mgt,UserManager,delete_user,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. metadata_mgt 呼叫 metadata_mgt/ConversataionManager 找 conversation(s) metadata
+3. 透過 conversation_path(s) 刪除對應的 conversations/{user_uid}/{conversation_uid}.csv
+4. 透過 conversation_uid(s) 刪除對應的 texts/{conversation_uid} 資料夾
+5. 透過 user_uid 刪除對應的 user metadata","{
+""status_code"": <int>,
+""message"": ""使用者刪除成功""
+}",,,,,,,,,,,,,,,,
+workflow manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 workflow metadata,,,,metadata_mgt,WorkflowManager,create_workflow_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""workflow_step"": <strings>, // 可選
+""workflow_status"": <string> // 可選
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata
+3. 驗證 conversation metadata 是否存在對應的 workdlow metadata
+4. 創建 workflow metadata","{
+""status_code"": <int>,
+""message"": ""Workflow 建立成功"",
+""data"": {
+""workflow_id"":<int>
+}
+}",,,,,,,,,,,,,,,,
+取得 workflow metadata,,,,metadata_mgt,WorkflowManager,get_workflow_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata
+3. 透過 conversation metadata 找對應的 workflow metadata","{
+""status_code"": <int>,
+""message"": ""查詢 Workflow 成功"",
+""data"": {
+""workflow_id"":<int>,
+""workflow_step"":<string>,
+""workflow_status"":<string>,
+""start_time"":<string>,
+""end_time"":<string>
+}
+}",,,,,,,,,,,,,,,,
+更新 workflow metadata,,,,metadata_mgt,WorkflowManager,update_workflow_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""workflow_step"":<string>, // 可選
+""workflow_status"":<string>, // 可選
+""start_time"":<string>, // 可選
+""end_time"":<string> // 可選
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata
+3. 透過 conversation metadata 找對應的 workflow metadata 並更新","{
+""status_code"": <int>,
+""message"": ""Workflow 更新成功""
+}",,,,,,,,,,,,,,,,
+刪除 workflow metadata,,,,metadata_mgt,WorkflowManager,delete_workflow_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata
+3. 透過 conversation metadata 找對應的 workflow metadata 並刪除 workflow metadata ","{
+""status_code"": <int>,
+""message"": ""Workflow 已刪除 (conversation_uid={conversation_uid})""
+}",,,,,,,,,,,,,,,,
+image manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 image metadata,,,,metadata_mgt,ImageManager,create_image_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata
+3. 創建 images/{conversation_uid }/{image_uid}.png 路徑
+4. 創建 image metadata","{
+""status_code"": <int>,
+""message"": ""Image 建立成功"",
+""data"": {
+""image_uid"": <uuid>,
+""conversation_uid"": <uuid>,
+""image_path"": <string>,
+""created_at"": <string>
+}
+}",,,,,,,,,,,,,,,,
+取得單一 image metadata,,,,metadata_mgt,ImageManager,get_image_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""image_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 image_uid 找對應的 image metadata","{
+""status_code"": <int>,
+""message"": ""Image 查詢成功"",
+""data"": {
+""image_uid"": <uuid>,
+""conversation_uid"": <uuid>,
+""image_path"": <string>,
+""created_at"": <string>
+}
+}",,,,,,,,,,,,,,,,
+取得對話下 image 列表 metadata,,,,metadata_mgt,ImageManager,get_image_metadata_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 驗證 conversation_uid 是否存在對應的 conversation metadata
+3. 透過 conversation metadata 找對應的 image(s) metadata","{
+""status_code"": <int>,
+""message"": ""Image 查詢清單成功"",
+""data"": [
+{
+""image_uid"": <uuid>,
+""image_path"": <string>,
+""created_at"": <string>
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+刪除 image metadata,,,,metadata_mgt,ImageManager,delete_image_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""image_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 image_uid 找對應的 image metadata 並刪除 image metadata","{
+""status_code"": <int>,
+""message"": ""Image 刪除成功""
+}",,,,,,,,,,,,,,,,
+audio manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 audio metadata,,,,metadata_mgt,AudioManager,create_audio_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 conversation_uid 找對應的 conversation metadata
+3. 創建 audios/{conversation_uid}/{audio_uid}.webm 路徑
+4. 創建 audio metadata","{
+""status_code"": <int>,
+""message"": ""Audio 建立成功"",
+""data"": {
+""audio_uid"": <uuid>,
+""conversation_uid"": <uuid>,
+""audio_path"": <string>,
+""created_at"": <string>
+}
+}",,,,,,,,,,,,,,,,
+取得單一 audio metadata,,,,metadata_mgt,AudioManager,get_audio_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""audio_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 audio_uid 找對應的 audio metadata","{
+""status_code"": <int>,
+""message"": ""Audio 查詢成功"",
+""data"": {
+""audio_uid"": <uuid>,
+""conversation_uid"": <uuid>,
+""audio_path"": <string>,
+""created_at"": <string>
+}
+}",,,,,,,,,,,,,,,,
+取得對話下 audio 列表 metadata,,,,metadata_mgt,AudioManager,get_audio_metadata_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 驗證 conversation_uid 是否存在對應的 conversation metadata
+3. 透過 conversation metadata 找對應的 audio(s) metadata","{
+""status_code"": <int>,
+""message"": ""Audio 查詢清單成功"",
+""data"": [
+{
+""audio_uid"": <uuid>,
+""audio_path"": <string>,
+""created_at"": <string>
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+刪除 audio metadata,,,,metadata_mgt,AudioManager,delete_audio_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""audio_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 audio_uid 找對應的 audio metadata 並刪除 audio metadata","{
+""status_code"": <int>,
+""message"": ""Audio 刪除成功""
+}",,,,,,,,,,,,,,,,
+agent manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 agent metadata,,,,metadata_mgt,AgentManager,create_agent_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <uuid>,
+""agent_name"": <string>,
+""api_key"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 驗證 user_uid 是否存在對應的 user metadata
+3. 驗證 api_key 可用
+4. 創建 agent metadata","{
+""status_code""  : <int>,
+""message"" : ""成功創建 agent"",
+""data"": {
+""agent_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
+取得單一 agent 名稱,,,,metadata_mgt,AgentManager,get_agent_name,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""agent_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 驗證 user_uid 是否存在對應的 agent metadata","{
+""status_code"": <intl>,
+""message"": ""成功取得單一 agent 名稱"",
+""data"": [
+{
+""agent_uid"": <uuid>,
+""agent_name"": <string>
+}
+]
+}",,,,,,,,,,,,,,,,
+取得 agent 清單 metadata,,,,metadata_mgt,AgentManager,get_agent_list_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 驗證 user_uid 是否存在對應的 agent metadata","{
+""status_code"": <intl>,
+""message"": ""成功取得使用者的 agent"",
+""data"": [
+{
+""agent_uid"": <uuid>,
+""agent_name"": <string>
+}, 
+{...}
+]
+}",,,,,,,,,,,,,,,,
+更新 agent metadata,,,,metadata_mgt,AgentManager,update_agent_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""agent_uid"": <uuid>,
+""agent_name"": <string>, // 可選
+""api_key"": <uuid> // 可選
+}","1. 檢查 payload（必填欄位）
+2. 透過 agent_uid 找對應的 agent metadata 並更新
+3. 驗證 api_key 可用","{
+""status_code""  : <int>,
+""message"" : ""成功更新 agent"",
+}",,,,,,,,,,,,,,,,
+刪除 agent metadata,,,,metadata_mgt,AgentManager,delete_agent_metadata,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""agent_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 透過 agent_uid 找對應的 agent metadata
+3. metadata_mgt 呼叫 conversation_mgt/ConversationManager 取得 agent conversation list (get_agent_conversation_list)
+4. metadata_mgt 呼叫 conversation_mgt/ConversationManager 刪除 conversation(s) (delete_conversation)
+5. 透過 agent_uid 刪除對應的 agent metadata","{
+""status_code""  : <int>,
+""message"" : ""成功刪除 agent"",
+}",,,,,,,,,,,,,,,,
+[Module] conversation management,,,,,,,,,,,,,,,,,,,,,,,,,
+conversation manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立對話,,,,conversation_mgt,ConversationManager,create_conversation,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <uuid>,
+""agent_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ConversationManager 創建 conversation metadata (create_conversation_metadata)
+3. conversation_mgt 呼叫 metadata_mgt/WorkflowManager 創建 workflow metadata (create_workflow_metadata)
+4. 創建 conversations/{user_uid}/{conversation_uid}.csv
+5. conversation_mgt 呼叫 conversation_mgt/ConversationManager 註冊 topic (create_topic)","{
+""status_code"": <int>,
+""message"": ""Conversation created locally (CSV) and workflow metadata created"",
+""data"": {
+""conversation_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
+取得對話列表,,,,conversation_mgt,ConversationManager,get_conversation_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ConversationManager 取得 conversation(s) metadata (get_conversation_metadata_list)","{
+""status_code"": <int>,
+""message"": ""Get conversation list success"",
+""data"": [
+{
+""conversation_uid"": <uuid>,
+""conversation_name"": <string>,
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+取得單一 agent 對話列表,,,,conversation_mgt,ConversationManager,get_agent_conversation_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""user_uid"": <uuid>,
+""agent_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ConversationManager 取得 conversation(s) metadata (get_conversation_metadata_list)","{
+""status_code"": <int>,
+""message"": ""Get agent conversation list success"",
+""data"": [
+{
+""conversation_uid"": <uuid>,
+""conversation_name"": <string>,
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+刪除對話,,,,conversation_mgt,ConversationManager,delete_conversation,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ConversationManager 取得 conversation metadata (get_conversation_metadata)
+3. 透過 conversation_path 取得 text_uid(s)
+4. conversation_mgt 呼叫 conversation_mgt/TextManager 刪除 text(s) metadata (delete_text)(delete_conversation_metadata)
+5. conversation_mgt 呼叫 metadata_mgt/TextManager 刪除 text metadata (delete_text_metadata)
+6. 透過 conversation_uid 刪除 texts/{conversation_uid} 資料夾
+7. 透過 conversation_path 刪除 conversations/{user_uid}/{conversation_uid}.csv
+8. conversation_mgt 呼叫 topic_mgt/TopicManager 刪除 topic (delete_topic)","{
+""status_code"": <int>,
+""message"": ""Conversation deleted""
+}",,,,,,,,,,,,,,,,
+text manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 Text,,,,conversation_mgt,TextManager,create_text,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""text_content"": <array of {type, content}>,
+""role"": <string>,
+""retry"": <string>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/TextManager 創建 text metadata (create_text_metadata)
+3. 在 conversations/{user_uid}/{conversation_uid}.csv 新增 text_uid
+4. 創建 texts/{conversation_uid}/{text_uid}.json
+5. 寫入 texts/{conversation_uid}/{text_uid}.json","{
+""status_code"": <int>,
+""message"": ""Text created successfully"",
+""data"": {
+""text_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
+取得 Text,,,,conversation_mgt,TextManager,get_text_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ConversationManager 取得 conversation metatada (get_conversation_metadata)
+3. 透過 conversation_path 取得 text_uid(s)
+4. 透過 conversation_uid、text_uid(s) 取得 texts/{conversation_uid}/{text_uid}.json(s)","{
+""status_code"": <int>,
+""message"": ""Get text list success"",
+""data"": [
+{
+""role"": <string>,
+""text_uid"": <uuid>,
+""text_content"": <array>,
+""reward"": <string>
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+刪除 Text,,,,conversation_mgt,TextManager,delete_text,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""text_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/TextManager 取得 text metadata (get_text_metadata)
+3. 透過 text_path 取得 texts/{conversation_uid}/{text_uid}.json 和 image_uid(s)
+4. conversation_mgt 呼叫 conversation_mgt/ImageManager 刪除 image metadata (delete_image)
+4. 透過 text_path 刪除 texts/{conversation_uid}/{text_uid}.json","{
+""status_code"": <int>,
+""message"": ""Text deleted""
+}",,,,,,,,,,,,,,,,
+回饋 Text,,,,conversation_mgt,TextManager,reward_text,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""text_uid"": <uuid>,
+""reward"": <string>
+}","1. 檢查 payload（必填欄位）
+2. 透過 text_path 修改 texts/{conversation_uid}/{text_uid}.json","{
+""status_code"": <int>,
+""message"": ""Text reward success""
+}",,,,,,,,,,,,,,,,
+image manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 Image,,,,conversation_mgt,ImageManager,create_image,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""content"": <string>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ImageManager 創建 image metadata (create_image_metadata)
+3. base64 解碼 content 成 {image_uid}.png 
+4. 在 images/{conversation_uid}/ 新增 {image_uid}.png","{
+""status_code"": <int>,
+""message"": ""Image 建立成功"",
+""data"": {
+""image_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
+取得 Image 列表,,,,conversation_mgt,ImageManager,get_image_list,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ImageManager 取得 image(s) metatada (get_image_metadata_list)
+3. 透過 image_path(s) 取得 images/{conversation_uid}/{image_uid}.png(s)","{
+""status_code"": <int>,
+""message"": ""Image 查詢清單成功"",
+""data"": [
+{
+""image_uid"": <uuid>,
+""image_path"": <string>
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+刪除 Image,,,,conversation_mgt,ImageManager,delete_image,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""image_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/ImagetManager 取得 image metadata (get_image_metadata)
+3. 透過 image_path 取得 images/{conversation_uid}/{image_uid}.png
+4. 透過 image_path 刪除 images/{conversation_uid}/{image_uid}.png
+5. conversation_mgt 呼叫 metadata_mgt/ImagetManager 刪除 image metadata (delete_image_metadata)","{
+""status_code"": <int>,
+""message"": ""Image 刪除成功""
+}",,,,,,,,,,,,,,,,
+取得 Image,,,,conversation_mgt,ImageManager,get_image,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""image_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 建構圖片路徑
+3. 檢查圖片路徑是否存在",二進制檔案,,,,,,,,,,,,,,,,
+audio manager,,,,,,,,,,,,,,,,,,,,,,,,,
+建立 Audio,,,,conversation_mgt,AudioManager,upload_audio,"headers = { ""Content-Type"": ""multipart/form-data"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/AudioManager 創建 audio metadata (create_audio_metadata)
+3. 在 audios/{conversation_uid}/ 新增 {audio_uid}.webm","{
+""status_code"": <int>,
+""message"": ""Audio 建立成功"",
+""data"": {
+""image_uid"": <uuid>
+}
+}",,,,,,,,,,,,,,,,
+取得 Audio 列表,,,,conversation_mgt,AudioManager,get_audio_list,"headers = { ""Content-Type"": ""multipart/form-data"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/AudioManager 取得 audio(s) metatada (get_audio_metadata_list)
+3. 透過 audio_path(s) 取得 audios/{conversation_uid}/{audio_uid}.webm(s)","{
+""status_code"": <int>,
+""message"": ""Audio 查詢清單成功"",
+""data"": [
+{
+""image_uid"": <uuid>,
+""image_path"": <string>,
+""created_at"": <string>
+},
+{...}
+]
+}",,,,,,,,,,,,,,,,
+刪除 Audio,,,,conversation_mgt,AudioManager,delete_audio,"headers = { ""Content-Type"": ""multipart/form-data }
+
+jsondata = {
+""audio_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/AudioManager 取得 audio metadata (get_audio_metadata)
+3. 透過 audio_path 取得 audios/{conversation_uid}/{audio_uid}.webm
+4. 透過 audio_path 刪除 audios/{conversation_uid}/{audio_uid}.webm
+5. conversation_mgt 呼叫 metadata_mgt/AudioManager 刪除 audio metadata (delete_audio_metadata)","{
+""status_code"": <int>,
+""message"": ""Audio 刪除成功""
+}",,,,,,,,,,,,,,,,
+取得 Audio,,,,conversation_mgt,AudioManager,get_audio/<str:audio_uid>,"headers = { ""Content-Type"": ""multipart/form-data"" }","1. 檢查 payload（必填欄位）
+2. conversation_mgt 呼叫 metadata_mgt/AudioManager 取得 audio metadata (get_audio_metadata)
+3. 建構 audio 路徑
+4. 檢查 audio 路徑是否存在",二進制檔案,,,,,,,,,,,,,,,,
+[Module] workflow management,,,,,,,,,,,,,,,,,,,,,,,,,
+workflow manager,,,,,,,,,,,,,,,,,,,,,,,,,
+開始執行工作流,,,,workflow_mgt,WorkflowManager,execute_workflow,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""text_content"": <text content>
+}","1. 檢查 payload（必填欄位）
+2. 呼叫 dify 對應函式","{
+""status_code"": <int>,
+""message"": ""Success execute workflow""
+}",,,,,,,,,,,,,,,,
+更新工作流狀態,,,,workflow_mgt,WorkflowManager,update_workflow_status,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <string>,
+""workflow_status"":<string>,
+""workflow_step"":<string>  // 可選
+}","1. 檢查 payload（必填欄位）
+2. workflow_mgt 呼叫 metadata_mgt/WorkflowManager 更新 workflow 狀態 (update_workflow_metadata)","{
+""status_code"": <int>,
+""message"": ""Workflow 更新成功""
+}",,,,,,,,,,,,,,,,
+紀錄 dify 執行 log,,,,workflow_mgt,WorkflowManager,logger_human_in_the_loop,"jsondata = {
+""status_code"": <string>,
+""message"": <string>
+}","1. 檢查 payload（必填欄位）
+2. 寫入 log 訊息","{
+""status_code"": <int>,
+""message"": ""Logger Human in the loop processed successfully""
+}",,,,,,,,,,,,,,,,
+consumer,,,,,,,,,,,,,,,,,,,,,,,,,
+WebSocket 分發傳送訊息,,,,workflow_mgt,Consumer,send_message,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""event_type"": <string>,
+""conversation_uid"": <uuid>,
+""text_content"": <text content>
+}","1. 檢查 payload（必填欄位）
+2. workflow_mgt 呼叫 workflow_mgt/WorkflowManager 執行 workflow (execute_workflow)",,,,,,,,,,,,,,,,,
+producer,,,,,,,,,,,,,,,,,,,,,,,,,
+group 分發 topic,,,,workflow_mgt,Producer,dispatch_topic,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""text_content"": <text content>
+}","1. 檢查 payload（必填欄位）
+2. workflow_mgt 呼叫 topic_mgt/Broker 推播 (self.broker_message)","{
+""status_code"": <int>,
+""message"": ""Dispatch successfully""
+}",,,,,,,,,,,,,,,,
+[Module] topic management,,,,,,,,,,,,,,,,,,,,,,,,,
+topic manager,,,,,,,,,,,,,,,,,,,,,,,,,
+創建 topic,,,,topic_mgt,TopicManager,create_topic,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. topic_mgt 呼叫 topic_mgt/Broker 註冊 (create_topic)","{
+""status_code"": <int>,
+""message"": ""Topic created successfully""
+}",,,,,,,,,,,,,,,,
+刪除 topic,,,,topic_mgt,TopicManager,delete_topic,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. topic_mgt 呼叫 topic_mgt/Broker 刪除 topic (delete_topic)","{
+""status_code"": <int>,
+""message"": ""Topic deleted successfully""
+}",,,,,,,,,,,,,,,,
+broker,,,,,,,,,,,,,,,,,,,,,,,,,
+創建 topic,,,,topic_mgt,Broker,create_topic,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. topic_mgt 呼叫 metadata_mgt/ConversationManager 驗證 conversation metadata 存在 (verify_conversation_exist)
+3. 註冊 topic","{
+""status_code"": <int>,
+""message"": ""Initialized topic for conversation {conversation_uid}""
+}",,,,,,,,,,,,,,,,
+刪除 topic,,,,topic_mgt,Broker,delete_topic,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>
+}","1. 檢查 payload（必填欄位）
+2. 刪除 topic
+3. 內部呼叫 topic_mgt/Broker 強制斷線 (force_disconnect)","{
+""status_code"": <int>,
+""message"": ""Removed topic for conversation {conversation_uid}""
+}",,,,,,,,,,,,,,,,
+WebSocket 連線、訂閱、斷線,,,,topic_mgt,Broker,"connect
+disconnect",,"(A) connect
+1. 透過 URL 取得 conversation_uid
+2. 建立連線
+3. 驗證 topic 是否已註冊
+3. 訂閱 topic
+
+(B) disconnect
+1. 取消訂閱 topic",,,,,,,,,,,,,,,,,
+WebSocket 強制斷線,,,,topic_mgt,Broker,force_disconnect,,"1. 檢查 payload（必填欄位）
+2. 關閉連線
+3. 取消訂閱 topic",,,,,,,,,,,,,,,,,
+WebSocket 接收訊息,,,,topic_mgt,Broker,receive,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""text_content"": <text content>
+}","1. 檢查 payload（必填欄位）
+2. topic_mgt 呼叫 workflow_mgt/Consumer 分發接收訊息 (self.send_message)",,,,,,,,,,,,,,,,,
+WebSocket 推播,,,,topic_mgt,Broker,broker_message,"headers = { ""Content-Type"": ""application/json"" }
+
+jsondata = {
+""conversation_uid"": <uuid>,
+""text_content"": <text content>
+}","1. 檢查 payload（必填欄位）
+2. 推播訊息",,,,,,,,,,,,,,,,,

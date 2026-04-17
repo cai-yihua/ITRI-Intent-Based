@@ -1,0 +1,69 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者刪除音訊
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_AM as "AudioManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_AM as "AudioManager [Actor]"
+end box
+
+
+' STEP 0: FE 刪除音訊
+group step 0: FE 刪除音訊
+autonumber 0.0
+FE -> Conv_AM: /delete_audio\n{audio_uid}
+activate Conv_AM
+end group
+
+
+' STEP 1: 取得 audio metadata
+group step 1: 取得 audio metadata
+autonumber 1.0
+Conv_AM -> Meta_AM: /get_audio_metadata\n{audio_uid}
+activate Meta_AM
+Meta_AM -> Meta_AM: 找對應 audio metadata\n取得 audio_path
+Meta_AM --> Conv_AM: 取得成功 {audio_path}
+deactivate Meta_AM
+end group
+
+
+' STEP 2: 刪除音訊檔案
+group step 2: 刪除音訊檔案
+autonumber 2.0
+Conv_AM -> Conv_AM: 刪除 media/audios/{conversation_uid}/{audio_uid}.webm
+end group
+
+
+' STEP 3: 刪除 audio metadata
+group step 3: 刪除 audio metadata
+autonumber 3.0
+Conv_AM -> Meta_AM: /delete_audio_metadata\n{audio_uid}
+activate Meta_AM
+Meta_AM -> Meta_AM: 刪除 audio metadata
+Meta_AM --> Conv_AM: 刪除成功
+deactivate Meta_AM
+end group
+
+
+autonumber 4
+Conv_AM --> FE: 刪除成功
+deactivate Conv_AM
+
+@enduml

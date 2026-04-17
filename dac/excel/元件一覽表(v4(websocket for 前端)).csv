@@ -1,0 +1,26 @@
+﻿ws endpoint,frontend send(backend recieve),frontend recieve(backend send)
+ws://140.118.162.94:30000/ws/conversation/{conversation_uid},"{
+conversation_uid:<string>,
+text_content:[  
+{
+  type:<string>,
+  content:<視type而定>
+},
+retry:<string>
+...
+]}","{
+event_type:<string>,
+conversation_uid:<string>,
+text_content:[  
+{
+  type:<string>,
+  content:<視type而定>
+},
+text_uid:<string>
+...
+]}"
+,,
+,,
+,,
+,,
+,,

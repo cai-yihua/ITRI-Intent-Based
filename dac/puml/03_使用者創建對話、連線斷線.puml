@@ -1,0 +1,232 @@
+@startuml Role Definition
+!pragma teoz true
+
+' Title
+title 使用者創建對話、連線斷線
+
+' ------- 全域樣式 -------
+skinparam backgroundColor #fefefe
+skinparam roundcorner 15
+skinparam DefaultFontSize 14
+skinparam DefaultFontName Arial
+
+' ------- Actor -------
+actor FE    as "FrontEnd [Actor]"
+
+' ------- Module -------
+' ─ Conversation Management ─
+box "Conversation Mgt Module [Module]" #LightGreen
+	participant Conv_CM as "ConversationManager [Actor]"
+end box
+
+' ─ Metadata Management ─
+box "Metadata Mgt Module [Module]" #LightGreen
+	participant Meta_CM as "ConversationManager [Actor]"
+	participant Meta_WM as "WorkflowManager [Actor]"
+end box
+
+' ─ Topic Management ─
+box "Topic Mgt Module [Module]" #LightGreen
+	participant Topic_TM as "TopicManager [Actor]"
+	participant Topic_B  as "Broker [Actor]"
+end box
+
+' ─ Workflow Management ─
+box "Workflow Mgt Module [Module]" #LightGreen
+	participant Work_WM as "WorkflowManager [Actor]"
+	participant Work_P  as "Producer [Actor]"
+	participant Work_C  as "Consumer [Actor]"
+end box
+
+' ─ AI Engine ─
+box "AI Engine [Module]" #LightGreen
+	participant dify as "Dify [Server]"
+end box
+
+
+== FE 創建對話 ==
+' STEP 0: FE 建立對話
+group step 0: FE 建立對話
+autonumber 0.0
+FE -> Conv_CM: /create_conversation
+activate Conv_CM
+end group
+
+
+' STEP 1: 建立 conversation metadata
+group step 1: 建立 conversation metadata
+autonumber 1.0
+Conv_CM -> Meta_CM: /create_conversation_metadata
+activate Meta_CM
+Meta_CM -> Meta_CM: 驗證 user_uid 是否存在
+Meta_CM -> Meta_CM: 創建 conversation metadata
+Meta_CM -> Meta_CM: 創建 CSV 路徑 (conversations/{user_uid}/{conversation_uid}.csv)
+Meta_CM --> Conv_CM: 創建成功
+deactivate Meta_CM
+end group
+
+
+' STEP 2: 建立 workflow metadata
+group step 2: 建立 workflow metadata
+autonumber 2.0
+Conv_CM -> Meta_WM: /create_workflow_metadata
+activate Meta_WM
+Meta_WM -> Meta_WM: 找對應 conversation metadata
+Meta_WM -> Meta_WM: 驗證是否已有 workflow metadata
+Meta_WM -> Meta_WM: 創建 workflow metadata
+Meta_WM --> Conv_CM: 創建成功
+deactivate Meta_WM
+end group
+
+
+' STEP 3: 建立 conversation.csv
+group step 3: 建立 conversation.csv
+autonumber 3.0
+Conv_CM -> Conv_CM: 建立 conversations/{user_uid}/{conversation_uid}.csv
+end group
+
+
+' STEP 4: 註冊 topic
+group step 4: 註冊 topic
+autonumber 4.0
+Conv_CM -> Topic_TM: /create_topic
+activate Topic_TM
+Topic_TM -> Topic_B: /create_topic
+activate Topic_B
+
+Topic_B -> Meta_CM: /verify_conversation_exist
+activate Meta_CM
+Meta_CM --> Topic_B: 驗證成功
+deactivate Meta_CM
+
+Topic_B -> Topic_B: 註冊 topic
+Topic_B --> Topic_TM: 註冊 topic 成功
+deactivate Topic_B
+
+Topic_TM --> Conv_CM: 註冊 topic 成功
+deactivate Topic_TM
+end group
+
+
+autonumber 5
+Conv_CM --> FE: 創建對話成功
+deactivate Conv_CM
+
+
+== FE 建立連線、訂閱 topic ==
+' STEP 0: FE 建立連線
+group step 0: FE 建立連線
+autonumber 0.0
+FE -> Topic_B: ws://server/ws/conversation/{conversation_id}
+activate Topic_B
+Topic_B -> Topic_B: 建立連線
+end group
+
+
+' STEP 1: 訂閱 topic
+group step 1: 訂閱 topic
+autonumber 1.0
+Topic_B -> Topic_B: 驗證 topic 已註冊
+Topic_B -> Topic_B: 訂閱 topic
+end group
+
+autonumber 2
+Topic_B --> FE: 連線成功
+
+
+== FE 傳送多模態訊息 ==
+' STEP 0: FE 傳送訊息
+group step 0: FE 傳送訊息
+autonumber 0.0
+note over FE: text_content 可含 image_uid / audio_uid\n（需先透過 upload API 取得，見圖 10 / 12）
+FE -> Topic_B: self.receive\n[text_content: message + image_uid* + audio_uid*]\n(@decorator 儲存 text)
+Topic_B -> Work_C: 分發接收訊息 self.send_message
+activate Work_C
+end group
+
+
+' STEP 1: 解析訊息 & 更新工作流狀態
+group step 1: 解析訊息 & 更新工作流狀態
+autonumber 1.0
+Work_C -> Work_WM: /execute_workflow
+deactivate Work_C
+activate Work_WM
+Work_WM -> Work_WM: 解析 text_content\n拆分 message / image_items / audio_items
+Work_WM -> Meta_WM: /update_workflow_status (status=1)
+activate Meta_WM
+Meta_WM --> Work_WM: 更新成功
+deactivate Meta_WM
+end group
+
+
+' STEP 2: 上傳多媒體至 Dify
+group step 2: 上傳多媒體至 Dify
+autonumber 2.0
+opt 含圖片
+	Work_WM -> dify: POST /v1/files/upload (image files)
+	dify --> Work_WM: upload_file_id[]
+end
+opt 含音訊
+	Work_WM -> dify: POST /v1/files/upload (audio files)
+	dify --> Work_WM: upload_file_id[]
+end
+end group
+
+
+' STEP 3: 呼叫 Dify 執行工作流 (SSE Streaming)
+group step 3: 呼叫 Dify 執行工作流
+autonumber 3.0
+Work_WM -> dify: POST /v1/chat-messages\n(query + files[image/audio])
+Work_WM -> Meta_WM: /update_workflow_status (status=2)
+activate Meta_WM
+Meta_WM --> Work_WM: 更新成功
+deactivate Meta_WM
+end group
+
+
+' STEP 4: 處理串流回應 & 推播至前端
+group step 4: 處理串流回應 & 推播至前端
+autonumber 4.0
+note over Work_WM: SSE Streaming：持續解析 Dify 回傳事件
+Work_WM -> Work_WM: 解析 node_finished (Answer 節點)\n取得回應文字 + 圖片 URL（若有）
+opt 回應含圖片 URL
+	Work_WM -> dify: 下載回應圖片 (image_url)
+	dify --> Work_WM: 圖片資料
+end
+Work_WM -> Work_P: /dispatch_topic (event_type=2)\n[text_content: message + image_uid*]
+activate Work_P
+Work_P -> Topic_B: 推播 self.broker_message\n(@decorator 儲存 text；若含圖片 URL → ImageManager.create_image)
+deactivate Work_P
+Topic_B -> FE: 推播 Agent 回應
+end group
+
+
+' STEP 5: 工作流完成通知
+group step 5: 工作流完成通知
+autonumber 5.0
+Work_WM -> Work_WM: 解析 workflow_finished\n更新 dify_conversation_id
+Work_WM -> Meta_WM: /update_workflow_status (status=3)
+activate Meta_WM
+Meta_WM --> Work_WM: 更新成功
+deactivate Meta_WM
+Work_WM -> Work_P: /dispatch_topic (event_type=3, 完成通知)
+activate Work_P
+Work_P -> Topic_B: 推播 self.broker_message
+deactivate Work_P
+deactivate Work_WM
+Topic_B -> FE: 推播完成通知
+end group
+
+
+== FE 關閉連線 ==
+' STEP 0: FE 關閉連線
+group step 0: FE 關閉連線
+autonumber 0.0
+FE -> Topic_B: self.disconnect
+Topic_B -> Topic_B: 取消訂閱 topic
+Topic_B --> FE: closed
+deactivate Topic_B
+end group
+
+
+@enduml
